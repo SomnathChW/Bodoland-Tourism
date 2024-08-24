@@ -1,0 +1,59 @@
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import CardList from "./CardList";
+
+type SectionProps = {
+    subHeading: string;
+    data: any[]; // Adjust the type as needed
+    cardComponent: React.ElementType; // This will be the component name
+    viewAll?: () => void; // Make the viewAll prop optional
+};
+
+const Section = ({
+    subHeading,
+    data,
+    cardComponent,
+    viewAll,
+}: SectionProps) => {
+    return (
+        <>
+            <View style={styles.mainBodyPaddingView}>
+                <View style={styles.subHeaddingView}>
+                    <Text style={styles.subHeaddings}>{subHeading}</Text>
+                    {viewAll && ( // Conditionally render the "View More" text
+                        <Text style={styles.links} onPress={viewAll}>
+                            View More
+                        </Text>
+                    )}
+                </View>
+            </View>
+            <CardList itemList={data} CardComponent={cardComponent} />
+        </>
+    );
+};
+
+export default Section;
+
+const styles = StyleSheet.create({
+    mainBodyPaddingView: {
+        paddingHorizontal: 20,
+    },
+    subHeaddingView: {
+        justifyContent: "space-between",
+        flexDirection: "row",
+        marginBottom: 15,
+        marginTop: 20,
+    },
+    subHeaddings: {
+        fontFamily: "SfProMedium",
+        fontSize: 22,
+        fontWeight: "bold",
+        color: "#fff",
+    },
+    links: {
+        fontFamily: "SfProMedium",
+        fontSize: 16,
+        color: "#646f7e",
+        paddingTop: 5,
+    },
+});

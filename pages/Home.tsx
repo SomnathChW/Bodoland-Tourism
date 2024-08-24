@@ -1,36 +1,81 @@
-import { Text, View, StatusBar, StyleSheet, Dimensions } from "react-native";
+import { Text, View, StatusBar, StyleSheet, ScrollView } from "react-native";
 import React from "react";
-import LottieView from "lottie-react-native";
+
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+
+import Section from "@/components/Section";
+import CardVertical from "@/components/CardVertical";
+import CardHorizontal from "@/components/CardHorizontal";
 import Carousel from "@/components/Carousel";
-import CardList from "@/components/CardList";
+
 import { carouselData } from "@/data/slider_data";
 import { districtData } from "@/data/district_data";
+import DistrictCards from "@/components/DistrictsCards";
+import Animated from "react-native-reanimated";
 
 const Home = () => {
+    const router = useRouter();
     return (
         <View style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <LottieView
-                            source={require("../assets/lottie/man_travel.json")}
-                            autoPlay
-                            loop
-                            style={styles.lottie}
+                    <Animated.View
+                        sharedTransitionTag="hello"
+                        style={styles.logo}
+                    >
+                        <Ionicons
+                            name="menu"
+                            size={30}
+                            style={styles.buttons}
                         />
-                        <Text style={styles.headingText}>Bodoland Tourism</Text>
-                    </View>
-                    <Ionicons name="menu" size={30} />
+                        <View>
+                            <Text style={styles.headingText}>
+                                Bodoland Tourism
+                            </Text>
+                            <Text style={styles.mainSubHeaddingText}>
+                                For Peace and Development
+                            </Text>
+                        </View>
+                    </Animated.View>
+                    <Ionicons name="search" size={30} style={styles.buttons} />
                 </View>
-                <Carousel itemList={carouselData} />
-                <View style={styles.body}>
-                    <View style={styles.subHeaddingView}>
-                        <Text style={styles.subHeaddings}>Districts</Text>
-                        <Text style={styles.links}>View More</Text>
-                    </View>
-                </View>
-                <CardList itemList={districtData}></CardList>
+                <ScrollView
+                    style={styles.scrollPadding}
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                >
+                    <Carousel itemList={carouselData} />
+                    <Section
+                        subHeading="Attractions"
+                        data={districtData}
+                        cardComponent={CardVertical}
+                        viewAll={() => router.push("/attractions")}
+                    />
+                    <Section
+                        subHeading="Districts"
+                        data={districtData}
+                        cardComponent={DistrictCards}
+                        viewAll={() => router.push("/navigate")}
+                    />
+                    <Section
+                        subHeading="Festivals"
+                        data={districtData}
+                        cardComponent={CardVertical}
+                        viewAll={() => router.push("/festivals")}
+                    />
+                    <Section
+                        subHeading="Cuisines"
+                        data={districtData}
+                        cardComponent={CardHorizontal}
+                        viewAll={() => router.push("/cuisine")}
+                    />
+                    <Section
+                        subHeading="Souvenirs"
+                        data={districtData}
+                        cardComponent={CardVertical}
+                        viewAll={() => router.push("/souvenirs")}
+                    />
+                </ScrollView>
             </View>
         </View>
     );
@@ -41,11 +86,7 @@ export default Home;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    backgroundImage: {
-        ...StyleSheet.absoluteFillObject,
-        width: "100%",
-        height: "100%", // Adjust as needed
+        backgroundColor: "#0d1116",
     },
     content: {
         flex: 1,
@@ -63,16 +104,24 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        gap: 10,
+        gap: 20,
     },
-    lottie: {
-        width: Dimensions.get("window").width * 0.07,
-        height: Dimensions.get("window").height * 0.07,
+    buttons: {
+        color: "#fff",
+    },
+    scrollPadding: {
+        paddingTop: 10,
     },
     headingText: {
         fontSize: 24,
         fontWeight: "bold",
         fontFamily: "SfProMedium",
+        color: "#fff",
+    },
+    mainSubHeaddingText: {
+        fontSize: 14,
+        fontWeight: "bold",
+        color: "#646f7e",
     },
     body: {
         paddingHorizontal: 20,
@@ -82,16 +131,18 @@ const styles = StyleSheet.create({
     subHeaddingView: {
         justifyContent: "space-between",
         flexDirection: "row",
+        marginBottom: 10,
     },
     subHeaddings: {
         fontFamily: "SfProMedium",
         fontSize: 22,
         fontWeight: "bold",
+        color: "#fff",
     },
     links: {
         fontFamily: "SfProMedium",
         fontSize: 16,
-        color: "#673ab7",
+        color: "#646f7e",
         paddingTop: 5,
     },
 });

@@ -1,17 +1,16 @@
-import { StyleSheet, Text, View, FlatList, Dimensions } from "react-native";
+import { StyleSheet, View } from "react-native";
 import React from "react";
-import CardHorizontal from "./CardHorizontal";
 import Animated, {
     useAnimatedScrollHandler,
     useSharedValue,
 } from "react-native-reanimated";
-import { DistrictTypes } from "@/data/district_data";
 
-type Props = {
-    itemList: DistrictTypes[];
+type CardListProps = {
+    itemList: any[]; // Adjust the type as needed
+    CardComponent: React.ElementType; // The card component to be rendered
 };
 
-const CardList = ({ itemList }: Props) => {
+const CardList = ({ itemList, CardComponent }: CardListProps) => {
     const scrollX = useSharedValue(0);
 
     const onScrollHandler = useAnimatedScrollHandler({
@@ -25,7 +24,7 @@ const CardList = ({ itemList }: Props) => {
             <Animated.FlatList
                 data={itemList}
                 renderItem={({ item, index }) => (
-                    <CardHorizontal
+                    <CardComponent
                         item={item}
                         index={index}
                         scrollX={scrollX}

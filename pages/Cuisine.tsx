@@ -1,25 +1,27 @@
-import { Text, View } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 import React from "react";
 
-const Cuisines = () => {
+const Cuisine = () => {
     return (
-        <View
-            style={{
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-            }}
-        >
-            <Text
-                style={{
-                    fontFamily: "SfProMedium",
-                    fontSize: 40,
-                }}
-            >
-                Cuisines Tab
-            </Text>
+        <View style={styles.container}>
+            <Text style={styles.text}>Cuisine Tab</Text>
         </View>
     );
 };
 
-export default Cuisines;
+export default Cuisine;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#0d1116",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    text: {
+        color: "#fff",
+        fontSize: 24,
+        fontWeight: "bold",
+        fontFamily: "SfProMedium",
+    },
+});

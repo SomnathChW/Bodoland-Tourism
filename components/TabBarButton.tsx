@@ -40,11 +40,19 @@ const TabBarButton = ({
     });
 
     const animatedIconStyles = useAnimatedStyle(() => {
-        const scaleValue = interpolate(focused.value, [0, 1], [1, 1.5]);
+        const scaleValue = interpolate(focused.value, [0, 1], [1, 1.2]);
         const top = interpolate(focused.value, [0, 1], [0, 8]);
         return {
             transform: [{ scale: scaleValue }],
             top,
+        };
+    });
+
+    const animatedTabSelector = useAnimatedStyle(() => {
+        const width = interpolate(focused.value, [0, 1], [0, 24]);
+        return {
+            width,
+            height: 5,
         };
     });
 
@@ -54,10 +62,16 @@ const TabBarButton = ({
             onLongPress={onLongPress}
             style={styles.tabBarItem}
         >
+            <Animated.View
+                style={[
+                    animatedTabSelector,
+                    { backgroundColor: "white", borderRadius: 5 },
+                ]}
+            ></Animated.View>
             <Animated.View style={animatedIconStyles}>
                 {icons[routeName]({
                     size: 24,
-                    color: isFocused ? "#673ab7" : "#222",
+                    color: isFocused ? "#fff" : "#646f7e",
                 })}
             </Animated.View>
             <Animated.Text
@@ -65,7 +79,7 @@ const TabBarButton = ({
                     animatedTextStyles,
                     styles.tabBarText,
                     {
-                        color: isFocused ? "#673ab7" : "#222",
+                        color: isFocused ? "#fff" : "#646f7e",
                     },
                 ]}
             >

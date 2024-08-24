@@ -8,6 +8,7 @@ import Animated, {
     SharedValue,
     useAnimatedStyle,
 } from "react-native-reanimated";
+import { tapGestureHandlerProps } from "react-native-gesture-handler/lib/typescript/handlers/TapGestureHandler";
 
 type Props = {
     item: CarouselTypes;
@@ -60,6 +61,11 @@ const CarouselCard = ({ item, index, scrollX }: Props) => {
                 colors={["transparent", " rgba(0, 0, 0, 0.6)"]}
                 style={styles.textView}
             >
+                {item.tag && (
+                    <View style={styles.tagView}>
+                        <Text style={styles.tag}>{item.tag}</Text>
+                    </View>
+                )}
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.description}>{displayText}</Text>
             </LinearGradient>
@@ -74,7 +80,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         width,
-        gap: 20,
     },
     image: {
         width: width * 0.8,
@@ -88,6 +93,24 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10,
         justifyContent: "flex-end",
+    },
+    tagView: {
+        backgroundColor: "#ff6b81",
+        padding: 1,
+        borderRadius: 5,
+        alignItems: "center",
+        justifyContent: "center",
+        alignSelf: "flex-start",
+        marginBottom: 5,
+        marginHorizontal: 5,
+    },
+    tag: {
+        fontFamily: "SfProMedium",
+        fontSize: 12,
+        fontWeight: "bold",
+        color: "black",
+        marginVertical: 2,
+        marginHorizontal: 5,
     },
     title: {
         fontFamily: "SfProMedium",

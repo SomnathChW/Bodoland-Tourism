@@ -12,7 +12,7 @@ type Props = {
 
 const { width, height } = Dimensions.get("screen");
 
-const CardHorizontal = ({ item, index, scrollX }: Props) => {
+const CardVertical = ({ item, index, scrollX }: Props) => {
     return (
         <Animated.View style={[styles.card]}>
             <Image source={item.image} style={styles.image} />
@@ -29,13 +29,13 @@ const CardHorizontal = ({ item, index, scrollX }: Props) => {
     );
 };
 
-export default CardHorizontal;
+export default CardVertical;
 
 const styles = StyleSheet.create({
     card: {
         alignItems: "center",
         justifyContent: "center",
-        width: width * 0.6,
+        width: width * 0.4,
         marginHorizontal: 10,
         backgroundColor: "white",
         borderRadius: 10,
@@ -43,14 +43,14 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 10, height: 0 },
     },
     image: {
-        width: width * 0.6,
-        height: height * 0.15,
+        width: width * 0.4,
+        height: height * 0.23,
         borderRadius: 10,
     },
     textView: {
         position: "absolute",
-        width: width * 0.6,
-        height: height * 0.15,
+        width: width * 0.4,
+        height: height * 0.23,
         padding: 15,
         borderRadius: 10,
         justifyContent: "flex-end",

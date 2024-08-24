@@ -22,6 +22,16 @@ const Carousel = ({ itemList }: Props) => {
         },
     });
 
+    itemList.sort((a, b) => {
+        if (a.tag && !b.tag) {
+            return -1;
+        }
+        if (!a.tag && b.tag) {
+            return 1;
+        }
+        return 0;
+    });
+
     return (
         <View>
             <Animated.FlatList
