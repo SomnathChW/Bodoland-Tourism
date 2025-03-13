@@ -3,23 +3,17 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router/stack";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import "react-native-reanimated";
-import * as SystemUI from "expo-system-ui";
+import * as NavigationBar from "expo-navigation-bar";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-
-async function setBackgroundColor() {
-    await SystemUI.setBackgroundColorAsync("#0d1116");
-}
 
 export default function RootLayout() {
     const [loaded] = useFonts({
         SfProMedium: require("../assets/fonts/sf-pro-display-medium.otf"),
     });
+
     useEffect(() => {
         if (loaded) {
-            setBackgroundColor();
             SplashScreen.hideAsync();
         }
     }, [loaded]);
@@ -38,9 +32,23 @@ export default function RootLayout() {
                     }}
                 />
                 <Stack.Screen
-                    name="navigate"
+                    name="details"
                     options={{
-                        title: "Home",
+                        title: "Details",
+                        headerShown: false,
+                    }}
+                />
+                <Stack.Screen
+                    name="festivals"
+                    options={{
+                        title: "Festivals",
+                        headerShown: false,
+                    }}
+                />
+                <Stack.Screen
+                    name="cuisine"
+                    options={{
+                        title: "Cuisine",
                         headerShown: false,
                     }}
                 />

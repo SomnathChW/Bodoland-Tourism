@@ -1,8 +1,14 @@
 import React from "react";
-import { Stack, Tabs } from "expo-router";
+import { Tabs } from "expo-router";
 import { TabBar } from "@/components/TabBar";
+import { useIsFocused } from "@react-navigation/native";
+import * as NavigationBar from "expo-navigation-bar";
 
 const _layout = () => {
+    if (useIsFocused()) {
+        NavigationBar.setBackgroundColorAsync("#000000");
+    }
+
     return (
         <Tabs
             backBehavior="initialRoute"
@@ -17,9 +23,9 @@ const _layout = () => {
                 }}
             />
             <Tabs.Screen
-                name="festivals"
+                name="stays"
                 options={{
-                    title: "Festivals",
+                    title: "Stays",
                     headerShown: false,
                 }}
             />
@@ -31,9 +37,9 @@ const _layout = () => {
                 }}
             />
             <Tabs.Screen
-                name="cuisine"
+                name="vrview"
                 options={{
-                    title: "Cuisine",
+                    title: "Virtual Tour",
                     headerShown: false,
                 }}
             />

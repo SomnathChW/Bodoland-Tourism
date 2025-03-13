@@ -1,7 +1,10 @@
 import { Text, View, StyleSheet } from "react-native";
 import React from "react";
+import * as NavigationBar from "expo-navigation-bar";
 
 const Cuisine = () => {
+    NavigationBar.setBackgroundColorAsync("#0d1116");
+
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Cuisine Tab</Text>

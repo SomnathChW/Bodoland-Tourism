@@ -1,21 +1,23 @@
-import { Text, View, StatusBar, StyleSheet, ScrollView } from "react-native";
+import { Text, View, StyleSheet, StatusBar, ScrollView } from "react-native";
 import React from "react";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import Animated from "react-native-reanimated";
 
 import Section from "@/components/Section";
 import CardVertical from "@/components/CardVertical";
 import CardHorizontal from "@/components/CardHorizontal";
 import Carousel from "@/components/Carousel";
+import CardSquare from "@/components/CardSquare";
 
 import { carouselData } from "@/data/slider_data";
 import { districtData } from "@/data/district_data";
-import DistrictCards from "@/components/DistrictsCards";
-import Animated from "react-native-reanimated";
+import { categoryData } from "@/data/category_data";
 
 const Home = () => {
     const router = useRouter();
+
     return (
         <View style={styles.container}>
             <View style={styles.content}>
@@ -34,7 +36,7 @@ const Home = () => {
                                 Bodoland Tourism
                             </Text>
                             <Text style={styles.mainSubHeaddingText}>
-                                For Peace and Development
+                                Discover a land untouched
                             </Text>
                         </View>
                     </Animated.View>
@@ -46,33 +48,32 @@ const Home = () => {
                 >
                     <Carousel itemList={carouselData} />
                     <Section
+                        subHeading=""
+                        data={categoryData}
+                        cardComponent={CardSquare}
+                    ></Section>
+                    <Section
                         subHeading="Attractions"
                         data={districtData}
                         cardComponent={CardVertical}
                         viewAll={() => router.push("/attractions")}
                     />
                     <Section
-                        subHeading="Districts"
-                        data={districtData}
-                        cardComponent={DistrictCards}
-                        viewAll={() => router.push("/navigate")}
-                    />
-                    <Section
-                        subHeading="Festivals"
-                        data={districtData}
-                        cardComponent={CardVertical}
-                        viewAll={() => router.push("/festivals")}
-                    />
-                    <Section
-                        subHeading="Cuisines"
+                        subHeading="360 View"
                         data={districtData}
                         cardComponent={CardHorizontal}
-                        viewAll={() => router.push("/cuisine")}
+                        viewAll={() => router.push("/vrview")}
+                    />
+                    <Section
+                        subHeading="Districts"
+                        data={districtData}
+                        cardComponent={CardVertical}
+                        viewAll={() => router.push("/vrview")}
                     />
                     <Section
                         subHeading="Souvenirs"
                         data={districtData}
-                        cardComponent={CardVertical}
+                        cardComponent={CardHorizontal}
                         viewAll={() => router.push("/souvenirs")}
                     />
                 </ScrollView>
@@ -122,11 +123,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: "bold",
         color: "#646f7e",
-    },
-    body: {
-        paddingHorizontal: 20,
-        paddingTop: 15,
-        paddingBottom: 10,
     },
     subHeaddingView: {
         justifyContent: "space-between",

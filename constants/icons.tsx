@@ -1,16 +1,16 @@
 import {
     Ionicons,
-    FontAwesome,
     MaterialIcons,
     Entypo,
+    FontAwesome5,
 } from "@expo/vector-icons";
 
 export const icons = {
     attractions: (props: any) => (
         <MaterialIcons name="attractions" {...props} />
     ),
-    festivals: (props: any) => <MaterialIcons name="festival" {...props} />,
+    vrview: (props: any) => <FontAwesome5 name="vr-cardboard" {...props} />,
     index: (props: any) => <Ionicons name="home" {...props} />,
-    cuisine: (props: any) => <FontAwesome name="cutlery" {...props} />,
+    stays: (props: any) => <FontAwesome5 name="hotel" {...props} />,
     souvenirs: (props: any) => <Entypo name="shop" {...props} />,
 };

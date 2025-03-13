@@ -1,17 +1,15 @@
 import { Text, View, StyleSheet } from "react-native";
 import React from "react";
-import * as NavigationBar from "expo-navigation-bar";
 
-const Festivals = () => {
-    NavigationBar.setBackgroundColorAsync("#0d1116");
+const Stays = () => {
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Festivals Tab</Text>
+            <Text style={styles.text}>Stays Tab</Text>
         </View>
     );
 };
 
-export default Festivals;
+export default Stays;
 
 const styles = StyleSheet.create({
     container: {

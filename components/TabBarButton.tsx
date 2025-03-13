@@ -13,11 +13,10 @@ const TabBarButton = ({
     onLongPress,
     isFocused,
     routeName,
-    color,
     label,
 }: {
-    onPress: Function;
-    onLongPress: Function;
+    onPress: any;
+    onLongPress: any;
     isFocused: boolean;
     routeName: string;
     color: string;
@@ -28,7 +27,9 @@ const TabBarButton = ({
     useEffect(() => {
         focused.value = withSpring(
             typeof isFocused === "boolean" ? (isFocused ? 1 : 0) : isFocused,
-            { duration: 300 }
+            {
+                duration: 300,
+            }
         );
     }, [focused, isFocused]);
 
@@ -69,7 +70,7 @@ const TabBarButton = ({
                 ]}
             ></Animated.View>
             <Animated.View style={animatedIconStyles}>
-                {icons[routeName]({
+                {icons[routeName as keyof typeof icons]({
                     size: 24,
                     color: isFocused ? "#fff" : "#646f7e",
                 })}

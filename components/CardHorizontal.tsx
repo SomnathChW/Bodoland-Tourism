@@ -1,31 +1,45 @@
-import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
+import {
+    StyleSheet,
+    Text,
+    View,
+    Image,
+    Dimensions,
+    Pressable,
+} from "react-native";
 import React from "react";
-import Animated, { SharedValue } from "react-native-reanimated";
-import { DistrictTypes } from "@/data/district_data";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 
 type Props = {
-    item: DistrictTypes;
-    index: number;
-    scrollX: SharedValue<number>;
+    item: any;
 };
 
 const { width, height } = Dimensions.get("screen");
 
-const CardHorizontal = ({ item, index, scrollX }: Props) => {
+const CardHorizontal = ({ item }: Props) => {
+    const router = useRouter();
+
     return (
-        <Animated.View style={[styles.card]}>
-            <Image source={item.image} style={styles.image} />
-            <LinearGradient
-                colors={["transparent", " rgba(0, 0, 0, 0.6)"]}
-                style={styles.textView}
+        <View style={[styles.card]}>
+            <Pressable
+                onPress={() =>
+                    router.navigate({
+                        pathname: "/details",
+                        params: { identifier: item.identifier },
+                    })
+                }
             >
-                <View style={styles.textView}>
-                    <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.description}>View on Map</Text>
-                </View>
-            </LinearGradient>
-        </Animated.View>
+                <Image source={item.image} style={styles.image} />
+                <LinearGradient
+                    colors={["transparent", " rgba(0, 0, 0, 0.6)"]}
+                    style={styles.textView}
+                >
+                    <View style={styles.textView}>
+                        <Text style={styles.title}>{item.title}</Text>
+                    </View>
+                </LinearGradient>
+            </Pressable>
+        </View>
     );
 };
 

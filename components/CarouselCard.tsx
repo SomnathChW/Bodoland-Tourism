@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
 import React from "react";
-import { CarouselTypes } from "@/data/slider_data";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
     Extrapolation,
@@ -8,10 +7,9 @@ import Animated, {
     SharedValue,
     useAnimatedStyle,
 } from "react-native-reanimated";
-import { tapGestureHandlerProps } from "react-native-gesture-handler/lib/typescript/handlers/TapGestureHandler";
 
 type Props = {
-    item: CarouselTypes;
+    item: any;
     index: number;
     scrollX: SharedValue<number>;
 };

@@ -7,7 +7,6 @@ import {
     Pressable,
 } from "react-native";
 import React from "react";
-import Animated from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 
@@ -15,12 +14,13 @@ type Props = {
     item: any;
 };
 
-const { width, height } = Dimensions.get("screen");
+const { width, height } = Dimensions.get("window");
 
-const CardVertical = ({ item }: Props) => {
+const CardFullHorizontal = ({ item }: Props) => {
     const router = useRouter();
+
     return (
-        <Animated.View style={[styles.card]}>
+        <View style={[styles.card]}>
             <Pressable
                 onPress={() =>
                     router.navigate({
@@ -39,32 +39,32 @@ const CardVertical = ({ item }: Props) => {
                     </View>
                 </LinearGradient>
             </Pressable>
-        </Animated.View>
+        </View>
     );
 };
 
-export default CardVertical;
+export default CardFullHorizontal;
 
 const styles = StyleSheet.create({
     card: {
         alignItems: "center",
         justifyContent: "center",
-        width: width * 0.4,
-        marginHorizontal: 10,
+        width: width - 40,
+        marginVertical: 10,
         backgroundColor: "white",
         borderRadius: 10,
         elevation: 5,
         shadowOffset: { width: 10, height: 0 },
     },
     image: {
-        width: width * 0.4,
-        height: height * 0.23,
+        width: width - 40,
+        height: height * 0.2,
         borderRadius: 10,
     },
     textView: {
         position: "absolute",
-        width: width * 0.4,
-        height: height * 0.23,
+        width: width - 40,
+        height: height * 0.2,
         padding: 15,
         borderRadius: 10,
         justifyContent: "flex-end",

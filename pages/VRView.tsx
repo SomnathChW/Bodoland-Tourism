@@ -1,33 +1,35 @@
 import { StyleSheet, StatusBar, View, Text, ScrollView } from "react-native";
 import React from "react";
 
-import { souvenirData } from "@/data/souvenir_data";
+import { VRData } from "@/data/vr_data";
 
 import CardListPage from "@/components/CardListPage";
 import { Ionicons } from "@expo/vector-icons";
 
-const Souvenirs = () => {
+const VrView = () => {
     return (
         <View style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logo}>
                         <View>
-                            <Text style={styles.headingText}>Souvenirs</Text>
+                            <Text style={styles.headingText}>
+                                Virtual Tours
+                            </Text>
                             <Text style={styles.mainSubHeaddingText}>
-                                Take some memories with you
+                                Explore Bodoland from your couch
                             </Text>
                         </View>
                     </View>
                     <Ionicons name="search" size={30} style={styles.buttons} />
                 </View>
-                <CardListPage itemList={souvenirData} />
+                <CardListPage itemList={VRData} />
             </View>
         </View>
     );
 };
 
-export default Souvenirs;
+export default VrView;
 
 const styles = StyleSheet.create({
     container: {
