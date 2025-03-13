@@ -48,7 +48,6 @@ const Home = () => {
                 >
                     <Carousel itemList={carouselData} />
                     <Section
-                        subHeading=""
                         data={categoryData}
                         cardComponent={CardSquare}
                     ></Section>

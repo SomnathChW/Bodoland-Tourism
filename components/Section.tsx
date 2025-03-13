@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import CardList from "./CardList";
 
 type SectionProps = {
-    subHeading: string;
+    subHeading?: string;
     data: any[]; // Adjust the type as needed
     cardComponent: React.ElementType; // This will be the component name
     viewAll?: () => void; // Make the viewAll prop optional
@@ -19,8 +19,10 @@ const Section = ({
         <>
             <View style={styles.mainBodyPaddingView}>
                 <View style={styles.subHeaddingView}>
-                    <Text style={styles.subHeaddings}>{subHeading}</Text>
-                    {viewAll && ( // Conditionally render the "View More" text
+                    {subHeading && (
+                        <Text style={styles.subHeaddings}>{subHeading}</Text>
+                    )}
+                    {viewAll && (
                         <Text style={styles.links} onPress={viewAll}>
                             View More
                         </Text>
