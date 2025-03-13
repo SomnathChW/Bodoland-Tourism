@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, StatusBar } from "react-native";
 import React from "react";
 
 const Attractions = () => {
@@ -17,6 +17,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#0d1116",
         alignItems: "center",
         justifyContent: "center",
+        paddingTop: StatusBar.currentHeight,
     },
     text: {
         color: "#fff",

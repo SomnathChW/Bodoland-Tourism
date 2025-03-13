@@ -57,25 +57,6 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 }
 
 const styles = StyleSheet.create({
-    // tabBar: {
-    //     position: "absolute",
-    //     bottom: 30,
-    //     flexDirection: "row",
-    //     justifyContent: "space-between",
-    //     alignItems: "center",
-    //     backgroundColor: "#fff",
-    //     marginHorizontal: 65,
-    //     paddingVertical: 10,
-    //     borderRadius: 20,
-    //     shadowColor: "#000",
-    //     shadowOffset: {
-    //         width: 0,
-    //         height: 10,
-    //     },
-    //     shadowRadius: 10,
-    //     shadowOpacity: 1,
-    //     elevation: 3,
-    // },
     tabBar: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -83,7 +64,6 @@ const styles = StyleSheet.create({
         backgroundColor: "#000",
         paddingVertical: 10,
         elevation: 3,
-        borderTopColor: "#22262e",
-        borderTopWidth: 3,
+        boxShadow: "0px 0px 12px rgba(70, 70, 70, 0.25)",
     },
 });

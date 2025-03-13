@@ -1,65 +1,50 @@
-# AR VR Integrated Tourism App
+# Welcome to your Expo app 👋
 
-## Overview
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-This is the repository for the **Augmented & Virtual Reality** project. The app is designed to assist tourists in discovering and planning their trips and purchase souvenirs. This README provides instructions for developers on how to set up, run, and develop the project.
+## Get started
 
-### Please put all the code into their separate folders as mentioned below:
+1. Install dependencies
 
-## Project Structure
+   ```bash
+   npm install
+   ```
 
--   **`/app`**: Contains the main application page structure.
-    -   **`/components`**: Reusable UI components.
-    -   **`/pages`**: Different screens/views of the app.
-    -   **`/assets`**: Images, fonts, and other static resources.
-    -   **`/constants`**: Configuration files for the app.
-    -   **`/data`**: Dummy Data for components.
+2. Start the app
 
-## Setup Instructions
-
-### Prerequisites
-
--   Ensure you have [Node.js](https://nodejs.org/) installed.
--   [Expo CLI](https://docs.expo.dev/get-started/installation/) for running the React Native app.
-
-### Installation
-
-1. **Clone or Download the Repository:**
-
-    ```bash
-    git clone https://your-private-repo-url.git
-    ```
-
-2. **Navigate to the Cloned Folder:**
-
-    ```bash
-    cd btr_tourism
-    ```
-
-3. **Install the Dependencies:**
-
-    ```bash
-    npx expo install
-    ```
-
-4. **Start the Development Server:**
-
-    ```bash
+   ```bash
     npx expo start
-    ```
+   ```
 
-## Please Use Separate Branches for Development and Testing Your Additions. 
+In the output, you'll find options to open the app in a
 
--   **`main`**: The main branch for the project.
+- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
+- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-## Development Guidelines
-For any new feature or bug fix, create a new branch from `main` and merge it back into `main` when the feature is complete.
+You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-The branch will be merged into `main` after a successful review of your pull request.
+## Get a fresh project
 
+When you're ready, run:
 
-#### Copyright Somnath C. - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- * Written by Somnath Chowdhury (<somnathchowdhury.0100@gmail.com>), July, 2023.
- 
+```bash
+npm run reset-project
+```
+
+This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+
+## Learn more
+
+To learn more about developing your project with Expo, look at the following resources:
+
+- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+
+## Join the community
+
+Join our community of developers creating universal apps.
+
+- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
+- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

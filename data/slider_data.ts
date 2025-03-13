@@ -60,3 +60,10 @@ export const carouselData = [
         tag: "New",
     },
 ];
+
+export interface CarouselTypes {
+    title: string;
+    image: any;
+    description: string;
+    tag?: string;
+}

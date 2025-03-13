@@ -33,7 +33,7 @@ const Carousel = ({ itemList }: Props) => {
     });
 
     return (
-        <View>
+        <View style={styles.container}>
             <Animated.FlatList
                 data={itemList}
                 renderItem={({ item, index }) => (
@@ -54,5 +54,9 @@ const Carousel = ({ itemList }: Props) => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {},
+});
 
 export default Carousel;

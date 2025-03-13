@@ -3,7 +3,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router/stack";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import * as NavigationBar from "expo-navigation-bar";
+import { StatusBar } from "expo-status-bar";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,6 +24,7 @@ export default function RootLayout() {
 
     return (
         <ThemeProvider value={DarkTheme}>
+            <StatusBar style="dark" />
             <Stack>
                 <Stack.Screen
                     name="(tabs)"
