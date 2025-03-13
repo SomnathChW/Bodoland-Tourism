@@ -10,8 +10,8 @@ npm-debug.*
 *.orig.*
 web-build/
 .vscode/
-package-lock.json
-android/
+android
+ios
 
 # macOS
 .DS_Store

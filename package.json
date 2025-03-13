@@ -49,4 +49,53 @@
     "typescript": "~5.3.3"
   },
   "private": true
+    "name": "btrtourism",
+    "main": "expo-router/entry",
+    "version": "1.0.0",
+    "scripts": {
+        "start": "expo start",
+        "android": "expo run:android",
+        "ios": "expo run:ios",
+        "web": "expo start --web",
+        "test": "jest --watchAll",
+        "lint": "expo lint"
+    },
+    "jest": {
+        "preset": "jest-expo"
+    },
+    "dependencies": {
+        "@expo/vector-icons": "^14.0.2",
+        "@react-navigation/native": "^7.0.14",
+        "expo": "~52.0.28",
+        "expo-constants": "~17.0.5",
+        "expo-font": "~13.0.3",
+        "expo-linking": "~7.0.5",
+        "expo-router": "~4.0.17",
+        "expo-splash-screen": "~0.29.21",
+        "expo-status-bar": "~2.0.1",
+        "expo-system-ui": "~4.0.7",
+        "expo-web-browser": "~14.0.2",
+        "react": "18.3.1",
+        "react-dom": "18.3.1",
+        "react-native": "~0.77.0",
+        "react-native-gesture-handler": "~2.22.1",
+        "react-native-reanimated": "~3.16.7",
+        "react-native-safe-area-context": "5.1.0",
+        "react-native-screens": "~4.6.0",
+        "react-native-web": "~0.19.13",
+        "lottie-react-native": "7.2.2",
+        "expo-linear-gradient": "~13.0.2"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.25.2",
+        "@types/jest": "^29.5.12",
+        "@types/react": "~18.3.12",
+        "@types/react-test-renderer": "^18.3.0",
+        "jest": "^29.2.1",
+        "jest-expo": "~52.0.3",
+        "react-test-renderer": "18.3.1",
+        "typescript": "~5.3.3"
+    },
+    "private": true,
+    "packageManager": "pnpm@10.5.2+sha512.da9dc28cd3ff40d0592188235ab25d3202add8a207afbedc682220e4a0029ffbff4562102b9e6e46b4e3f9e8bd53e6d05de48544b0c57d4b0179e22c76d1199b"
 }
