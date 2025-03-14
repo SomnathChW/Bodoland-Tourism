@@ -45,18 +45,21 @@ const Home = () => {
                 <ScrollView
                     style={styles.scrollPadding}
                     contentContainerStyle={{ paddingBottom: 20 }}
+                    stickyHeaderIndices={[1]}
                 >
                     <Carousel itemList={carouselData} />
                     <Section
+                        style={{ backgroundColor: "#0d1116", marginTop: 10 }}
                         data={categoryData}
                         cardComponent={CardSquare}
                     ></Section>
                     <Section
-                        subHeading="Attractions"
+                        subHeading="Districts"
                         data={districtData}
                         cardComponent={CardVertical}
-                        viewAll={() => router.push("/attractions")}
+                        viewAll={() => router.push("/vrview")}
                     />
+
                     <Section
                         subHeading="360 View"
                         data={districtData}
@@ -64,16 +67,16 @@ const Home = () => {
                         viewAll={() => router.push("/vrview")}
                     />
                     <Section
-                        subHeading="Districts"
-                        data={districtData}
-                        cardComponent={CardVertical}
-                        viewAll={() => router.push("/vrview")}
-                    />
-                    <Section
                         subHeading="Souvenirs"
                         data={districtData}
                         cardComponent={CardHorizontal}
                         viewAll={() => router.push("/souvenirs")}
+                    />
+                    <Section
+                        subHeading="Attractions"
+                        data={districtData}
+                        cardComponent={CardVertical}
+                        viewAll={() => router.push("/attractions")}
                     />
                 </ScrollView>
             </View>
@@ -110,7 +113,7 @@ const styles = StyleSheet.create({
         color: "#fff",
     },
     scrollPadding: {
-        paddingTop: 10,
+        // paddingTop: 10,
     },
     headingText: {
         fontSize: 24,

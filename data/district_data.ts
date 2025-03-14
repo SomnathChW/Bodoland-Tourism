@@ -2,7 +2,7 @@ export const districtData = [
     {
         identifier: "district-kokrajhar",
         title: "Kokrajhar",
-        image: require("@/assets/images/app_images/manas-national-park.jpg"),
+        image: require("@/assets/images/app_images/kokrajhar.jpg"),
         location:
             "https://www.google.com/maps/search/?api=1&query=Kokrajhar+District",
     },

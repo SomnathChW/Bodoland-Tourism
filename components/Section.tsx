@@ -7,6 +7,7 @@ type SectionProps = {
     data: any[]; // Adjust the type as needed
     cardComponent: React.ElementType; // This will be the component name
     viewAll?: () => void; // Make the viewAll prop optional
+    style?: any;
 };
 
 const Section = ({
@@ -14,9 +15,10 @@ const Section = ({
     data,
     cardComponent,
     viewAll,
+    style,
 }: SectionProps) => {
     return (
-        <>
+        <View style={[{ marginBottom: 20 }, style]}>
             <View style={styles.mainBodyPaddingView}>
                 <View style={styles.subHeaddingView}>
                     {subHeading && (
@@ -30,7 +32,7 @@ const Section = ({
                 </View>
             </View>
             <CardList itemList={data} CardComponent={cardComponent} />
-        </>
+        </View>
     );
 };
 
@@ -44,7 +46,6 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         flexDirection: "row",
         marginBottom: 15,
-        marginTop: 20,
     },
     subHeaddings: {
         fontFamily: "SfProMedium",

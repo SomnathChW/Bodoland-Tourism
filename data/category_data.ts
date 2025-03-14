@@ -36,15 +36,15 @@ export const categoryData = [
     },
     {
         identifier: "district-udalguri",
-        title: "Conveniences",
-        image: require("@/assets/images/app_images/raimona-national-park.jpg"),
+        title: "Attractions",
+        image: require("@/assets/images/icons/attractions.png"),
         location:
             "https://www.google.com/maps/search/?api=1&query=Udalguri+District",
     },
     {
         identifier: "category-kokrajhar",
         title: "About",
-        image: require("@/assets/images/icons/attractions.png"),
+        image: require("@/assets/images/icons/about.png"),
         location:
             "https://www.google.com/maps/search/?api=1&query=Kokrajhar+District",
     },

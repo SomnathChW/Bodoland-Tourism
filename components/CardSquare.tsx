@@ -15,6 +15,8 @@ type Props = {
 };
 
 const { width, height } = Dimensions.get("screen");
+const DIMENSION_RATIO = 0.17;
+const NUM_CARDS_ON_SCREEN = 4.8;
 
 const DistrictCards = ({ item }: Props) => {
     const router = useRouter();
@@ -45,15 +47,17 @@ const styles = StyleSheet.create({
     card: {
         alignItems: "center",
         justifyContent: "center",
-        marginHorizontal: 10,
+        marginHorizontal:
+            (width * (1 - DIMENSION_RATIO * NUM_CARDS_ON_SCREEN)) /
+            (NUM_CARDS_ON_SCREEN * 2),
     },
     imageContainer: {
-        width: width * 0.2,
-        height: width * 0.2,
+        width: width * DIMENSION_RATIO,
+        height: width * DIMENSION_RATIO,
         overflow: "hidden",
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: 30,
+        borderRadius: 20,
         backgroundColor: "rgba(52, 52, 52, 0.35)",
     },
     image: {
@@ -62,7 +66,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontFamily: "SfProMedium",
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "bold",
         color: "#646f7e",
     },

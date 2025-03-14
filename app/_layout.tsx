@@ -4,6 +4,7 @@ import { Stack } from "expo-router/stack";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
+import * as SystemUI from "expo-system-ui";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,6 +22,8 @@ export default function RootLayout() {
     if (!loaded) {
         return null;
     }
+
+    SystemUI.setBackgroundColorAsync("black");
 
     return (
         <ThemeProvider value={DarkTheme}>

@@ -16,6 +16,9 @@ type Props = {
 };
 
 const { width, height } = Dimensions.get("screen");
+const WIDTH_RATIO = 0.27;
+const HEIGHT_RATIO = 0.17;
+const NUM_CARDS_ON_SCREEN = 3.2;
 
 const CardVertical = ({ item }: Props) => {
     const router = useRouter();
@@ -30,14 +33,11 @@ const CardVertical = ({ item }: Props) => {
                 }
             >
                 <Image source={item.image} style={styles.image} />
-                <LinearGradient
-                    colors={["transparent", " rgba(0, 0, 0, 0.6)"]}
-                    style={styles.textView}
-                >
+                <View style={styles.textView}>
                     <View style={styles.textView}>
                         <Text style={styles.title}>{item.title}</Text>
                     </View>
-                </LinearGradient>
+                </View>
             </Pressable>
         </Animated.View>
     );
@@ -49,29 +49,34 @@ const styles = StyleSheet.create({
     card: {
         alignItems: "center",
         justifyContent: "center",
-        width: width * 0.4,
-        marginHorizontal: 10,
+        width: width * WIDTH_RATIO,
+        marginHorizontal:
+            (width * (1 - WIDTH_RATIO * NUM_CARDS_ON_SCREEN)) /
+            (NUM_CARDS_ON_SCREEN * 2),
         backgroundColor: "white",
         borderRadius: 10,
         elevation: 5,
         shadowOffset: { width: 10, height: 0 },
     },
     image: {
-        width: width * 0.4,
-        height: height * 0.23,
+        width: width * WIDTH_RATIO,
+        height: height * HEIGHT_RATIO,
         borderRadius: 10,
     },
     textView: {
         position: "absolute",
-        width: width * 0.4,
-        height: height * 0.23,
-        padding: 15,
-        borderRadius: 10,
+        bottom: 0,
+        width: width * WIDTH_RATIO,
+        height: height * HEIGHT_RATIO * 0.2,
+        padding: 7,
         justifyContent: "flex-end",
+        borderBottomRightRadius: 10,
+        borderBottomLeftRadius: 10,
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
     title: {
         fontFamily: "SfProMedium",
-        fontSize: 16,
+        fontSize: 11,
         fontWeight: "bold",
         color: "white",
         marginHorizontal: 5,
