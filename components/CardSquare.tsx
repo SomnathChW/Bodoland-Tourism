@@ -47,13 +47,14 @@ const styles = StyleSheet.create({
     card: {
         alignItems: "center",
         justifyContent: "center",
-        marginHorizontal:
+        marginHorizontal: Math.ceil(
             (width * (1 - DIMENSION_RATIO * NUM_CARDS_ON_SCREEN)) /
-            (NUM_CARDS_ON_SCREEN * 2),
+                (NUM_CARDS_ON_SCREEN * 2)
+        ),
     },
     imageContainer: {
-        width: width * DIMENSION_RATIO,
-        height: width * DIMENSION_RATIO,
+        width: Math.ceil(width * DIMENSION_RATIO),
+        height: Math.ceil(width * DIMENSION_RATIO),
         overflow: "hidden",
         alignItems: "center",
         justifyContent: "center",

@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import React from "react";
 import Animated from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 
 type Props = {
@@ -16,9 +15,9 @@ type Props = {
 };
 
 const { width, height } = Dimensions.get("screen");
-const WIDTH_RATIO = 0.27;
-const HEIGHT_RATIO = 0.17;
-const NUM_CARDS_ON_SCREEN = 3.2;
+const WIDTH_RATIO = 0.32;
+const HEIGHT_RATIO = 0.2;
+const NUM_CARDS_ON_SCREEN = 2.8;
 
 const CardVertical = ({ item }: Props) => {
     const router = useRouter();
@@ -49,29 +48,30 @@ const styles = StyleSheet.create({
     card: {
         alignItems: "center",
         justifyContent: "center",
-        width: width * WIDTH_RATIO,
-        marginHorizontal:
+        width: Math.ceil(width * WIDTH_RATIO),
+        marginHorizontal: Math.ceil(
             (width * (1 - WIDTH_RATIO * NUM_CARDS_ON_SCREEN)) /
-            (NUM_CARDS_ON_SCREEN * 2),
+                (NUM_CARDS_ON_SCREEN * 2)
+        ),
         backgroundColor: "white",
         borderRadius: 10,
         elevation: 5,
         shadowOffset: { width: 10, height: 0 },
     },
     image: {
-        width: width * WIDTH_RATIO,
-        height: height * HEIGHT_RATIO,
+        width: Math.ceil(width * WIDTH_RATIO),
+        height: Math.ceil(height * HEIGHT_RATIO),
         borderRadius: 10,
     },
     textView: {
         position: "absolute",
         bottom: 0,
-        width: width * WIDTH_RATIO,
-        height: height * HEIGHT_RATIO * 0.2,
+        width: Math.ceil(width * WIDTH_RATIO),
+        height: Math.ceil(height * HEIGHT_RATIO * 0.2),
         padding: 7,
         justifyContent: "flex-end",
-        borderBottomRightRadius: 10,
-        borderBottomLeftRadius: 10,
+        borderBottomRightRadius: 9,
+        borderBottomLeftRadius: 9,
         backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
     title: {

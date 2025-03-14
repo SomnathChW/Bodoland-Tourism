@@ -1,4 +1,11 @@
-import { Text, View, StyleSheet, StatusBar, ScrollView } from "react-native";
+import {
+    Text,
+    View,
+    StyleSheet,
+    StatusBar,
+    ScrollView,
+    Dimensions,
+} from "react-native";
 import React from "react";
 
 import { Ionicons } from "@expo/vector-icons";

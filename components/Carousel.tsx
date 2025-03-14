@@ -77,7 +77,7 @@ const Carousel = ({ itemList }: Props) => {
 };
 
 const styles = StyleSheet.create({
-    container: {},
+    container: { marginTop: 10 },
 });
 
 export default Carousel;
