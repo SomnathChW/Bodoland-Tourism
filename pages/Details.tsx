@@ -2,8 +2,31 @@ import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
 import React from "react";
 import { useLocalSearchParams } from "expo-router";
 import * as NavigationBar from "expo-navigation-bar";
+import Animated from "react-native-reanimated";
 
 const { height } = Dimensions.get("screen");
+
+const Hotels = () => {
+    NavigationBar.setBackgroundColorAsync("#0d1116");
+
+    return (
+        <View style={styles.full}>
+            <Image
+                source={require("@/assets/images/app_images/manas-national-park.jpg")}
+                resizeMode="contain"
+                style={styles.displayImage}
+            />
+            <Text style={styles.text}>Hotels</Text>
+            <Text style={styles.subText}>About</Text>
+            <View style={{ height: 2, backgroundColor: "#646f7e" }}></View>
+            <Text style={styles.details}>
+                Lorem Ipsum Dolor Set Ametadfgrtdhyjukiukyjtrgewerty
+                trheyuiryeewr rytiuuyretewrq rweyeuukyjtrhregtet eryutetrs
+                ertyuy
+            </Text>
+        </View>
+    );
+};
 
 const Details = () => {
     const identifier = useLocalSearchParams().identifier;

@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
     subHeaddingView: {
         justifyContent: "space-between",
         flexDirection: "row",
+        alignItems: "center",
         marginBottom: 15,
     },
     subHeaddings: {
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
     },
     links: {
         fontFamily: "SfProMedium",
-        fontSize: 16,
+        fontSize: 14,
         color: "#646f7e",
         paddingTop: 5,
     },

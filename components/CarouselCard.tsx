@@ -28,7 +28,7 @@ const CarouselCard = ({ item, index, scrollX }: Props) => {
                             index * width,
                             (index + 1) * width,
                         ],
-                        [-width * 0.2, 0, width * 0.2],
+                        [-width * 0.15, 0, width * 0.15],
                         Extrapolation.CLAMP
                     ),
                 },
@@ -40,7 +40,7 @@ const CarouselCard = ({ item, index, scrollX }: Props) => {
                             index * width,
                             (index + 1) * width,
                         ],
-                        [0.9, 1, 0.9],
+                        [0.95, 1.1, 0.95],
                         Extrapolation.CLAMP
                     ),
                 },
@@ -78,16 +78,17 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         width,
+        marginVertical: 10,
     },
     image: {
         width: width * 0.8,
-        height: height * 0.2,
+        height: height * 0.22,
         borderRadius: 10,
     },
     textView: {
         position: "absolute",
         width: width * 0.8,
-        height: height * 0.2,
+        height: height * 0.22,
         padding: 15,
         borderRadius: 10,
         justifyContent: "flex-end",

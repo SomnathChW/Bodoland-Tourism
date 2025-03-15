@@ -7,11 +7,14 @@ import {
     Pressable,
 } from "react-native";
 import React from "react";
-import Animated from "react-native-reanimated";
 import { useRouter } from "expo-router";
 
 type Props = {
-    item: any;
+    item: {
+        identifier: string;
+        image: any;
+        title?: string;
+    };
 };
 
 const { width, height } = Dimensions.get("screen");
@@ -19,10 +22,12 @@ const WIDTH_RATIO = 0.32;
 const HEIGHT_RATIO = 0.2;
 const NUM_CARDS_ON_SCREEN = 2.8;
 
+const TEST = false;
+
 const CardVertical = ({ item }: Props) => {
     const router = useRouter();
     return (
-        <Animated.View style={[styles.card]}>
+        <View style={[styles.card]}>
             <Pressable
                 onPress={() =>
                     router.navigate({
@@ -32,13 +37,15 @@ const CardVertical = ({ item }: Props) => {
                 }
             >
                 <Image source={item.image} style={styles.image} />
-                <View style={styles.textView}>
+                {item.title && (
                     <View style={styles.textView}>
-                        <Text style={styles.title}>{item.title}</Text>
+                        <View style={styles.textView}>
+                            <Text style={styles.title}>{item.title}</Text>
+                        </View>
                     </View>
-                </View>
+                )}
             </Pressable>
-        </Animated.View>
+        </View>
     );
 };
 
@@ -76,9 +83,9 @@ const styles = StyleSheet.create({
     },
     title: {
         fontFamily: "SfProMedium",
-        fontSize: 11,
+        fontSize: 14,
         fontWeight: "bold",
-        color: "white",
+        color: "#646f7e",
         marginHorizontal: 5,
     },
     description: {

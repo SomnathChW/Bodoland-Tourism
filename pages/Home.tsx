@@ -29,10 +29,7 @@ const Home = () => {
         <View style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.header}>
-                    <Animated.View
-                        sharedTransitionTag="hello"
-                        style={styles.logo}
-                    >
+                    <View style={styles.logo}>
                         <Ionicons
                             name="menu"
                             size={30}
@@ -46,7 +43,7 @@ const Home = () => {
                                 Discover a land untouched
                             </Text>
                         </View>
-                    </Animated.View>
+                    </View>
                     <Ionicons name="search" size={30} style={styles.buttons} />
                 </View>
                 <ScrollView
