@@ -14,7 +14,7 @@
         "newArchEnabled": true,
         "ios": {
             "supportsTablet": true,
-            "bundleIdentifier": "com.gtaayush11.BTRTourism",
+            "bundleIdentifier": "in.coolidance.btrtourism",
             "userInterfaceStyle": "dark"
         },
         "android": {
@@ -22,7 +22,7 @@
                 "foregroundImage": "./assets/images/adaptive-icon.png",
                 "backgroundColor": "#0d1116"
             },
-            "package": "com.gtaayush11.BTRTourism",
+            "package": "in.coolidance.btrtourism",
             "userInterfaceStyle": "dark"
         },
         "web": {
