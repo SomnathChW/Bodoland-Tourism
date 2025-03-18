@@ -4,7 +4,8 @@ import { Stack } from "expo-router/stack";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import * as SystemUI from "expo-system-ui";
+
+import { AuthProvider } from "@/context/AuthContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,40 +24,39 @@ export default function RootLayout() {
         return null;
     }
 
-    SystemUI.setBackgroundColorAsync("black");
 
     return (
-        <ThemeProvider value={DarkTheme}>
-            <StatusBar style="light" />
-            <Stack>
-                <Stack.Screen
-                    name="(tabs)"
-                    options={{
-                        headerShown: false,
+        <AuthProvider>
+            <ThemeProvider value={DarkTheme}>
+                <StatusBar style="light" />
+                <Stack
+                    initialRouteName="signin"
+                    screenOptions={{
+                        contentStyle: { backgroundColor: "#0d1116" },
                     }}
-                />
-                <Stack.Screen
-                    name="details"
-                    options={{
-                        title: "Details",
-                        headerShown: false,
-                    }}
-                />
-                <Stack.Screen
-                    name="festivals"
-                    options={{
-                        title: "Festivals",
-                        headerShown: false,
-                    }}
-                />
-                <Stack.Screen
-                    name="cuisine"
-                    options={{
-                        title: "Cuisine",
-                        headerShown: false,
-                    }}
-                />
-            </Stack>
-        </ThemeProvider>
+                >
+                    <Stack.Screen
+                        name="(protected)"
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+                    <Stack.Screen
+                        name="signin"
+                        options={{
+                            title: "Sign In",
+                            headerShown: false,
+                        }}
+                    />
+                    <Stack.Screen
+                        name="signup"
+                        options={{
+                            title: "Sign Up",
+                            headerShown: false,
+                        }}
+                    />
+                </Stack>
+            </ThemeProvider>
+        </AuthProvider>
     );
 }

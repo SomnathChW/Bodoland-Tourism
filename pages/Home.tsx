@@ -4,13 +4,11 @@ import {
     StyleSheet,
     StatusBar,
     ScrollView,
-    Dimensions,
 } from "react-native";
 import React from "react";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import Animated from "react-native-reanimated";
 
 import Section from "@/components/Section";
 import CardVertical from "@/components/CardVertical";
@@ -24,7 +22,6 @@ import { categoryData } from "@/data/category_data";
 
 const Home = () => {
     const router = useRouter();
-
     return (
         <View style={styles.container}>
             <View style={styles.content}>
