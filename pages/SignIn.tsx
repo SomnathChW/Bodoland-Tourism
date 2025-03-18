@@ -160,7 +160,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 const SignInPage = () => {
-    const { session, signIn } = useAuth();
+    const { session, signIn, signUp } = useAuth();
     const [secureText, setSecureText] = useState(true);
     const [showNameInput, setShowNameInput] = useState(false);
 
@@ -168,9 +168,21 @@ const SignInPage = () => {
     const opacity = useSharedValue(0);
     const margin = useSharedValue(0);
 
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [name, setName] = useState("");
+
     NavigationBar.setBackgroundColorAsync("#0d1116");
 
-    const handleSignUpPress = () => {
+    const handleSignIn = () => {
+        signIn({ email, password });
+    };
+
+    const handlesignUp = () => {
+        signUp({ email, password, name });
+    };
+
+    const handleSignUpShow = () => {
         if (showNameInput) {
             height.value = withTiming(0, { duration: 300 });
             opacity.value = withTiming(0, { duration: 200 });
@@ -210,6 +222,7 @@ const SignInPage = () => {
                     placeholder="Full Name"
                     placeholderTextColor={"#3a3e50"}
                     cursorColor={"white"}
+                    onChangeText={(text) => setName(text)}
                 />
             </Animated.View>
             {/* Email Input */}
@@ -219,6 +232,7 @@ const SignInPage = () => {
                 inputMode="email"
                 placeholderTextColor={"#3a3e50"}
                 cursorColor={"white"}
+                onChangeText={(text) => setEmail(text)}
             />
             {/* Password Input */}
             <View style={styles.inputContainer}>
@@ -228,6 +242,7 @@ const SignInPage = () => {
                     placeholderTextColor="#3a3e50"
                     cursorColor="white"
                     secureTextEntry={secureText}
+                    onChangeText={(text) => setPassword(text)}
                 />
                 <TouchableOpacity
                     onPress={() => setSecureText(!secureText)}
@@ -242,12 +257,15 @@ const SignInPage = () => {
             </View>
             {/* Buttons */}
             <Animated.View style={[styles.buttonContainer]}>
-                <TouchableOpacity style={styles.signInButton} onPress={signIn}>
+                <TouchableOpacity
+                    style={styles.signInButton}
+                    onPress={showNameInput ? handlesignUp : handleSignIn}
+                >
                     <Text style={styles.signInButtonText}>
                         {showNameInput ? "  Sign Up" : "  Sign In"}
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleSignUpPress}>
+                <TouchableOpacity onPress={handleSignUpShow}>
                     <Text style={styles.subHeadding}>
                         {showNameInput
                             ? "Already a user?"
@@ -257,7 +275,10 @@ const SignInPage = () => {
                         </Text>
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.googleButton} onPress={signIn}>
+                <TouchableOpacity
+                    style={styles.googleButton}
+                    onPress={handleSignIn}
+                >
                     <AntDesign name="google" size={22} color="white" />
                     <Text style={styles.signInButtonText}>
                         Continue with Google

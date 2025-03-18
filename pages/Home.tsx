@@ -1,10 +1,4 @@
-import {
-    Text,
-    View,
-    StyleSheet,
-    StatusBar,
-    ScrollView,
-} from "react-native";
+import { Text, View, StyleSheet, StatusBar, ScrollView } from "react-native";
 import React from "react";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -19,9 +13,12 @@ import CardSquare from "@/components/CardSquare";
 import { carouselData } from "@/data/slider_data";
 import { districtData } from "@/data/district_data";
 import { categoryData } from "@/data/category_data";
+import { useAuth } from "@/context/AuthContext";
 
 const Home = () => {
     const router = useRouter();
+    const { signOut, user } = useAuth();
+
     return (
         <View style={styles.container}>
             <View style={styles.content}>
@@ -41,7 +38,12 @@ const Home = () => {
                             </Text>
                         </View>
                     </View>
-                    <Ionicons name="search" size={30} style={styles.buttons} />
+                    <Ionicons
+                        name="search"
+                        size={30}
+                        style={styles.buttons}
+                        onPress={signOut}
+                    />
                 </View>
                 <ScrollView
                     style={styles.scrollPadding}
