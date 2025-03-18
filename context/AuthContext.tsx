@@ -12,7 +12,7 @@ const AuthContext = createContext({
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState(false);
-    const [session, setSession] = useState(true);
+    const [session, setSession] = useState(false);
     const [loading, setLoading] = useState(false);
 
     SystemUI.setBackgroundColorAsync("#0d1116");

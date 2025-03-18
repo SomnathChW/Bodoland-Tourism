@@ -5,7 +5,7 @@
         "version": "1.0.0",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
-        "scheme": "btr-tourism",
+        "scheme": "btrtourism",
         "userInterfaceStyle": "dark",
         "backgroundColor": "#0d1116",
         "navigationBar": {

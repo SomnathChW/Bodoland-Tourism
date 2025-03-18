@@ -24,7 +24,6 @@ export default function RootLayout() {
         return null;
     }
 
-
     return (
         <AuthProvider>
             <ThemeProvider value={DarkTheme}>
@@ -49,7 +48,7 @@ export default function RootLayout() {
                         }}
                     />
                     <Stack.Screen
-                        name="signup"
+                        name="password_recovery"
                         options={{
                             title: "Sign Up",
                             headerShown: false,
