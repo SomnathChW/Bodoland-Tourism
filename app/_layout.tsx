@@ -5,57 +5,65 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 
-import { AuthProvider } from "@/context/AuthContext";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayoutContent() {
     const [loaded] = useFonts({
         SfProMedium: require("../assets/fonts/sf-pro-display-medium.otf"),
     });
 
+    const { loading } = useAuth();
+
     useEffect(() => {
-        if (loaded) {
+        if (loaded && !loading) {
             SplashScreen.hideAsync();
         }
-    }, [loaded]);
+    }, [loaded, loading]);
 
-    if (!loaded) {
+    if (!loaded || loading) {
         return null;
     }
 
     return (
-        <AuthProvider>
-            <ThemeProvider value={DarkTheme}>
-                <StatusBar style="light" />
-                <Stack
-                    initialRouteName="signin"
-                    screenOptions={{
-                        contentStyle: { backgroundColor: "#0d1116" },
+        <ThemeProvider value={DarkTheme}>
+            <StatusBar style="light" />
+            <Stack
+                initialRouteName="signin"
+                screenOptions={{
+                    contentStyle: { backgroundColor: "#0d1116" },
+                }}
+            >
+                <Stack.Screen
+                    name="(protected)"
+                    options={{
+                        headerShown: false,
                     }}
-                >
-                    <Stack.Screen
-                        name="(protected)"
-                        options={{
-                            headerShown: false,
-                        }}
-                    />
-                    <Stack.Screen
-                        name="signin"
-                        options={{
-                            title: "Sign In",
-                            headerShown: false,
-                        }}
-                    />
-                    <Stack.Screen
-                        name="password_recovery"
-                        options={{
-                            title: "Sign Up",
-                            headerShown: false,
-                        }}
-                    />
-                </Stack>
-            </ThemeProvider>
+                />
+                <Stack.Screen
+                    name="signin"
+                    options={{
+                        title: "Sign In",
+                        headerShown: false,
+                    }}
+                />
+                <Stack.Screen
+                    name="password_recovery"
+                    options={{
+                        title: "Sign Up",
+                        headerShown: false,
+                    }}
+                />
+            </Stack>
+        </ThemeProvider>
+    );
+}
+
+export default function RootLayout() {
+    return (
+        <AuthProvider>
+            <RootLayoutContent />
         </AuthProvider>
     );
 }

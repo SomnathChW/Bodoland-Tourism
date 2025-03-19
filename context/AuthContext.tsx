@@ -65,7 +65,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             const responseUser = await account.get();
             setUser(responseUser);
         } catch (error) {
-            console.error(error);
+            console.error("Error checking auth:", error);
         }
         setLoading(false);
     };
@@ -83,13 +83,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 email,
                 password
             );
-            console.log(responseSession);
             setSession(responseSession);
             const responseUser = await account.get();
-            console.log(responseUser);
             setUser(responseUser);
         } catch (error) {
-            console.error(error);
+            console.error("Error signing in:", error);
         }
         setLoading(false);
     };
@@ -108,7 +106,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             await account.create(ID.unique(), email, password, name);
             await signIn({ email, password });
         } catch (error) {
-            console.error(error);
+            console.error("Error signing up:", error);
         }
         setLoading(false);
     };
@@ -120,7 +118,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             setSession(null);
             setUser(null);
         } catch (error) {
-            console.error(error);
+            console.error("Error signing out:", error);
         }
         setLoading(false);
     };
