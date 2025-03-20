@@ -5,7 +5,7 @@ import {
     ReactNode,
     useEffect,
 } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import * as SystemUI from "expo-system-ui";
 import { Models } from "react-native-appwrite";
 import { toast } from "sonner-native";
@@ -62,11 +62,20 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     const checkAuth = async () => {
         try {
             const responseSession = await account.getSession("current");
+            console.log("responseSession", responseSession);
             setSession(responseSession);
+            console.log("responseSession", responseSession);
             const responseUser = await account.get();
             setUser(responseUser);
         } catch (error) {
-            console.error("Error checking auth:", error);
+            if (
+                error instanceof Error &&
+                "type" in error &&
+                (error as any).type.includes("general_unauthorized_scope")
+            ) {
+            } else {
+                console.error("Error checking auth:", error);
+            }
         }
         setLoading(false);
     };
@@ -104,7 +113,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
         } catch (error) {
             if (!isSignup) {
-                toast.error(errorMessage, { id: toast_id });
+                if (error instanceof Error) {
+                    toast.error(error.message, { id: toast_id });
+                } else {
+                    toast.error(errorMessage, { id: toast_id });
+                }
             }
         } finally {
             setLoading(false);

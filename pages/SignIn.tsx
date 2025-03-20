@@ -1,4 +1,10 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+    StyleSheet,
+    Text,
+    View,
+    TouchableOpacity,
+    ScrollView,
+} from "react-native";
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Redirect } from "expo-router";
@@ -11,7 +17,6 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import { validateAuthInputs } from "@/lib/formValidator";
-import { toast } from "sonner-native";
 
 const SignInPage = () => {
     const { session, signIn, signUp } = useAuth();
@@ -68,7 +73,10 @@ const SignInPage = () => {
     }
 
     return (
-        <View style={styles.container}>
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+        >
             <Text style={styles.heading}>
                 {showNameInput ? "Welcome" : "Welcome Back"}
             </Text>
@@ -147,7 +155,7 @@ const SignInPage = () => {
                     </Text>
                 </TouchableOpacity>
             </Animated.View>
-        </View>
+        </ScrollView>
     );
 };
 
@@ -156,7 +164,6 @@ export default SignInPage;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
         paddingHorizontal: 25,
     },
     heading: {
