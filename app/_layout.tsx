@@ -1,62 +1,90 @@
+import "react-native-gesture-handler";
+import "react-native-reanimated";
+
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router/stack";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import * as SystemUI from "expo-system-ui";
+
+import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { Toaster } from "sonner-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayoutContent() {
     const [loaded] = useFonts({
         SfProMedium: require("../assets/fonts/sf-pro-display-medium.otf"),
     });
 
+    const { loading } = useAuth();
+
     useEffect(() => {
-        if (loaded) {
+        if (loaded && !loading) {
             SplashScreen.hideAsync();
         }
-    }, [loaded]);
+    }, [loaded, loading]);
 
-    if (!loaded) {
+    if (!loaded || loading) {
         return null;
     }
-
-    SystemUI.setBackgroundColorAsync("black");
 
     return (
         <ThemeProvider value={DarkTheme}>
             <StatusBar style="light" />
-            <Stack>
+            <Stack
+                initialRouteName="signin"
+                screenOptions={{
+                    contentStyle: { backgroundColor: "#0d1116" },
+                }}
+            >
                 <Stack.Screen
-                    name="(tabs)"
+                    name="(protected)"
                     options={{
                         headerShown: false,
                     }}
                 />
                 <Stack.Screen
-                    name="details"
+                    name="signin"
                     options={{
-                        title: "Details",
+                        title: "Sign In",
                         headerShown: false,
                     }}
                 />
                 <Stack.Screen
-                    name="festivals"
+                    name="password_recovery"
                     options={{
-                        title: "Festivals",
-                        headerShown: false,
-                    }}
-                />
-                <Stack.Screen
-                    name="cuisine"
-                    options={{
-                        title: "Cuisine",
+                        title: "Sign Up",
                         headerShown: false,
                     }}
                 />
             </Stack>
         </ThemeProvider>
+    );
+}
+
+export default function RootLayout() {
+    return (
+        <SafeAreaProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+                <AuthProvider>
+                    <RootLayoutContent />
+                    <Toaster
+                        toastOptions={{
+                            style: {
+                                backgroundColor: "rgba(52, 52, 52, 0.35)",
+                            },
+                        }}
+                        gap={10}
+                        position="bottom-center"
+                        visibleToasts={1}
+                        swipeToDismissDirection="left"
+                    />
+                </AuthProvider>
+            </GestureHandlerRootView>
+        </SafeAreaProvider>
     );
 }

@@ -1,16 +1,8 @@
-import {
-    Text,
-    View,
-    StyleSheet,
-    StatusBar,
-    ScrollView,
-    Dimensions,
-} from "react-native";
-import React from "react";
+import { Text, View, StyleSheet, StatusBar, ScrollView } from "react-native";
+import { useState } from "react";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import Animated from "react-native-reanimated";
 
 import Section from "@/components/Section";
 import CardVertical from "@/components/CardVertical";
@@ -21,9 +13,18 @@ import CardSquare from "@/components/CardSquare";
 import { carouselData } from "@/data/slider_data";
 import { districtData } from "@/data/district_data";
 import { categoryData } from "@/data/category_data";
+import { useAuth } from "@/context/AuthContext";
+import AlertDialog from "@/components/AlertDialog";
 
 const Home = () => {
     const router = useRouter();
+    const { signOut, user } = useAuth();
+
+    const [showDialog, setShowDialog] = useState(false);
+
+    const handleDialog = () => {
+        setShowDialog(!showDialog);
+    };
 
     return (
         <View style={styles.container}>
@@ -44,7 +45,12 @@ const Home = () => {
                             </Text>
                         </View>
                     </View>
-                    <Ionicons name="search" size={30} style={styles.buttons} />
+                    <Ionicons
+                        name="search"
+                        size={30}
+                        style={styles.buttons}
+                        onPress={handleDialog}
+                    />
                 </View>
                 <ScrollView
                     style={styles.scrollPadding}
@@ -83,6 +89,13 @@ const Home = () => {
                         viewAll={() => router.push("/attractions")}
                     />
                 </ScrollView>
+                <AlertDialog
+                    visible={showDialog}
+                    title="Sign Out"
+                    description="Are you sure you want to sign out?"
+                    onCancel={handleDialog}
+                    onConfirm={signOut}
+                />
             </View>
         </View>
     );
@@ -95,6 +108,10 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#0d1116",
         paddingTop: StatusBar.currentHeight,
+        justifyContent: "center",
+        alignItems: "center",
+        alignContent: "center",
+        alignSelf: "center",
     },
     content: {
         flex: 1,

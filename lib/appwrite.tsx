@@ -1,5 +1,5 @@
 import { Platform } from "react-native";
-import { Client, Databases } from "react-native-appwrite";
+import { Account, Client, Databases, ID } from "react-native-appwrite";
 
 if (
     !process.env.EXPO_PUBLIC_ENDPOINT ||
@@ -27,3 +27,7 @@ switch (Platform.OS) {
         client.setPlatform(appwrite_ios_platform);
         break;
 }
+
+const account = new Account(client);
+
+export { client, account, ID };
