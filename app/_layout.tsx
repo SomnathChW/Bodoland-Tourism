@@ -1,11 +1,17 @@
+import "react-native-gesture-handler";
+import "react-native-reanimated";
+
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router/stack";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { Toaster } from "sonner-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -62,8 +68,23 @@ function RootLayoutContent() {
 
 export default function RootLayout() {
     return (
-        <AuthProvider>
-            <RootLayoutContent />
-        </AuthProvider>
+        <SafeAreaProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+                <AuthProvider>
+                    <RootLayoutContent />
+                    <Toaster
+                        toastOptions={{
+                            style: {
+                                backgroundColor: "rgba(52, 52, 52, 0.35)",
+                            },
+                        }}
+                        gap={10}
+                        position="bottom-center"
+                        visibleToasts={1}
+                        swipeToDismissDirection="left"
+                    />
+                </AuthProvider>
+            </GestureHandlerRootView>
+        </SafeAreaProvider>
     );
 }

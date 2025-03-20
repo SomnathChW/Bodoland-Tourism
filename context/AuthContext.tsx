@@ -8,6 +8,7 @@ import {
 import { StyleSheet, Text, View } from "react-native";
 import * as SystemUI from "expo-system-ui";
 import { Models } from "react-native-appwrite";
+import { toast } from "sonner-native";
 
 import { account, ID } from "@/lib/appwrite";
 
@@ -73,11 +74,22 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     const signIn = async ({
         email,
         password,
+        isSignup,
     }: {
         email: string;
         password: string;
+        isSignup?: boolean;
     }) => {
+        let toast_id: string | number = "";
+        const loadingMessage = "Signing in...";
+        const successMessage = "Signed in";
+        const errorMessage = "Error signing in";
+
+        if (!isSignup) {
+            toast_id = toast.loading(loadingMessage);
+        }
         setLoading(true);
+
         try {
             const responseSession = await account.createEmailPasswordSession(
                 email,
@@ -86,10 +98,17 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             setSession(responseSession);
             const responseUser = await account.get();
             setUser(responseUser);
+
+            if (!isSignup) {
+                toast.success(successMessage, { id: toast_id });
+            }
         } catch (error) {
-            console.error("Error signing in:", error);
+            if (!isSignup) {
+                toast.error(errorMessage, { id: toast_id });
+            }
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const signUp = async ({
@@ -101,10 +120,12 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         password: string;
         name: string;
     }) => {
+        const toast_id = toast.loading("Signing up...");
         setLoading(true);
         try {
             await account.create(ID.unique(), email, password, name);
-            await signIn({ email, password });
+            toast.success("Signed up", { id: toast_id });
+            await signIn({ email, password, isSignup: true });
         } catch (error) {
             console.error("Error signing up:", error);
         }
@@ -112,11 +133,13 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const signOut = async () => {
+        const toast_id = toast.loading("Signing out...");
         setLoading(true);
         try {
             await account.deleteSession("current");
             setSession(null);
             setUser(null);
+            toast.success("Signed out", { id: toast_id });
         } catch (error) {
             console.error("Error signing out:", error);
         }
@@ -133,13 +156,12 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     return (
         <AuthContext.Provider value={contextData}>
-            {loading ? (
-                <View style={styles.container}>
-                    <Text style={styles.text}>Loading..</Text>
-                </View>
-            ) : (
-                children
-            )}
+            {loading
+                ? // <View style={styles.container}>
+                  //     <Text style={styles.text}>Loading..</Text>
+                  // </View>
+                  children
+                : children}
         </AuthContext.Provider>
     );
 };
