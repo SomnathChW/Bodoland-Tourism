@@ -21,36 +21,68 @@ const AlertDialog = ({
     onConfirm,
 }: AlertDialogProps) => {
     return (
-        <Modal transparent visible={visible} animationType="fade">
-            <View style={styles.overlay}>
-                <View style={styles.modalContainer}>
-                    <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.description}>{description}</Text>
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity
-                            style={[styles.button, styles.cancelButton]}
-                            onPress={onCancel}
-                        >
-                            <Text
-                                style={[styles.buttonText, styles.cancelText]}
-                            >
-                                {cancelText}
-                            </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.button, styles.continueButton]}
-                            onPress={onConfirm}
-                        >
-                            <Text
-                                style={[styles.buttonText, styles.continueText]}
-                            >
-                                {confirmText}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
+        <>
+            {visible ? (
+                <View
+                    style={{
+                        height: "100%",
+                        width: "100%",
+                        position: "absolute",
+                        top: 0,
+                    }}
+                >
+                    <Modal
+                        transparent
+                        visible={visible}
+                        animationType="fade"
+                        style={{ margin: 0 }}
+                    >
+                        <View style={styles.overlay}>
+                            <View style={styles.modalContainer}>
+                                <Text style={styles.title}>{title}</Text>
+                                <Text style={styles.description}>
+                                    {description}
+                                </Text>
+                                <View style={styles.buttonContainer}>
+                                    <TouchableOpacity
+                                        style={[
+                                            styles.button,
+                                            styles.cancelButton,
+                                        ]}
+                                        onPress={onCancel}
+                                    >
+                                        <Text
+                                            style={[
+                                                styles.buttonText,
+                                                styles.cancelText,
+                                            ]}
+                                        >
+                                            {cancelText}
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[
+                                            styles.button,
+                                            styles.continueButton,
+                                        ]}
+                                        onPress={onConfirm}
+                                    >
+                                        <Text
+                                            style={[
+                                                styles.buttonText,
+                                                styles.continueText,
+                                            ]}
+                                        >
+                                            {confirmText}
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
                 </View>
-            </View>
-        </Modal>
+            ) : null}
+        </>
     );
 };
 
@@ -60,7 +92,6 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(0,0,0,0.6)",
         justifyContent: "center",
         alignItems: "center",
-        zIndex: 1000,
         elevation: 10,
     },
     modalContainer: {
@@ -74,12 +105,14 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "600",
         marginBottom: 10,
+        fontFamily: "SfProMedium",
     },
     description: {
         color: "#a0a0a0",
         fontSize: 14,
         marginBottom: 20,
         lineHeight: 20,
+        fontFamily: "SfProRegular",
     },
     buttonContainer: {
         flexDirection: "row",
@@ -94,7 +127,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         backgroundColor: "#181818",
-        borderColor: "#a0a0a0",
+        borderColor: "rgba(255, 255, 255, 0.19)",
     },
     continueButton: {
         backgroundColor: "#fff",
@@ -103,9 +136,11 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 14,
         fontWeight: "500",
+        fontFamily: "SfProMedium",
     },
     cancelText: {
         color: "#fff",
+        fontFamily: "SfProMedium",
     },
     continueText: {
         color: "#000",

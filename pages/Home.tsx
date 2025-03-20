@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet, StatusBar, ScrollView } from "react-native";
-import React from "react";
+import { useState } from "react";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -14,10 +14,17 @@ import { carouselData } from "@/data/slider_data";
 import { districtData } from "@/data/district_data";
 import { categoryData } from "@/data/category_data";
 import { useAuth } from "@/context/AuthContext";
+import AlertDialog from "@/components/AlertDialog";
 
 const Home = () => {
     const router = useRouter();
     const { signOut, user } = useAuth();
+
+    const [showDialog, setShowDialog] = useState(false);
+
+    const handleDialog = () => {
+        setShowDialog(!showDialog);
+    };
 
     return (
         <View style={styles.container}>
@@ -42,7 +49,7 @@ const Home = () => {
                         name="search"
                         size={30}
                         style={styles.buttons}
-                        onPress={signOut}
+                        onPress={handleDialog}
                     />
                 </View>
                 <ScrollView
@@ -82,6 +89,13 @@ const Home = () => {
                         viewAll={() => router.push("/attractions")}
                     />
                 </ScrollView>
+                <AlertDialog
+                    visible={showDialog}
+                    title="Sign Out"
+                    description="Are you sure you want to sign out?"
+                    onCancel={handleDialog}
+                    onConfirm={signOut}
+                />
             </View>
         </View>
     );
@@ -94,6 +108,10 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#0d1116",
         paddingTop: StatusBar.currentHeight,
+        justifyContent: "center",
+        alignItems: "center",
+        alignContent: "center",
+        alignSelf: "center",
     },
     content: {
         flex: 1,
