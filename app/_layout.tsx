@@ -41,26 +41,15 @@ function RootLayoutContent() {
                     contentStyle: { backgroundColor: "#0d1116" },
                 }}
             >
-                <Stack.Screen
-                    name="(protected)"
-                    options={{
-                        headerShown: false,
-                    }}
-                />
-                <Stack.Screen
-                    name="signin"
-                    options={{
-                        title: "Sign In",
-                        headerShown: false,
-                    }}
-                />
-                <Stack.Screen
-                    name="password_recovery"
-                    options={{
-                        title: "Sign Up",
-                        headerShown: false,
-                    }}
-                />
+                {["(protected)", "signin", "password_recovery"].map((name) => (
+                    <Stack.Screen
+                        key={name}
+                        name={name}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+                ))}
             </Stack>
         </ThemeProvider>
     );
@@ -75,10 +64,9 @@ export default function RootLayout() {
                     <Toaster
                         toastOptions={{
                             style: {
-                                backgroundColor: "rgba(52, 52, 52, 0.35)",
+                                backgroundColor: "rgba(50, 50, 50, 1)",
                             },
                         }}
-                        gap={10}
                         position="bottom-center"
                         visibleToasts={1}
                         swipeToDismissDirection="left"

@@ -9,47 +9,30 @@ const _layout = () => {
         NavigationBar.setBackgroundColorAsync("#000000");
     }
 
+    const screens = [
+        { name: "attractions", title: "Attractions" },
+        { name: "stays", title: "Stays" },
+        { name: "index", title: "Home" },
+        { name: "vrview", title: "Virtual Tour" },
+        { name: "souvenirs", title: "Souvenirs" },
+    ];
+
     return (
         <Tabs
             backBehavior="initialRoute"
             initialRouteName="index"
             tabBar={(props) => <TabBar {...props} />}
         >
-            <Tabs.Screen
-                name="attractions"
-                options={{
-                    title: "Attractions",
-                    headerShown: false,
-                }}
-            />
-            <Tabs.Screen
-                name="stays"
-                options={{
-                    title: "Stays",
-                    headerShown: false,
-                }}
-            />
-            <Tabs.Screen
-                name="index"
-                options={{
-                    title: "Home",
-                    headerShown: false,
-                }}
-            />
-            <Tabs.Screen
-                name="vrview"
-                options={{
-                    title: "Virtual Tour",
-                    headerShown: false,
-                }}
-            />
-            <Tabs.Screen
-                name="souvenirs"
-                options={{
-                    title: "Souvenirs",
-                    headerShown: false,
-                }}
-            />
+            {screens.map((items) => (
+                <Tabs.Screen
+                    key={items.name}
+                    name={items.name}
+                    options={{
+                        title: items.title,
+                        headerShown: false,
+                    }}
+                />
+            ))}
         </Tabs>
     );
 };
