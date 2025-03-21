@@ -5,13 +5,14 @@ import {
     ReactNode,
     useEffect,
 } from "react";
-import { StyleSheet } from "react-native";
 import * as SystemUI from "expo-system-ui";
 import * as SecureStore from "expo-secure-store";
 import { Models } from "react-native-appwrite";
 import { toast } from "sonner-native";
 
 import { account, ID } from "@/lib/appwrite";
+
+import { mockAccount } from "@/dev_helpers/mockAccount";
 
 const AuthContext = createContext<{
     user: Models.User<{}> | null;
@@ -55,8 +56,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     const checkUserFromBackend = async () => {
         try {
             const responseSession = await account.getSession("current");
+            // const responseSession = await mockAccount.getSession();
             setSession(responseSession);
             const responseUser = await account.get();
+            // const responseUser = await mockAccount.get();
             setUser(responseUser);
         } catch (error) {
             if (
@@ -67,7 +70,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const loggedIn = await SecureStore.getItemAsync("loggedIn");
                 if (loggedIn) {
                     SecureStore.deleteItemAsync("loggedIn");
-                    toast.error("Please sign in again to continue");
+                    toast.error("Please sign in to continue");
                 }
                 setSession(null);
                 setUser(null);
@@ -128,8 +131,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 email,
                 password
             );
+            // const responseSession =
+            //     await mockAccount.createEmailPasswordSession(email, password);
             setSession(responseSession);
             const responseUser = await account.get();
+            // const responseUser = await mockAccount.get();
             setUser(responseUser);
 
             await SecureStore.setItemAsync(
@@ -171,6 +177,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(true);
         try {
             await account.create(ID.unique(), email, password, name);
+            // await mockAccount.create(ID.unique(), email, password, name);
             toast.success("Signed up", { id: toast_id });
             await signIn({ email, password, isSignup: true });
         } catch (error) {
@@ -183,11 +190,12 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         const toast_id = toast.loading("Signing out...");
         setLoading(true);
         try {
+            await account.deleteSession("current");
+            // await mockAccount.deleteSession();
             setSession(null);
             setUser(null);
             await SecureStore.deleteItemAsync("session");
             await SecureStore.deleteItemAsync("user");
-            await account.deleteSession("current");
             toast.success("Signed out", { id: toast_id });
         } catch (error) {
             if (
@@ -217,12 +225,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     return (
         <AuthContext.Provider value={contextData}>
-            {loading
-                ? // <View style={styles.container}>
-                  //     <Text style={styles.text}>Loading..</Text>
-                  // </View>
-                  children
-                : children}
+            {children}
         </AuthContext.Provider>
     );
 };
@@ -232,15 +235,3 @@ const useAuth = () => {
 };
 
 export { useAuth, AuthProvider, AuthContext };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    text: {
-        fontSize: 24,
-        color: "white",
-    },
-});
