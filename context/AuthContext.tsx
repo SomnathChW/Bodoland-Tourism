@@ -4,6 +4,7 @@ import {
     useState,
     ReactNode,
     useEffect,
+    useRef,
 } from "react";
 import * as SystemUI from "expo-system-ui";
 import * as SecureStore from "expo-secure-store";
@@ -50,8 +51,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         null
     );
     const [session, setSession] = useState<Models.Session | null>(null);
-
-    SystemUI.setBackgroundColorAsync("#0d1116");
+    const hasInitialized = useRef(false);
 
     const checkUserFromBackend = async () => {
         try {
@@ -83,7 +83,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        init();
+        SystemUI.setBackgroundColorAsync("#0d1116");
+        if (!hasInitialized.current) {
+            init();
+            hasInitialized.current = true;
+        }
     }, []);
 
     const init = async () => {
@@ -196,6 +200,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             setUser(null);
             await SecureStore.deleteItemAsync("session");
             await SecureStore.deleteItemAsync("user");
+            await SecureStore.deleteItemAsync("loggedIn");
             toast.success("Signed out", { id: toast_id });
         } catch (error) {
             if (

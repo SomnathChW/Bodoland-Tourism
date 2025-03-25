@@ -41,7 +41,7 @@ const SignInPage = () => {
         }
     };
 
-    const handlesignUp = () => {
+    const handleSignUp = () => {
         if (!validateAuthInputs({ email, password, name })) {
             return;
         } else {
@@ -129,7 +129,7 @@ const SignInPage = () => {
             <Animated.View style={[styles.buttonContainer]}>
                 <TouchableOpacity
                     style={styles.signInButton}
-                    onPress={showNameInput ? handlesignUp : handleSignIn}
+                    onPress={showNameInput ? handleSignUp : handleSignIn}
                 >
                     <Text style={styles.signInButtonText}>
                         {showNameInput ? "  Sign Up" : "  Sign In"}
