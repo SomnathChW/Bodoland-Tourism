@@ -1,4 +1,5 @@
-import { StyleSheet, View, FlatList } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import React from "react";
 
 type CardListProps = {
@@ -9,13 +10,14 @@ type CardListProps = {
 const CardList = ({ itemList, CardComponent }: CardListProps) => {
     return (
         <View>
-            <FlatList
+            <FlashList
                 data={itemList}
                 renderItem={({ item }) => <CardComponent item={item} />}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 removeClippedSubviews={false}
                 style={styles.flatList}
+                estimatedItemSize={15}
             />
         </View>
     );

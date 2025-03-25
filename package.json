@@ -22,6 +22,7 @@
         "@expo/vector-icons": "^14.0.2",
         "@react-navigation/bottom-tabs": "^7.2.0",
         "@react-navigation/native": "^7.0.14",
+        "@shopify/flash-list": "1.7.3",
         "@shopify/react-native-skia": "^1.11.18",
         "expo": "~52.0.38",
         "expo-blur": "~14.0.3",
@@ -32,6 +33,7 @@
         "expo-linking": "~7.0.5",
         "expo-navigation-bar": "^4.0.8",
         "expo-router": "~4.0.18",
+        "expo-secure-store": "~14.0.1",
         "expo-splash-screen": "~0.29.22",
         "expo-status-bar": "~2.0.1",
         "expo-symbols": "~0.2.2",
@@ -63,5 +65,5 @@
         "typescript": "^5.3.3"
     },
     "private": true,
-    "packageManager": "pnpm@10.5.2+sha512.da9dc28cd3ff40d0592188235ab25d3202add8a207afbedc682220e4a0029ffbff4562102b9e6e46b4e3f9e8bd53e6d05de48544b0c57d4b0179e22c76d1199b"
+    "packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af"
 }

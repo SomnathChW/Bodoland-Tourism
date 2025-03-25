@@ -21,10 +21,10 @@ const client = new Client()
 
 switch (Platform.OS) {
     case "ios":
-        client.setPlatform(appwrite_android_platform);
+        client.setPlatform(appwrite_ios_platform);
         break;
     case "android":
-        client.setPlatform(appwrite_ios_platform);
+        client.setPlatform(appwrite_android_platform);
         break;
 }
 

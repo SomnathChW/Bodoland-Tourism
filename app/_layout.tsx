@@ -7,11 +7,14 @@ import { Stack } from "expo-router/stack";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
+import { StyleSheet } from "react-native";
 
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { Toaster } from "sonner-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { View } from "react-native";
+import LottieView from "lottie-react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,9 +31,7 @@ function RootLayoutContent() {
         }
     }, [loaded, loading]);
 
-    if (!loaded || loading) {
-        return null;
-    }
+    const showOverlay = !loaded || loading;
 
     return (
         <ThemeProvider value={DarkTheme}>
@@ -41,27 +42,26 @@ function RootLayoutContent() {
                     contentStyle: { backgroundColor: "#0d1116" },
                 }}
             >
-                <Stack.Screen
-                    name="(protected)"
-                    options={{
-                        headerShown: false,
-                    }}
-                />
-                <Stack.Screen
-                    name="signin"
-                    options={{
-                        title: "Sign In",
-                        headerShown: false,
-                    }}
-                />
-                <Stack.Screen
-                    name="password_recovery"
-                    options={{
-                        title: "Sign Up",
-                        headerShown: false,
-                    }}
-                />
+                {["(protected)", "signin", "password_recovery"].map((name) => (
+                    <Stack.Screen
+                        key={name}
+                        name={name}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+                ))}
             </Stack>
+            {showOverlay && (
+                <View style={styles.overlay}>
+                    <LottieView
+                        source={require("@/assets/lottie/loading.json")}
+                        style={{ width: "70%", height: "70%" }}
+                        autoPlay
+                        loop
+                    />
+                </View>
+            )}
         </ThemeProvider>
     );
 }
@@ -75,10 +75,9 @@ export default function RootLayout() {
                     <Toaster
                         toastOptions={{
                             style: {
-                                backgroundColor: "rgba(52, 52, 52, 0.35)",
+                                backgroundColor: "rgba(50, 50, 50, 1)",
                             },
                         }}
-                        gap={10}
                         position="bottom-center"
                         visibleToasts={1}
                         swipeToDismissDirection="left"
@@ -88,3 +87,19 @@ export default function RootLayout() {
         </SafeAreaProvider>
     );
 }
+
+const styles = StyleSheet.create({
+    overlay: {
+        ...StyleSheet.absoluteFillObject, // Covers the entire screen
+        backgroundColor: "rgba(0,0,0, 0.5)", // Semi-transparent black
+        justifyContent: "center",
+        alignItems: "center",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: "100%",
+        height: "100%",
+    },
+});

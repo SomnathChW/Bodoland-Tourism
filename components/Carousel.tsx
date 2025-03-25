@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, Dimensions } from "react-native";
+import { StyleSheet, View, FlatList, Dimensions } from "react-native";
 import React, { useEffect, useRef } from "react";
 import { CarouselTypes } from "@/data/slider_data";
 import CarouselCard from "./CarouselCard";

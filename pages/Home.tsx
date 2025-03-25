@@ -18,12 +18,17 @@ import AlertDialog from "@/components/AlertDialog";
 
 const Home = () => {
     const router = useRouter();
-    const { signOut, user } = useAuth();
+    const { signOut } = useAuth();
 
     const [showDialog, setShowDialog] = useState(false);
 
     const handleDialog = () => {
         setShowDialog(!showDialog);
+    };
+
+    const handleSignOut = async () => {
+        handleDialog();
+        await signOut();
     };
 
     return (
@@ -94,7 +99,7 @@ const Home = () => {
                     title="Sign Out"
                     description="Are you sure you want to sign out?"
                     onCancel={handleDialog}
-                    onConfirm={signOut}
+                    onConfirm={handleSignOut}
                 />
             </View>
         </View>

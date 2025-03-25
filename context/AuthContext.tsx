@@ -4,13 +4,16 @@ import {
     useState,
     ReactNode,
     useEffect,
+    useRef,
 } from "react";
-import { StyleSheet } from "react-native";
 import * as SystemUI from "expo-system-ui";
+import * as SecureStore from "expo-secure-store";
 import { Models } from "react-native-appwrite";
 import { toast } from "sonner-native";
 
 import { account, ID } from "@/lib/appwrite";
+
+import { mockAccount } from "@/dev_helpers/mockAccount";
 
 const AuthContext = createContext<{
     user: Models.User<{}> | null;
@@ -48,11 +51,43 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         null
     );
     const [session, setSession] = useState<Models.Session | null>(null);
+    const hasInitialized = useRef(false);
 
-    SystemUI.setBackgroundColorAsync("#0d1116");
+    const checkUserFromBackend = async () => {
+        try {
+            const responseSession = await account.getSession("current");
+            // const responseSession = await mockAccount.getSession();
+            setSession(responseSession);
+            const responseUser = await account.get();
+            // const responseUser = await mockAccount.get();
+            setUser(responseUser);
+        } catch (error) {
+            if (
+                error instanceof Error &&
+                "type" in error &&
+                (error as any).type.includes("general_unauthorized_scope")
+            ) {
+                const loggedIn = await SecureStore.getItemAsync("loggedIn");
+                if (loggedIn) {
+                    SecureStore.deleteItemAsync("loggedIn");
+                    toast.error("Please sign in to continue");
+                }
+                setSession(null);
+                setUser(null);
+                await SecureStore.deleteItemAsync("session");
+                await SecureStore.deleteItemAsync("user");
+            } else {
+                toast.error("Error checking your account");
+            }
+        }
+    };
 
     useEffect(() => {
-        init();
+        SystemUI.setBackgroundColorAsync("#0d1116");
+        if (!hasInitialized.current) {
+            init();
+            hasInitialized.current = true;
+        }
     }, []);
 
     const init = async () => {
@@ -61,23 +96,19 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const checkAuth = async () => {
         try {
-            const responseSession = await account.getSession("current");
-            console.log("responseSession", responseSession);
-            setSession(responseSession);
-            console.log("responseSession", responseSession);
-            const responseUser = await account.get();
-            setUser(responseUser);
-        } catch (error) {
-            if (
-                error instanceof Error &&
-                "type" in error &&
-                (error as any).type.includes("general_unauthorized_scope")
-            ) {
-            } else {
-                console.error("Error checking auth:", error);
+            const sessionString = await SecureStore.getItemAsync("session");
+            if (sessionString) {
+                setSession(JSON.parse(sessionString));
             }
+            const userString = await SecureStore.getItemAsync("user");
+            if (userString) {
+                setUser(JSON.parse(userString));
+            }
+            setLoading(false);
+            checkUserFromBackend();
+        } catch (error) {
+            toast.error("Error checking your account");
         }
-        setLoading(false);
     };
 
     const signIn = async ({
@@ -104,9 +135,22 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 email,
                 password
             );
+            // const responseSession =
+            //     await mockAccount.createEmailPasswordSession(email, password);
             setSession(responseSession);
             const responseUser = await account.get();
+            // const responseUser = await mockAccount.get();
             setUser(responseUser);
+
+            await SecureStore.setItemAsync(
+                "session",
+                JSON.stringify(responseSession)
+            );
+            await SecureStore.setItemAsync(
+                "user",
+                JSON.stringify(responseUser)
+            );
+            await SecureStore.setItemAsync("loggedIn", true.toString());
 
             if (!isSignup) {
                 toast.success(successMessage, { id: toast_id });
@@ -137,10 +181,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(true);
         try {
             await account.create(ID.unique(), email, password, name);
+            // await mockAccount.create(ID.unique(), email, password, name);
             toast.success("Signed up", { id: toast_id });
             await signIn({ email, password, isSignup: true });
         } catch (error) {
-            console.error("Error signing up:", error);
+            toast.error("Error signing up");
         }
         setLoading(false);
     };
@@ -150,11 +195,27 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(true);
         try {
             await account.deleteSession("current");
+            // await mockAccount.deleteSession();
             setSession(null);
             setUser(null);
+            await SecureStore.deleteItemAsync("session");
+            await SecureStore.deleteItemAsync("user");
+            await SecureStore.deleteItemAsync("loggedIn");
             toast.success("Signed out", { id: toast_id });
         } catch (error) {
-            console.error("Error signing out:", error);
+            if (
+                error instanceof Error &&
+                "type" in error &&
+                (error as any).type.includes("general_unauthorized_scope")
+            ) {
+                setSession(null);
+                setUser(null);
+                await SecureStore.deleteItemAsync("session");
+                await SecureStore.deleteItemAsync("user");
+                await SecureStore.deleteItemAsync("loggedIn");
+            } else {
+                toast.error("Error signing out", { id: toast_id });
+            }
         }
         setLoading(false);
     };
@@ -169,12 +230,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     return (
         <AuthContext.Provider value={contextData}>
-            {loading
-                ? // <View style={styles.container}>
-                  //     <Text style={styles.text}>Loading..</Text>
-                  // </View>
-                  children
-                : children}
+            {children}
         </AuthContext.Provider>
     );
 };
@@ -184,15 +240,3 @@ const useAuth = () => {
 };
 
 export { useAuth, AuthProvider, AuthContext };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    text: {
-        fontSize: 24,
-        color: "white",
-    },
-});

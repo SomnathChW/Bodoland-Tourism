@@ -1,8 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Redirect, Stack } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 
 const StackLayout = () => {
+    const screens = [
+        { name: "details", title: "Details" },
+        { name: "festivals", title: "Festivals" },
+        { name: "cuisine", title: "Cuisine" },
+    ];
+
     return (
         <Stack initialRouteName="(tabs)">
             <Stack.Screen
@@ -11,27 +17,16 @@ const StackLayout = () => {
                     headerShown: false,
                 }}
             />
-            <Stack.Screen
-                name="details"
-                options={{
-                    title: "Details",
-                    headerShown: false,
-                }}
-            />
-            <Stack.Screen
-                name="festivals"
-                options={{
-                    title: "Festivals",
-                    headerShown: false,
-                }}
-            />
-            <Stack.Screen
-                name="cuisine"
-                options={{
-                    title: "Cuisine",
-                    headerShown: false,
-                }}
-            />
+            {screens.map((items) => (
+                <Stack.Screen
+                    key={items.name}
+                    name={items.name}
+                    options={{
+                        title: items.title,
+                        headerShown: false,
+                    }}
+                />
+            ))}
         </Stack>
     );
 };
