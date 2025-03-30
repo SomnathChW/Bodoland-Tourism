@@ -72,10 +72,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                     SecureStore.deleteItemAsync("loggedIn");
                     toast.error("Please sign in to continue");
                 }
-                setSession(null);
-                setUser(null);
                 await SecureStore.deleteItemAsync("session");
                 await SecureStore.deleteItemAsync("user");
+                setSession(null);
+                setUser(null);
             } else {
                 toast.error("Error checking your account");
             }
@@ -208,11 +208,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 "type" in error &&
                 (error as any).type.includes("general_unauthorized_scope")
             ) {
-                setSession(null);
-                setUser(null);
                 await SecureStore.deleteItemAsync("session");
                 await SecureStore.deleteItemAsync("user");
                 await SecureStore.deleteItemAsync("loggedIn");
+                setSession(null);
+                setUser(null);
             } else {
                 toast.error("Error signing out", { id: toast_id });
             }
