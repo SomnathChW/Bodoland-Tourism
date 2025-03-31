@@ -4,17 +4,17 @@ import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
-import Section from "@/components/Section";
+import Section from "@/components/UI/Section";
 import CardVertical from "@/components/CardVertical";
 import CardHorizontal from "@/components/CardHorizontal";
-import Carousel from "@/components/Carousel";
-import CardSquare from "@/components/CardSquare";
+import Carousel from "@/components/UI/Carousel/Carousel";
+import CardSquare from "@/components/CategoryCard";
 
 import { carouselData } from "@/data/slider_data";
 import { districtData } from "@/data/district_data";
 import { categoryData } from "@/data/category_data";
 import { useAuth } from "@/context/AuthContext";
-import AlertDialog from "@/components/AlertDialog";
+import AlertDialog from "@/components/UI/AlertDialog";
 
 const Home = () => {
     const router = useRouter();
@@ -61,6 +61,7 @@ const Home = () => {
                     style={styles.scrollPadding}
                     contentContainerStyle={{ paddingBottom: 20 }}
                     stickyHeaderIndices={[1]}
+                    showsVerticalScrollIndicator={false}
                 >
                     <Carousel itemList={carouselData} />
                     <Section
