@@ -1,8 +1,8 @@
 import { StyleSheet, StatusBar, View, Text, ScrollView } from "react-native";
 import React from "react";
 
-import { VRData } from "@/data/vr_data";
-import VrCard from "@/components/VrCard";
+import { souvenirData } from "@/data/souvenir_data";
+import ProductCard from "@/components/ProductCard";
 
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
@@ -28,14 +28,16 @@ const Souvenirs = () => {
                     <Ionicons name="search" size={30} style={styles.buttons} />
                 </View>
                 <FlashList
-                    data={VRData}
+                    data={souvenirData}
                     renderItem={({ item, index }) => (
-                        <VrCard item={item} index={index} />
+                        <ProductCard item={item} index={index} />
                     )}
                     horizontal={false}
                     showsVerticalScrollIndicator={false}
                     numColumns={2}
                     estimatedItemSize={30}
+                    keyExtractor={(item) => item.identifier}
+                    contentContainerStyle={{}}
                 />
             </View>
         </View>
