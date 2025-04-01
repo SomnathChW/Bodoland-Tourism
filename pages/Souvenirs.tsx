@@ -6,8 +6,10 @@ import ProductCard from "@/components/ProductCard";
 
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
+import { useDrawer } from "@/context/DrawerContext";
 
 const Souvenirs = () => {
+    const { toggleDrawer } = useDrawer();
     return (
         <View style={styles.container}>
             <View style={styles.content}>
@@ -17,6 +19,7 @@ const Souvenirs = () => {
                             name="menu"
                             size={30}
                             style={styles.buttons}
+                            onPress={toggleDrawer}
                         />
                         <View>
                             <Text style={styles.headingText}>Souvenirs</Text>

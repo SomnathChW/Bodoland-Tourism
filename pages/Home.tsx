@@ -15,10 +15,12 @@ import { districtData } from "@/data/district_data";
 import { categoryData } from "@/data/category_data";
 import { useAuth } from "@/context/AuthContext";
 import AlertDialog from "@/components/UI/AlertDialog";
+import { useDrawer } from "@/context/DrawerContext";
 
 const Home = () => {
     const router = useRouter();
     const { signOut } = useAuth();
+    const { toggleDrawer } = useDrawer();
 
     const [showDialog, setShowDialog] = useState(false);
 
@@ -40,6 +42,7 @@ const Home = () => {
                             name="menu"
                             size={30}
                             style={styles.buttons}
+                            onPress={toggleDrawer}
                         />
                         <View>
                             <Text style={styles.headingText}>
