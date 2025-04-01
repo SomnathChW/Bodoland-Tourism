@@ -22,8 +22,6 @@ const WIDTH_RATIO = 0.32;
 const HEIGHT_RATIO = 0.2;
 const NUM_CARDS_ON_SCREEN = 2.8;
 
-const TEST = false;
-
 const CardVertical = ({ item }: Props) => {
     const router = useRouter();
     return (

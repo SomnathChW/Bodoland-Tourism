@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import CardList from "./CardList";
+import CardList from "../CardList";
 
 type SectionProps = {
     subHeading?: string;
