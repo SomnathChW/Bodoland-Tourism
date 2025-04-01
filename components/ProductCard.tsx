@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
-import { Entypo, FontAwesome } from "@expo/vector-icons";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
 
 type Props = {
     item: {
@@ -29,7 +29,7 @@ const NUM_CARDS_ON_SCREEN = 2;
 const CARD_WIDTH =
     (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
     NUM_CARDS_ON_SCREEN;
-const CARD_HEIGHT = height * 0.3;
+const CARD_HEIGHT = height * 0.25;
 
 const ProductCard = ({ item, index }: Props) => {
     const router = useRouter();
@@ -53,19 +53,25 @@ const ProductCard = ({ item, index }: Props) => {
                             <Text style={styles.title} numberOfLines={1}>
                                 {item.title}
                             </Text>
-                            <View style={styles.discountView}>
-                                <View style={styles.offerView}>
-                                    <Text style={styles.offerPercentageText}>
-                                        {item.discount_percentage + "% off"}
-                                    </Text>
-                                </View>
-                            </View>
                             <View
                                 style={{
                                     flexDirection: "row",
                                     alignItems: "center",
                                 }}
                             >
+                                <View style={styles.offerView}>
+                                    <AntDesign
+                                        name="arrowdown"
+                                        size={10}
+                                        color="lime"
+                                        style={{
+                                            marginRight: 2,
+                                        }}
+                                    />
+                                    <Text style={styles.offerPercentageText}>
+                                        {item.discount_percentage + "%"}
+                                    </Text>
+                                </View>
                                 <Text style={styles.price}>
                                     {"₹ " + item.price}
                                 </Text>
@@ -74,13 +80,6 @@ const ProductCard = ({ item, index }: Props) => {
                                 </Text>
                             </View>
                         </View>
-                        <Pressable onPress={() => {}} style={styles.icon}>
-                            <Entypo
-                                name="shopping-cart"
-                                size={20}
-                                color="#646f7e"
-                            />
-                        </Pressable>
                     </View>
                 )}
                 <Pressable
@@ -88,11 +87,11 @@ const ProductCard = ({ item, index }: Props) => {
                     onPress={() => setIsBookmarked(!isBookmarked)}
                 >
                     <FontAwesome
-                        name="bookmark"
-                        size={15}
+                        name={isBookmarked ? "heart" : "heart-o"}
+                        size={20}
                         color={
                             isBookmarked
-                                ? "rgb(255, 255, 255)"
+                                ? "rgba(255, 0, 0, 0.80)"
                                 : "rgba(0, 0, 0, 0.40)"
                         }
                     />
@@ -131,23 +130,21 @@ const styles = StyleSheet.create({
         position: "absolute",
         alignItems: "center",
         justifyContent: "center",
-        height: CARD_HEIGHT * 0.14,
-        width: CARD_HEIGHT * 0.12,
+        height: CARD_HEIGHT * 0.15,
+        width: CARD_HEIGHT * 0.15,
         top: CARD_HEIGHT * 0.05,
         right: CARD_WIDTH * 0.05,
         alignSelf: "flex-start",
-        padding: 2,
-        paddingHorizontal: 10,
         borderRadius: 10,
-        backgroundColor: "rgba(52, 52, 52, 0.5)",
+        backgroundColor: "rgba(52, 52, 52, 0.24)",
     },
     image: {
         width: CARD_WIDTH,
-        height: CARD_HEIGHT * 0.65,
+        height: CARD_HEIGHT * 0.75,
     },
     infoView: {
         width: CARD_WIDTH,
-        height: CARD_HEIGHT * 0.35,
+        height: CARD_HEIGHT * 0.25,
         justifyContent: "space-between",
         flexDirection: "row",
         alignItems: "center",
@@ -163,47 +160,42 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "white",
         marginHorizontal: 5,
-        marginBottom: 5,
+        marginBottom: 4,
+        textAlignVertical: "center",
     },
     price: {
         fontFamily: "SfProMedium",
         fontSize: 12,
         color: "white",
         marginHorizontal: 4,
-        fontWeight: "bold",
-    },
-    discountView: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        alignContent: "center",
-        marginBottom: 5,
+        textAlignVertical: "bottom",
+        lineHeight: 12,
     },
     discount: {
         fontFamily: "SfProMedium",
-        fontSize: 12,
+        fontSize: 10,
         color: "#646f7e",
         marginLeft: 4,
         textDecorationLine: "line-through",
+        textAlignVertical: "bottom",
+        lineHeight: 12,
     },
     offerView: {
-        backgroundColor: "rgba(84, 224, 126, 0.4)",
+        // backgroundColor: "rgba(84, 224, 126, 0.4)",
         paddingVertical: 1,
         paddingHorizontal: 3,
         borderRadius: 3,
-        marginLeft: 4,
+        marginLeft: 0,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
     },
     offerPercentageText: {
         fontFamily: "SfProMedium",
         fontSize: 10,
-        color: "white",
+        color: "lime",
         textAlign: "center",
-    },
-    icon: {
-        marginLeft: 10,
-        marginRight: 4,
-        backgroundColor: "rgba(255, 255, 255, 0.08)",
-        padding: 10,
-        borderRadius: 5,
+        textAlignVertical: "bottom",
+        lineHeight: 12,
     },
 });

@@ -46,7 +46,9 @@ const VrCard = ({ item, index }: Props) => {
                 {item.title && (
                     <View style={styles.infoView}>
                         <View style={styles.textView}>
-                            <Text style={styles.title}>{item.title}</Text>
+                            <Text style={styles.title} numberOfLines={1}>
+                                {item.title}
+                            </Text>
                             <View
                                 style={{
                                     flexDirection: "row",
@@ -59,7 +61,7 @@ const VrCard = ({ item, index }: Props) => {
                                     color="#646f7e"
                                     style={[styles.icon, { marginLeft: 2 }]}
                                 />
-                                <Text style={styles.location}>
+                                <Text style={styles.location} numberOfLines={1}>
                                     {item.location}
                                 </Text>
                             </View>
