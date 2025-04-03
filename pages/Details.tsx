@@ -1,3 +1,4 @@
+import React, { useEffect, useCallback } from "react";
 import {
     StyleSheet,
     Text,
@@ -5,336 +6,304 @@ import {
     Image,
     Dimensions,
     StatusBar,
-    Pressable,
+    TouchableOpacity,
+    ScrollView,
     Platform,
-    FlatList,
 } from "react-native";
-import React, { useEffect, useState, memo } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as NavigationBar from "expo-navigation-bar";
 import Animated, {
     useSharedValue,
-    useAnimatedScrollHandler,
     useAnimatedStyle,
+    useAnimatedScrollHandler,
     interpolate,
     Extrapolation,
+    withTiming,
+    cancelAnimation,
 } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { height } = Dimensions.get("screen");
-
-// Simplified header constants
-const HEADER_MAX_HEIGHT = height * 0.4; // Reduced from 0.45
-const HEADER_MIN_HEIGHT = 80;
+const HEADER_MAX_HEIGHT = height * 0.45;
+const HEADER_MIN_HEIGHT = 55;
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
-// Status bar height
-const STATUS_BAR_HEIGHT =
-    Platform.OS === "ios" ? 44 : StatusBar.currentHeight || 0;
+// Pre-define constants outside component
+const FEATURES = [
+    { icon: "wifi", text: "Free WiFi" },
+    { icon: "restaurant", text: "Restaurant" },
+    { icon: "car", text: "Free Parking" },
+    { icon: "snow", text: "Air Conditioning" },
+];
 
-// Memoized components for better performance
-const AboutSection = memo(({ details }) => (
-    <View>
-        <Text style={styles.subText}>About</Text>
-        <View style={styles.divider}></View>
-        <Text style={styles.details}>{details}</Text>
+// Feature item component
+const FeatureItem = React.memo(({ icon, text }) => (
+    <View style={styles.featureItem}>
+        <Ionicons name={icon} size={20} color="#646f7e" />
+        <Text style={styles.featureText}>{text}</Text>
     </View>
 ));
 
-const AmenitiesSection = memo(() => {
-    const amenities = [
-        { icon: "🏊", text: "Infinity Pool" },
-        { icon: "🍽️", text: "Gourmet Dining" },
-        { icon: "🧖", text: "Luxury Spa" },
-        { icon: "🏋️", text: "Fitness Center" },
-        { icon: "🚗", text: "Valet Parking" },
-        { icon: "📶", text: "High-Speed WiFi" },
-    ];
-
-    return (
-        <View style={{ marginTop: 20 }}>
-            <Text style={styles.subText}>Amenities</Text>
-            <View style={styles.divider}></View>
-            <View style={styles.amenitiesContainer}>
-                {amenities.map((item, index) => (
-                    <View key={index} style={styles.amenityItem}>
-                        <Text style={styles.amenityIcon}>{item.icon}</Text>
-                        <Text style={styles.amenityText}>{item.text}</Text>
-                    </View>
-                ))}
-            </View>
-        </View>
-    );
-});
-
-const LocationSection = memo(() => (
-    <View style={{ marginTop: 20 }}>
-        <Text style={styles.subText}>Location</Text>
-        <View style={styles.divider}></View>
-        <Text style={styles.details}>
-            Nestled at the edge of Manas National Park, our resort offers
-            private access to wildlife safaris and natural trails.
-        </Text>
-
-        <View style={styles.locationDetails}>
-            <View style={styles.locationItem}>
-                <Ionicons name="location-outline" size={18} color="#2E71F0" />
-                <Text style={styles.locationText}>
-                    Manas National Park, Assam
-                </Text>
-            </View>
-        </View>
-    </View>
-));
-
-const BookingSection = memo(({ onPress }) => (
-    <View style={styles.bookNowContainer}>
-        <View>
-            <Text style={styles.priceLabel}>Starting from</Text>
-            <Text style={styles.priceText}>
-                $299<Text style={styles.priceUnit}> / night</Text>
-            </Text>
-        </View>
-        <Pressable style={styles.bookNowButton} onPress={onPress}>
-            <Text style={styles.bookNowText}>Book Now</Text>
-        </Pressable>
-    </View>
-));
-
-const GalleryItem = memo(({ source }) => (
-    <View style={styles.galleryItem}>
+// Similar card component
+const SimilarCard = React.memo(({ item }) => (
+    <View style={styles.similarCard}>
         <Image
-            source={source}
-            style={styles.galleryImage}
-            progressiveRenderingEnabled={true}
-            resizeMethod="resize"
+            source={require("@/assets/images/app_images/manas-national-park.jpg")}
+            style={styles.similarCardImage}
         />
+        <View style={styles.similarCardContent}>
+            <Text style={styles.similarCardTitle}>Related Place {item}</Text>
+            <View style={styles.similarRatingContainer}>
+                {Array(3)
+                    .fill(0)
+                    .map((_, index) => (
+                        <Ionicons
+                            key={index}
+                            name="star"
+                            size={12}
+                            color="#FFD700"
+                        />
+                    ))}
+                <Text style={styles.similarCardRating}>4.7</Text>
+            </View>
+        </View>
     </View>
 ));
 
-const GallerySection = memo(() => {
-    // Gallery images data
-    const galleryImages = [
-        require("@/assets/images/app_images/manas-national-park.jpg"),
-        require("@/assets/images/app_images/manas-national-park.jpg"),
-        require("@/assets/images/app_images/manas-national-park.jpg"),
-        require("@/assets/images/app_images/manas-national-park.jpg"),
-    ];
-
-    return (
-        <View style={styles.galleryContainer}>
-            <Text style={styles.galleryTitle}>Photo Gallery</Text>
-            <FlatList
-                data={galleryImages}
-                keyExtractor={(_, index) => `gallery-${index}`}
-                numColumns={2}
-                renderItem={({ item }) => <GalleryItem source={item} />}
-                initialNumToRender={4}
-                maxToRenderPerBatch={2}
-                windowSize={3}
-                scrollEnabled={false}
-                removeClippedSubviews={true}
-                style={styles.galleryGrid}
-                columnWrapperStyle={{ justifyContent: "space-between" }}
-            />
-        </View>
-    );
-});
-
+// Main component with optimization for first render
 const Details = () => {
+    const identifier = useLocalSearchParams().identifier;
     const router = useRouter();
-    const identifier = useLocalSearchParams().identifier || "Luxury Resort";
-    const [isLiked, setIsLiked] = useState(false);
-    const [showGallery, setShowGallery] = useState(false);
+    const insets = useSafeAreaInsets();
+
+    // Calculate header heights accounting for status bar
+    const minimizedHeaderHeight = HEADER_MIN_HEIGHT + insets.top;
+
+    // Animation values
     const scrollY = useSharedValue(0);
+    const isReady = useSharedValue(0);
 
+    // Set up navigation immediately
     useEffect(() => {
-        NavigationBar.setBackgroundColorAsync("#0d1116");
-        StatusBar.setBarStyle("light-content");
+        if (Platform.OS === "android") {
+            NavigationBar.setBackgroundColorAsync("#0d1116");
+        }
 
-        // Defer loading gallery for better initial render performance
-        const timer = setTimeout(() => setShowGallery(true), 100);
-        return () => clearTimeout(timer);
+        isReady.value = withTiming(1, { duration: 10 });
+
+        return () => {
+            cancelAnimation(scrollY);
+            cancelAnimation(isReady);
+        };
     }, []);
 
-    // Optimized scroll handler with worklet annotation
+    // Scroll handler
     const scrollHandler = useAnimatedScrollHandler({
         onScroll: (event) => {
-            "worklet";
             scrollY.value = event.contentOffset.y;
         },
     });
 
-    // Combined animation styles for better performance
-    const headerAnimatedStyle = useAnimatedStyle(() => {
-        return {
-            height: Math.max(
-                HEADER_MIN_HEIGHT,
-                HEADER_MAX_HEIGHT - scrollY.value
-            ),
-        };
-    });
+    // Back button handler
+    const handleBack = useCallback(() => {
+        router.back();
+    }, [router]);
 
-    const headerImageStyle = useAnimatedStyle(() => {
-        const opacity = interpolate(
+    // Animated styles with fixed header sizing
+    const headerAnimatedStyle = useAnimatedStyle(() => ({
+        height: interpolate(
             scrollY.value,
-            [HEADER_SCROLL_DISTANCE * 0.7, HEADER_SCROLL_DISTANCE],
-            [1, 0],
+            [0, HEADER_SCROLL_DISTANCE],
+            [HEADER_MAX_HEIGHT, minimizedHeaderHeight],
             Extrapolation.CLAMP
-        );
+        ),
+        opacity: isReady.value,
+    }));
 
-        return { opacity };
-    });
+    const imageAnimatedStyle = useAnimatedStyle(() => ({
+        opacity: interpolate(
+            scrollY.value,
+            [0, HEADER_SCROLL_DISTANCE * 0.7, HEADER_SCROLL_DISTANCE],
+            [1, 0.3, 0],
+            Extrapolation.CLAMP
+        ),
+        transform: [
+            {
+                scale: interpolate(
+                    scrollY.value,
+                    [0, HEADER_SCROLL_DISTANCE],
+                    [1, 1.2],
+                    Extrapolation.CLAMP
+                ),
+            },
+        ],
+    }));
 
-    const titleAnimatedStyle = useAnimatedStyle(() => {
-        const opacity = interpolate(
+    const minimizedHeaderStyle = useAnimatedStyle(() => ({
+        opacity: interpolate(
             scrollY.value,
             [HEADER_SCROLL_DISTANCE * 0.7, HEADER_SCROLL_DISTANCE],
             [0, 1],
             Extrapolation.CLAMP
-        );
+        ),
+    }));
 
-        return { opacity };
-    });
-
-    const imageContentStyle = useAnimatedStyle(() => {
-        const opacity = interpolate(
+    const floatingBackButtonStyle = useAnimatedStyle(() => ({
+        opacity: interpolate(
             scrollY.value,
             [0, HEADER_SCROLL_DISTANCE * 0.5],
             [1, 0],
             Extrapolation.CLAMP
-        );
+        ),
+    }));
 
-        return { opacity };
-    });
-
-    // Content container style
-    const contentContainerStyle = {
-        paddingTop: HEADER_MAX_HEIGHT,
-    };
-
-    // Function for booking - can be used with memo
-    const handleBookNow = () => {
-        // Booking logic here
-    };
-
-    // About text content
-    const aboutText =
-        "Experience luxury at our premium resort featuring spacious suites with breathtaking views of Manas National Park. Each room is elegantly designed with modern amenities and comfortable furnishings to ensure a relaxing stay.";
-
+    // Render only basic structure initially for faster mounting
     return (
         <View style={styles.container}>
-            <StatusBar translucent backgroundColor="transparent" />
+            <StatusBar
+                barStyle="light-content"
+                translucent
+                backgroundColor="transparent"
+            />
 
+            {/* Header with Image */}
+            <Animated.View style={[styles.header, headerAnimatedStyle]}>
+                {/* Image - Using lower quality for faster load */}
+                <Animated.Image
+                    source={require("@/assets/images/app_images/manas-national-park.jpg")}
+                    style={[styles.headerImage, imageAnimatedStyle]}
+                    resizeMethod="resize"
+                    fadeDuration={0}
+                />
+
+                <View style={styles.overlay} />
+
+                {/* Minimized Header with fixed positioning */}
+                <Animated.View
+                    style={[
+                        styles.minimizedHeader,
+                        minimizedHeaderStyle,
+                        {
+                            height: minimizedHeaderHeight,
+                            paddingTop: insets.top,
+                            backgroundColor: "#1a2432", // Lighter background for visibility
+                        },
+                    ]}
+                >
+                    <TouchableOpacity
+                        style={styles.headerBackButton}
+                        onPress={handleBack}
+                    >
+                        <Ionicons name="arrow-back" size={24} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.minimizedTitle} numberOfLines={1}>
+                        {identifier}
+                    </Text>
+                    <View style={styles.headerRightPlaceholder} />
+                </Animated.View>
+
+                {/* Floating Back Button */}
+                <Animated.View
+                    style={[
+                        styles.floatingBackButton,
+                        floatingBackButtonStyle,
+                        { top: insets.top + 10 },
+                    ]}
+                >
+                    <TouchableOpacity onPress={handleBack}>
+                        <Ionicons name="arrow-back" size={24} color="#fff" />
+                    </TouchableOpacity>
+                </Animated.View>
+            </Animated.View>
+
+            {/* Content Scroll View */}
             <Animated.ScrollView
                 contentContainerStyle={[
-                    styles.scrollContainer,
-                    contentContainerStyle,
+                    styles.scrollViewContent,
+                    { paddingTop: HEADER_MAX_HEIGHT },
                 ]}
-                scrollEventThrottle={16}
-                onScroll={scrollHandler}
                 showsVerticalScrollIndicator={false}
+                onScroll={scrollHandler}
+                scrollEventThrottle={16}
                 removeClippedSubviews={true}
                 overScrollMode="never"
+                maxToRenderPerBatch={4}
+                windowSize={5}
+                updateCellsBatchingPeriod={50}
             >
-                <View style={styles.cardContainer}>
-                    <View style={styles.cardHeaderContainer}>
-                        {/* About Section */}
-                        <AboutSection details={aboutText} />
-
-                        {/* Amenities Section */}
-                        <AmenitiesSection />
-
-                        {/* Location Section */}
-                        <LocationSection />
-
-                        {/* Booking Section */}
-                        <BookingSection onPress={handleBookNow} />
+                {/* Title Section */}
+                <View style={styles.titleSection}>
+                    <Text style={styles.title}>{identifier}</Text>
+                    <View style={styles.ratingContainer}>
+                        {Array(5)
+                            .fill(0)
+                            .map((_, index) => (
+                                <Ionicons
+                                    key={index}
+                                    name="star"
+                                    size={16}
+                                    color="#FFD700"
+                                />
+                            ))}
+                        <Text style={styles.ratingText}>4.8 (240 reviews)</Text>
+                    </View>
+                    <View style={styles.locationContainer}>
+                        <Ionicons name="location" size={16} color="#646f7e" />
+                        <Text style={styles.locationText}>Assam, India</Text>
                     </View>
                 </View>
 
-                {/* Deferred Gallery Section */}
-                {showGallery && <GallerySection />}
-            </Animated.ScrollView>
-
-            {/* Header with optimized animations */}
-            <Animated.View style={[styles.header, headerAnimatedStyle]}>
-                <Animated.Image
-                    source={require("@/assets/images/app_images/manas-national-park.jpg")}
-                    style={[styles.headerImage, headerImageStyle]}
-                    progressiveRenderingEnabled={true}
-                    resizeMethod="resize"
-                />
-
-                {/* Gradient overlay */}
-                <View style={styles.gradientOverlay} />
-
-                {/* Header content */}
-                <Animated.View
-                    style={[styles.imageHeaderContent, imageContentStyle]}
-                >
-                    <Pressable
-                        style={styles.backButton}
-                        onPress={() => router.back()}
-                    >
-                        <Ionicons name="arrow-back" size={24} color="white" />
-                    </Pressable>
-
-                    <View style={styles.imageTextContainer}>
-                        <Text style={styles.imageHeaderTitle}>
-                            {identifier}
-                        </Text>
-                        <View style={styles.imageHeaderRating}>
-                            <Text style={styles.imageHeaderRatingText}>
-                                5.0
-                            </Text>
-                            <Text style={styles.imageStar}>★★★★★</Text>
-                        </View>
-                    </View>
-
-                    <Pressable
-                        style={styles.likeButton}
-                        onPress={() => setIsLiked(!isLiked)}
-                    >
-                        <Ionicons
-                            name={isLiked ? "heart" : "heart-outline"}
-                            size={24}
-                            color={isLiked ? "#FF3B30" : "white"}
-                        />
-                    </Pressable>
-                </Animated.View>
-
-                {/* Mini header that appears on scroll */}
-                <Animated.View
-                    style={[styles.headerTitleContainer, titleAnimatedStyle]}
-                >
-                    <Pressable
-                        style={styles.miniHeaderBackButton}
-                        onPress={() => router.back()}
-                    >
-                        <Ionicons name="arrow-back" size={22} color="white" />
-                    </Pressable>
-                    <Text style={styles.headerTitle} numberOfLines={1}>
-                        {identifier}
+                {/* Details Section */}
+                <View style={styles.detailsSection}>
+                    <Text style={styles.sectionTitle}>About</Text>
+                    <View style={styles.separator} />
+                    <Text style={styles.details}>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Nulla facilisis, nunc vel tincidunt vestibulum, risus
+                        leo varius nisl, a dignissim velit massa eu mauris.
                     </Text>
-                    <Pressable
-                        style={styles.miniHeaderLikeButton}
-                        onPress={() => setIsLiked(!isLiked)}
+                </View>
+
+                {/* Features Section */}
+                <View style={styles.featuresSection}>
+                    <Text style={styles.sectionTitle}>Features</Text>
+                    <View style={styles.separator} />
+                    <View style={styles.featuresList}>
+                        {FEATURES.map((feature, index) => (
+                            <FeatureItem
+                                key={index}
+                                icon={feature.icon}
+                                text={feature.text}
+                            />
+                        ))}
+                    </View>
+                </View>
+
+                {/* Similar Places */}
+                <View style={styles.similarSection}>
+                    <Text style={styles.sectionTitle}>Similar Places</Text>
+                    <View style={styles.separator} />
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.similarCardsContainer}
+                        removeClippedSubviews={true}
                     >
-                        <Ionicons
-                            name={isLiked ? "heart" : "heart-outline"}
-                            size={22}
-                            color={isLiked ? "#FF3B30" : "white"}
-                        />
-                    </Pressable>
-                </Animated.View>
-            </Animated.View>
+                        {[1, 2, 3].map((item) => (
+                            <SimilarCard key={item} item={item} />
+                        ))}
+                    </ScrollView>
+                </View>
+
+                {/* Space at bottom */}
+                <View style={{ height: 50 }} />
+            </Animated.ScrollView>
         </View>
     );
 };
 
-export default Details;
-
+// Optimized styles - minimizing calculations
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -345,262 +314,173 @@ const styles = StyleSheet.create({
         top: 0,
         left: 0,
         right: 0,
-        backgroundColor: "#0d1116",
         overflow: "hidden",
-        zIndex: 999,
+        zIndex: 10,
+        backgroundColor: "#0d1116",
     },
     headerImage: {
         width: "100%",
         height: "100%",
         resizeMode: "cover",
     },
-    gradientOverlay: {
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: "100%",
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
         backgroundColor: "rgba(13, 17, 22, 0.4)",
     },
-    imageHeaderContent: {
+    minimizedHeader: {
         position: "absolute",
         top: 0,
         left: 0,
         right: 0,
-        bottom: 0,
-        paddingTop: STATUS_BAR_HEIGHT + 10,
-        paddingHorizontal: 20,
         flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
+        alignItems: "center", // Changed from center to flex-end
+        paddingBottom: 10, // Add padding at the bottom
+        justifyContent: "flex-start",
+        paddingHorizontal: 15,
+        zIndex: 20,
     },
-    imageTextContainer: {
-        position: "absolute",
-        bottom: 20,
-        left: 20,
-        right: 70,
+    headerBackButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: "center",
+        alignItems: "center",
     },
-    imageHeaderTitle: {
+    headerRightPlaceholder: {
+        width: 40,
+    },
+    minimizedTitle: {
         color: "#fff",
-        fontSize: 32,
-        fontWeight: "bold",
         fontFamily: "SfProMedium",
-        textShadowColor: "rgba(0, 0, 0, 0.5)",
-        textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 3,
+        fontSize: 18,
+        fontWeight: "bold",
+        flex: 1,
+        textAlign: "center",
+    },
+    floatingBackButton: {
+        position: "absolute",
+        left: 20,
+        zIndex: 15,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: "rgba(0, 0, 0, 0.3)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    scrollViewContent: {
+        paddingHorizontal: 20,
+    },
+    titleSection: {
+        marginTop: 20,
+        marginBottom: 25,
+    },
+    title: {
+        color: "#fff",
+        fontFamily: "SfProMedium",
+        fontSize: 28,
+        fontWeight: "bold",
+        marginBottom: 10,
+    },
+    ratingContainer: {
+        flexDirection: "row",
+        alignItems: "center",
         marginBottom: 8,
     },
-    imageHeaderRating: {
+    ratingText: {
+        color: "#fff",
+        marginLeft: 8,
+        fontSize: 14,
+    },
+    locationContainer: {
         flexDirection: "row",
         alignItems: "center",
     },
-    imageHeaderRatingText: {
-        color: "#fff",
-        fontSize: 18,
-        fontWeight: "bold",
-        marginRight: 10,
-        textShadowColor: "rgba(0, 0, 0, 0.5)",
-        textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 3,
+    locationText: {
+        color: "#646f7e",
+        marginLeft: 5,
+        fontSize: 14,
     },
-    imageStar: {
-        color: "#FFD700",
-        fontSize: 16,
-        textShadowColor: "rgba(0, 0, 0, 0.5)",
-        textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 3,
+    detailsSection: {
+        marginBottom: 30,
     },
-    backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: "rgba(0, 0, 0, 0.3)",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    likeButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: "rgba(0, 0, 0, 0.3)",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    headerTitleContainer: {
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        height: HEADER_MIN_HEIGHT,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        backgroundColor: "rgba(13, 17, 22, 0.95)",
-        paddingHorizontal: 15,
-        paddingTop: STATUS_BAR_HEIGHT,
-    },
-    miniHeaderBackButton: {
-        width: 34,
-        height: 34,
-        borderRadius: 17,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    miniHeaderLikeButton: {
-        width: 34,
-        height: 34,
-        borderRadius: 17,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    headerTitle: {
-        flex: 1,
-        color: "#fff",
-        fontFamily: "SfProMedium",
-        fontSize: 18,
-        fontWeight: "bold",
-        textAlign: "center",
-        marginHorizontal: 10,
-    },
-    scrollContainer: {
-        paddingBottom: 30,
-    },
-    cardContainer: {
-        backgroundColor: "transparent",
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        overflow: "hidden",
-    },
-    cardHeaderContainer: {
-        backgroundColor: "rgba(25, 32, 44, 0.95)",
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        padding: 24,
-        paddingTop: 30,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: -4, // Reduced for better performance
-        },
-        shadowOpacity: 0.15, // Reduced for better performance
-        shadowRadius: 10,
-        elevation: 8, // Reduced for better performance on Android
-    },
-    subText: {
+    sectionTitle: {
         color: "#646f7e",
         fontFamily: "SfProMedium",
         fontSize: 18,
         fontWeight: "bold",
         marginBottom: 5,
     },
-    divider: {
+    separator: {
         height: 2,
         backgroundColor: "#646f7e",
         marginBottom: 15,
-        width: "100%",
     },
     details: {
         color: "#fff",
         fontFamily: "SfProMedium",
         fontSize: 16,
-        lineHeight: 24,
+        lineHeight: 25,
+        marginBottom: 15,
     },
-    amenitiesContainer: {
+    featuresSection: {
+        marginBottom: 30,
+    },
+    featuresList: {
         flexDirection: "row",
         flexWrap: "wrap",
-        marginTop: 5,
-    },
-    amenityItem: {
-        width: "50%",
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 15,
-    },
-    amenityIcon: {
-        fontSize: 18,
-        marginRight: 10,
-    },
-    amenityText: {
-        color: "#fff",
-        fontSize: 14,
-    },
-    locationDetails: {
-        marginTop: 15,
-    },
-    locationItem: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 10,
-    },
-    locationText: {
-        color: "#fff",
-        fontSize: 14,
-        marginLeft: 8,
-    },
-    bookNowContainer: {
-        marginTop: 30,
-        flexDirection: "row",
         justifyContent: "space-between",
+    },
+    featureItem: {
+        flexDirection: "row",
         alignItems: "center",
-    },
-    priceLabel: {
-        color: "#646f7e",
-        fontSize: 14,
-        marginBottom: 2,
-    },
-    priceText: {
-        color: "#fff",
-        fontSize: 26,
-        fontWeight: "bold",
-    },
-    priceUnit: {
-        fontSize: 16,
-        color: "#ccc",
-    },
-    bookNowButton: {
-        backgroundColor: "#2E71F0",
-        paddingVertical: 14,
-        paddingHorizontal: 28,
-        borderRadius: 12,
-        shadowColor: "#2E71F0",
-        shadowOffset: {
-            width: 0,
-            height: 4, // Reduced from 5
-        },
-        shadowOpacity: 0.2, // Reduced from 0.3
-        shadowRadius: 6, // Reduced from 10
-        elevation: 4, // Reduced from 5
-    },
-    bookNowText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "bold",
-    },
-    galleryContainer: {
-        marginTop: 15,
-        marginBottom: 10,
-        paddingHorizontal: 24,
-    },
-    galleryTitle: {
-        color: "#fff",
-        fontFamily: "SfProMedium",
-        fontSize: 20,
-        fontWeight: "bold",
-        marginBottom: 15,
-    },
-    galleryGrid: {
-        width: "100%",
-    },
-    galleryItem: {
         width: "48%",
         marginBottom: 15,
-        borderRadius: 15,
-        overflow: "hidden",
-        height: 120,
+        backgroundColor: "rgba(100, 111, 126, 0.1)",
+        padding: 12,
+        borderRadius: 10,
     },
-    galleryImage: {
+    featureText: {
+        color: "#fff",
+        marginLeft: 8,
+        fontSize: 14,
+    },
+    similarSection: {
+        marginBottom: 30,
+    },
+    similarCardsContainer: {
+        paddingVertical: 10,
+    },
+    similarCard: {
+        width: 180,
+        marginRight: 15,
+        borderRadius: 12,
+        overflow: "hidden",
+        backgroundColor: "rgba(100, 111, 126, 0.1)",
+    },
+    similarCardImage: {
         width: "100%",
-        height: "100%",
+        height: 120,
         resizeMode: "cover",
     },
+    similarCardContent: {
+        padding: 10,
+    },
+    similarCardTitle: {
+        color: "#fff",
+        fontSize: 14,
+        fontWeight: "bold",
+        marginBottom: 5,
+    },
+    similarRatingContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    similarCardRating: {
+        color: "#fff",
+        fontSize: 12,
+        marginLeft: 5,
+    },
 });
+
+export default Details;

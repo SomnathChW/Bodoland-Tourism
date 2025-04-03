@@ -28,7 +28,7 @@ const CardVertical = ({ item }: Props) => {
         <View style={[styles.card]}>
             <Pressable
                 onPress={() =>
-                    router.navigate({
+                    router.push({
                         pathname: "/details",
                         params: { identifier: item.identifier },
                     })
