@@ -6,10 +6,12 @@ import {
     RadialGradient,
 } from "@shopify/react-native-skia";
 import React from "react";
+import { useDrawer } from "@/context/DrawerContext";
 
 const { height, width } = Dimensions.get("screen");
 
 const Stays = () => {
+    const { toggleDrawer } = useDrawer();
     return (
         <View style={styles.container}>
             <Canvas style={{ flex: 1 }}>
