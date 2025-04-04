@@ -27,9 +27,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const { height } = Dimensions.get("screen");
 const HEADER_MAX_HEIGHT = height * 0.45;
 const HEADER_MIN_HEIGHT = 55;
-const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
-// Pre-define constants outside component
 const FEATURES = [
     { icon: "wifi", text: "Free WiFi" },
     { icon: "restaurant", text: "Restaurant" },
@@ -37,7 +35,6 @@ const FEATURES = [
     { icon: "snow", text: "Air Conditioning" },
 ];
 
-// Feature item component
 const FeatureItem = React.memo(({ icon, text }) => (
     <View style={styles.featureItem}>
         <Ionicons name={icon} size={20} color="#646f7e" />
@@ -45,13 +42,12 @@ const FeatureItem = React.memo(({ icon, text }) => (
     </View>
 ));
 
-// Similar card component
 const SimilarCard = React.memo(({ item }) => (
     <View style={styles.similarCard}>
-        <Image
-            source={require("@/assets/images/app_images/manas-national-park.jpg")}
+        {/* <Image
+            source={require("@/assets/images/districts/chirang.jpg")}
             style={styles.similarCardImage}
-        />
+        /> */}
         <View style={styles.similarCardContent}>
             <Text style={styles.similarCardTitle}>Related Place {item}</Text>
             <View style={styles.similarRatingContainer}>
@@ -71,50 +67,40 @@ const SimilarCard = React.memo(({ item }) => (
     </View>
 ));
 
-// Main component with optimization for first render
 const Details = () => {
     const identifier = useLocalSearchParams().identifier;
     const router = useRouter();
     const insets = useSafeAreaInsets();
 
-    // Calculate header heights accounting for status bar
     const minimizedHeaderHeight = HEADER_MIN_HEIGHT + insets.top;
+    const scrollDistance = HEADER_MAX_HEIGHT - minimizedHeaderHeight;
 
-    // Animation values
     const scrollY = useSharedValue(0);
     const isReady = useSharedValue(0);
 
-    // Set up navigation immediately
     useEffect(() => {
-        if (Platform.OS === "android") {
-            NavigationBar.setBackgroundColorAsync("#0d1116");
-        }
-
         isReady.value = withTiming(1, { duration: 10 });
 
         return () => {
             cancelAnimation(scrollY);
             cancelAnimation(isReady);
         };
-    }, []);
+    }, [isReady, scrollY]);
 
-    // Scroll handler
     const scrollHandler = useAnimatedScrollHandler({
         onScroll: (event) => {
             scrollY.value = event.contentOffset.y;
         },
     });
 
-    // Back button handler
     const handleBack = useCallback(() => {
         router.back();
     }, [router]);
 
-    // Animated styles with fixed header sizing
     const headerAnimatedStyle = useAnimatedStyle(() => ({
         height: interpolate(
             scrollY.value,
-            [0, HEADER_SCROLL_DISTANCE],
+            [0, scrollDistance],
             [HEADER_MAX_HEIGHT, minimizedHeaderHeight],
             Extrapolation.CLAMP
         ),
@@ -124,7 +110,7 @@ const Details = () => {
     const imageAnimatedStyle = useAnimatedStyle(() => ({
         opacity: interpolate(
             scrollY.value,
-            [0, HEADER_SCROLL_DISTANCE * 0.7, HEADER_SCROLL_DISTANCE],
+            [0, scrollDistance * 0.7, scrollDistance],
             [1, 0.3, 0],
             Extrapolation.CLAMP
         ),
@@ -132,7 +118,7 @@ const Details = () => {
             {
                 scale: interpolate(
                     scrollY.value,
-                    [0, HEADER_SCROLL_DISTANCE],
+                    [0, scrollDistance],
                     [1, 1.2],
                     Extrapolation.CLAMP
                 ),
@@ -143,7 +129,7 @@ const Details = () => {
     const minimizedHeaderStyle = useAnimatedStyle(() => ({
         opacity: interpolate(
             scrollY.value,
-            [HEADER_SCROLL_DISTANCE * 0.7, HEADER_SCROLL_DISTANCE],
+            [scrollDistance * 0.7, scrollDistance],
             [0, 1],
             Extrapolation.CLAMP
         ),
@@ -152,34 +138,25 @@ const Details = () => {
     const floatingBackButtonStyle = useAnimatedStyle(() => ({
         opacity: interpolate(
             scrollY.value,
-            [0, HEADER_SCROLL_DISTANCE * 0.5],
+            [0, scrollDistance * 0.5],
             [1, 0],
             Extrapolation.CLAMP
         ),
     }));
 
-    // Render only basic structure initially for faster mounting
     return (
         <View style={styles.container}>
-            <StatusBar
-                barStyle="light-content"
-                translucent
-                backgroundColor="transparent"
-            />
-
-            {/* Header with Image */}
             <Animated.View style={[styles.header, headerAnimatedStyle]}>
-                {/* Image - Using lower quality for faster load */}
-                <Animated.Image
-                    source={require("@/assets/images/app_images/manas-national-park.jpg")}
-                    style={[styles.headerImage, imageAnimatedStyle]}
-                    resizeMethod="resize"
-                    fadeDuration={0}
-                />
+                <Animated.View style={imageAnimatedStyle}>
+                    <Image
+                        source={require("@/assets/images/districts/chirang.jpg")}
+                        style={styles.headerImage}
+                        resizeMode="cover"
+                    />
+                </Animated.View>
 
                 <View style={styles.overlay} />
 
-                {/* Minimized Header with fixed positioning */}
                 <Animated.View
                     style={[
                         styles.minimizedHeader,
@@ -187,7 +164,7 @@ const Details = () => {
                         {
                             height: minimizedHeaderHeight,
                             paddingTop: insets.top,
-                            backgroundColor: "#1a2432", // Lighter background for visibility
+                            backgroundColor: "#1a2432",
                         },
                     ]}
                 >
@@ -203,7 +180,6 @@ const Details = () => {
                     <View style={styles.headerRightPlaceholder} />
                 </Animated.View>
 
-                {/* Floating Back Button */}
                 <Animated.View
                     style={[
                         styles.floatingBackButton,
@@ -217,7 +193,6 @@ const Details = () => {
                 </Animated.View>
             </Animated.View>
 
-            {/* Content Scroll View */}
             <Animated.ScrollView
                 contentContainerStyle={[
                     styles.scrollViewContent,
@@ -232,7 +207,6 @@ const Details = () => {
                 windowSize={5}
                 updateCellsBatchingPeriod={50}
             >
-                {/* Title Section */}
                 <View style={styles.titleSection}>
                     <Text style={styles.title}>{identifier}</Text>
                     <View style={styles.ratingContainer}>
@@ -254,7 +228,6 @@ const Details = () => {
                     </View>
                 </View>
 
-                {/* Details Section */}
                 <View style={styles.detailsSection}>
                     <Text style={styles.sectionTitle}>About</Text>
                     <View style={styles.separator} />
@@ -265,7 +238,6 @@ const Details = () => {
                     </Text>
                 </View>
 
-                {/* Features Section */}
                 <View style={styles.featuresSection}>
                     <Text style={styles.sectionTitle}>Features</Text>
                     <View style={styles.separator} />
@@ -280,7 +252,6 @@ const Details = () => {
                     </View>
                 </View>
 
-                {/* Similar Places */}
                 <View style={styles.similarSection}>
                     <Text style={styles.sectionTitle}>Similar Places</Text>
                     <View style={styles.separator} />
@@ -295,15 +266,11 @@ const Details = () => {
                         ))}
                     </ScrollView>
                 </View>
-
-                {/* Space at bottom */}
-                <View style={{ height: 50 }} />
             </Animated.ScrollView>
         </View>
     );
 };
 
-// Optimized styles - minimizing calculations
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -333,8 +300,8 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         flexDirection: "row",
-        alignItems: "center", // Changed from center to flex-end
-        paddingBottom: 10, // Add padding at the bottom
+        alignItems: "center",
+        paddingBottom: 10,
         justifyContent: "flex-start",
         paddingHorizontal: 15,
         zIndex: 20,

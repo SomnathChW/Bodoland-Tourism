@@ -13,7 +13,14 @@ const StackLayout = () => {
 
     return (
         <>
-            <Stack initialRouteName="(tabs)">
+            <Stack
+                initialRouteName="(tabs)"
+                screenOptions={{
+                    animation: "ios_from_right",
+                    statusBarAnimation: "fade",
+                    animationDuration: 300,
+                }}
+            >
                 <Stack.Screen
                     name="(tabs)"
                     options={{
@@ -27,6 +34,7 @@ const StackLayout = () => {
                         options={{
                             title: items.title,
                             headerShown: false,
+                            navigationBarColor: "#0d1116",
                         }}
                     />
                 ))}
