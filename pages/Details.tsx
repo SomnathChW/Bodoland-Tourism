@@ -3,7 +3,6 @@ import {
     StyleSheet,
     Text,
     View,
-    Image,
     Dimensions,
     StatusBar,
     TouchableOpacity,
@@ -23,6 +22,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Image } from "expo-image";
 
 const { height } = Dimensions.get("screen");
 const HEADER_MAX_HEIGHT = height * 0.45;
@@ -44,10 +44,12 @@ const FeatureItem = React.memo(({ icon, text }) => (
 
 const SimilarCard = React.memo(({ item }) => (
     <View style={styles.similarCard}>
-        {/* <Image
-            source={require("@/assets/images/districts/chirang.jpg")}
+        <LazyImage
+            source={{
+                uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+            }}
             style={styles.similarCardImage}
-        /> */}
+        />
         <View style={styles.similarCardContent}>
             <Text style={styles.similarCardTitle}>Related Place {item}</Text>
             <View style={styles.similarRatingContainer}>
@@ -66,6 +68,45 @@ const SimilarCard = React.memo(({ item }) => (
         </View>
     </View>
 ));
+
+// Define props interface for LazyImage component
+interface LazyImageProps {
+    source: any;
+    style: any;
+    contentFit?: string;
+}
+
+// Lazy loading wrapper for better performance
+const LazyImage = React.memo(
+    ({ source, style, contentFit = "cover" }: LazyImageProps) => {
+        const isLoaded = useSharedValue(0);
+
+        const animatedStyles = useAnimatedStyle(() => ({
+            opacity: isLoaded.value,
+        }));
+
+        const onLoad = useCallback(() => {
+            isLoaded.value = withTiming(1, { duration: 500 });
+        }, [isLoaded]);
+
+        return (
+            <View style={[style, { backgroundColor: "#1a2432" }]}>
+                <Animated.View
+                    style={[StyleSheet.absoluteFill, animatedStyles]}
+                >
+                    <Image
+                        source={source}
+                        style={StyleSheet.absoluteFill}
+                        contentFit={contentFit}
+                        onLoad={onLoad}
+                        transition={300}
+                        cachePolicy="memory-disk"
+                    />
+                </Animated.View>
+            </View>
+        );
+    }
+);
 
 const Details = () => {
     const identifier = useLocalSearchParams().identifier;
@@ -148,10 +189,12 @@ const Details = () => {
         <View style={styles.container}>
             <Animated.View style={[styles.header, headerAnimatedStyle]}>
                 <Animated.View style={imageAnimatedStyle}>
-                    <Image
-                        source={require("@/assets/images/districts/chirang.jpg")}
+                    <LazyImage
+                        source={{
+                            uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+                        }}
                         style={styles.headerImage}
-                        resizeMode="cover"
+                        contentFit="cover"
                     />
                 </Animated.View>
 

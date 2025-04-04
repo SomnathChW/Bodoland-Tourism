@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
+import { StyleSheet, Text, View, Dimensions } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
@@ -7,6 +7,7 @@ import Animated, {
     SharedValue,
     useAnimatedStyle,
 } from "react-native-reanimated";
+import { Image } from "expo-image";
 
 type Props = {
     item: any;
@@ -65,7 +66,7 @@ const CarouselCard = ({ item, index, scrollX }: Props) => {
                     </View>
                 )}
                 <Text style={styles.title}>{item.title}</Text>
-                <Text style={styles.description}>{displayText}</Text>
+                <Text style={styles.description} numberOfLines={1} >{displayText}</Text>
             </LinearGradient>
         </Animated.View>
     );

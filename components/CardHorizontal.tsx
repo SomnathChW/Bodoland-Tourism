@@ -1,14 +1,8 @@
-import {
-    StyleSheet,
-    Text,
-    View,
-    Image,
-    Dimensions,
-    Pressable,
-} from "react-native";
+import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { Image } from "expo-image";
 
 type Props = {
     item: any;

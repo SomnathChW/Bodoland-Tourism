@@ -2,13 +2,13 @@ import {
     StyleSheet,
     Text,
     View,
-    Image,
     Dimensions,
     Pressable,
 } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import { Image } from "expo-image";
 
 type Props = {
     item: {

@@ -5,7 +5,6 @@ import {
     Dimensions,
     TouchableOpacity,
     Text,
-    Image,
     ScrollView,
     StatusBar,
     Platform,
@@ -20,6 +19,7 @@ import Animated, {
     Extrapolation,
 } from "react-native-reanimated";
 import { Feather, MaterialIcons, FontAwesome } from "@expo/vector-icons";
+import { Image } from "expo-image";
 
 const { width } = Dimensions.get("window");
 const DRAWER_WIDTH: number = width * 0.6;
