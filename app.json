@@ -2,7 +2,7 @@
     "expo": {
         "name": "BTR Tourism",
         "slug": "btr-tourism",
-        "version": "0.0.1",
+        "version": "0.0.2",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
         "scheme": "btrtourism",
@@ -26,7 +26,8 @@
                 "backgroundColor": "#0d1116"
             },
             "package": "in.coolidance.btrtourism",
-            "userInterfaceStyle": "dark"
+            "userInterfaceStyle": "dark",
+            "versionCode": 2
         },
         "web": {
             "bundler": "metro",
