@@ -19,6 +19,8 @@ import Animated, {
     Extrapolation,
     withTiming,
     cancelAnimation,
+    useDerivedValue,
+    SharedValue,
 } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -137,59 +139,92 @@ const Details = () => {
     const handleBack = useCallback(() => {
         router.back();
     }, [router]);
-
-    const headerAnimatedStyle = useAnimatedStyle(() => ({
-        height: interpolate(
-            scrollY.value,
-            [0, scrollDistance],
-            [HEADER_MAX_HEIGHT, minimizedHeaderHeight],
-            Extrapolation.CLAMP
-        ),
-        opacity: isReady.value,
-    }));
-
-    const imageAnimatedStyle = useAnimatedStyle(() => ({
-        opacity: interpolate(
-            scrollY.value,
-            [0, scrollDistance * 0.7, scrollDistance],
-            [1, 0.3, 0],
-            Extrapolation.CLAMP
-        ),
-        transform: [
-            {
-                scale: interpolate(
+    function useScrollAnimations(
+        scrollY: SharedValue<number>,
+        scrollDistance: number,
+        minimizedHeaderHeight: number, 
+        isReady: SharedValue<number>
+    ) {
+        // Calculate all animations in a single derived value
+        const animations = useDerivedValue(() => {
+            return {
+                headerHeight: interpolate(
+                    scrollY.value,
+                    [0, scrollDistance],
+                    [HEADER_MAX_HEIGHT, minimizedHeaderHeight],
+                    Extrapolation.CLAMP
+                ),
+                imageOpacity: interpolate(
+                    scrollY.value,
+                    [0, scrollDistance],
+                    [1, 0],
+                    Extrapolation.CLAMP
+                ),
+                imageScale: interpolate(
                     scrollY.value,
                     [0, scrollDistance],
                     [1, 1.2],
                     Extrapolation.CLAMP
                 ),
-            },
-        ],
-    }));
+                minimizedHeaderOpacity: interpolate(
+                    scrollY.value,
+                    [scrollDistance * 0.7, scrollDistance],
+                    [0, 1],
+                    Extrapolation.CLAMP
+                ),
+                backButtonOpacity: interpolate(
+                    scrollY.value,
+                    [0, scrollDistance * 0.5],
+                    [1, 0],
+                    Extrapolation.CLAMP
+                ),
+            };
+        });
 
-    const minimizedHeaderStyle = useAnimatedStyle(() => ({
-        opacity: interpolate(
-            scrollY.value,
-            [scrollDistance * 0.7, scrollDistance],
-            [0, 1],
-            Extrapolation.CLAMP
-        ),
-    }));
+        // Create individual styles from the shared calculations
+        const headerAnimatedStyle = useAnimatedStyle(() => ({
+            height: animations.value.headerHeight,
+            opacity: isReady.value,
+        }));
 
-    const floatingBackButtonStyle = useAnimatedStyle(() => ({
-        opacity: interpolate(
-            scrollY.value,
-            [0, scrollDistance * 0.5],
-            [1, 0],
-            Extrapolation.CLAMP
-        ),
-    }));
+        const imageAnimatedStyle = useAnimatedStyle(() => ({
+            opacity: animations.value.imageOpacity,
+            transform: [{ scale: animations.value.imageScale }],
+        }));
+
+        const minimizedHeaderStyle = useAnimatedStyle(() => ({
+            opacity: animations.value.minimizedHeaderOpacity,
+        }));
+
+        const floatingBackButtonStyle = useAnimatedStyle(() => ({
+            opacity: animations.value.backButtonOpacity,
+        }));
+
+        return {
+            headerAnimatedStyle,
+            imageAnimatedStyle,
+            minimizedHeaderStyle,
+            floatingBackButtonStyle,
+        };
+    }
+
+    const {
+        headerAnimatedStyle,
+        imageAnimatedStyle,
+        minimizedHeaderStyle,
+        floatingBackButtonStyle,
+    } = useScrollAnimations(
+        scrollY,
+        scrollDistance,
+        minimizedHeaderHeight,
+        isReady
+    );
 
     return (
         <View style={styles.container}>
             <Animated.View style={[styles.header, headerAnimatedStyle]}>
                 <Animated.View style={imageAnimatedStyle}>
-                    <LazyImage
+                    <Image
                         source={{
                             uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
                         }}
@@ -197,8 +232,6 @@ const Details = () => {
                         contentFit="cover"
                     />
                 </Animated.View>
-
-                <View style={styles.overlay} />
 
                 <Animated.View
                     style={[
@@ -332,10 +365,6 @@ const styles = StyleSheet.create({
         width: "100%",
         height: "100%",
         resizeMode: "cover",
-    },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(13, 17, 22, 0.4)",
     },
     minimizedHeader: {
         position: "absolute",
