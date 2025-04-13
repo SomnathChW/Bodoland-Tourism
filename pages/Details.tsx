@@ -6,6 +6,7 @@ import {
     Dimensions,
     TouchableOpacity,
     ScrollView,
+    InteractionManager,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import Animated, {
@@ -41,7 +42,7 @@ interface LazyImageProps {
     priority?: "low" | "normal" | "high";
 }
 
-// Optimized LazyImage component
+// Optimized LazyImage component with preloading for high-priority images
 const LazyImage = React.memo(
     ({
         source,
@@ -51,9 +52,20 @@ const LazyImage = React.memo(
     }: LazyImageProps) => {
         const isLoaded = useSharedValue(0);
 
-        const animatedStyles = useAnimatedStyle(() => ({
-            opacity: isLoaded.value,
-        }));
+        // Optimized: Memoized animated style to prevent recreation
+        const animatedStyles = useAnimatedStyle(
+            () => ({
+                opacity: isLoaded.value,
+            }),
+            []
+        );
+
+        // Optimized: Pre-cache high priority images
+        useEffect(() => {
+            if (priority === "high") {
+                FastImage.preload([{ uri: source.uri }]);
+            }
+        }, [source.uri, priority]);
 
         const onLoad = useCallback(() => {
             isLoaded.value = withTiming(1, { duration: 300 });
@@ -65,13 +77,13 @@ const LazyImage = React.memo(
                     style={[StyleSheet.absoluteFill, animatedStyles]}
                 >
                     <FastImage
-                        source={source}
+                        source={{
+                            ...source,
+                            priority: FastImage.priority[priority]
+                        }}
                         style={StyleSheet.absoluteFill}
-                        contentFit={contentFit}
+                        resizeMode={FastImage.resizeMode.cover}
                         onLoad={onLoad}
-                        transition={300}
-                        cachePolicy="memory-disk"
-                        priority={FastImage.priority[priority]}
                     />
                 </Animated.View>
             </View>
@@ -80,45 +92,75 @@ const LazyImage = React.memo(
 );
 
 // Memoized feature item component
-const FeatureItem = React.memo(({ icon, text }) => (
-    <View style={styles.featureItem}>
-        <Ionicons name={icon} size={20} color="#646f7e" />
-        <Text style={styles.featureText}>{text}</Text>
-    </View>
-));
+const FeatureItem = React.memo(
+    ({ icon, text }: { icon: any; text: string }) => (
+        <View style={styles.featureItem}>
+            <Ionicons name={icon} size={20} color="#646f7e" />
+            <Text style={styles.featureText}>{text}</Text>
+        </View>
+    )
+);
 
-// Memoized similar card component
-const SimilarCard = React.memo(({ item, shouldRender = true }) => {
-    if (!shouldRender) return null;
+// DelayedComponentLoader for progressive UI rendering
+const DelayedComponentLoader = ({
+    shouldRender = false,
+    delay = 0,
+    children,
+}: {
+    shouldRender?: boolean;
+    delay?: number;
+    children: React.ReactNode;
+}) => {
+    const [isVisible, setIsVisible] = useState(false);
 
-    return (
-        <View style={styles.similarCard}>
-            <LazyImage
-                source={{
-                    uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-                }}
-                style={styles.similarCardImage}
-                priority="low"
-            />
-            <View style={styles.similarCardContent}>
-                <Text style={styles.similarCardTitle}>
-                    Related Place {item}
-                </Text>
-                <View style={styles.similarRatingContainer}>
-                    {[0, 1, 2].map((_, index) => (
-                        <Ionicons
-                            key={index}
-                            name="star"
-                            size={12}
-                            color="#FFD700"
-                        />
-                    ))}
-                    <Text style={styles.similarCardRating}>4.7</Text>
+    useEffect(() => {
+        if (shouldRender) {
+            const timer = setTimeout(() => {
+                setIsVisible(true);
+            }, delay);
+            return () => clearTimeout(timer);
+        }
+        return () => {};
+    }, [shouldRender, delay]);
+
+    if (!isVisible) return null;
+    return children;
+};
+
+// Memoized similar card component with optional rendering
+const SimilarCard = React.memo(
+    ({ item, shouldRender = true }: { item: any; shouldRender?: boolean }) => {
+        if (!shouldRender) return null;
+
+        return (
+            <View style={styles.similarCard}>
+                <LazyImage
+                    source={{
+                        uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+                    }}
+                    style={styles.similarCardImage}
+                    priority="low"
+                />
+                <View style={styles.similarCardContent}>
+                    <Text style={styles.similarCardTitle}>
+                        Related Place {item}
+                    </Text>
+                    <View style={styles.similarRatingContainer}>
+                        {[0, 1, 2].map((_, index) => (
+                            <Ionicons
+                                key={index}
+                                name="star"
+                                size={12}
+                                color="#FFD700"
+                            />
+                        ))}
+                        <Text style={styles.similarCardRating}>4.7</Text>
+                    </View>
                 </View>
             </View>
-        </View>
-    );
-});
+        );
+    }
+);
 
 const Details = () => {
     // Use real params when available
@@ -130,10 +172,11 @@ const Details = () => {
     // State for deferred loading phases
     const [animationPhase, setAnimationPhase] = useState(0); // 0: initial, 1: basic animations, 2: full animations
     const [showSimilar, setShowSimilar] = useState(false);
+    const [showFeatures, setShowFeatures] = useState(false);
 
     // Refs to track animation frame and timeouts
     const animFrameRef = useRef<number | null>(null);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const timeoutRef = useRef<NodeJS.Timeout[]>([]);
 
     const minimizedHeaderHeight = HEADER_MIN_HEIGHT + insets.top;
     const scrollDistance = HEADER_MAX_HEIGHT - minimizedHeaderHeight;
@@ -142,12 +185,15 @@ const Details = () => {
     const scrollY = useSharedValue(0);
     const isReady = useSharedValue(0);
 
-    // Scroll handler
-    const scrollHandler = useAnimatedScrollHandler({
-        onScroll: (event) => {
-            scrollY.value = event.contentOffset.y;
+    // Optimized: Scroll handler with empty dependency array
+    const scrollHandler = useAnimatedScrollHandler(
+        {
+            onScroll: (event) => {
+                scrollY.value = event.contentOffset.y;
+            },
         },
-    });
+        []
+    );
 
     // Back button handler
     const handleBack = useCallback(() => {
@@ -158,10 +204,13 @@ const Details = () => {
     // This allows us to defer the creation of complex animations while respecting Rules of Hooks
 
     // Define basic animations for phase 1 (minimal setup)
-    const basicHeaderStyle = useAnimatedStyle(() => ({
-        height: HEADER_MAX_HEIGHT,
-        opacity: isReady.value,
-    }));
+    const basicHeaderStyle = useAnimatedStyle(
+        () => ({
+            height: HEADER_MAX_HEIGHT,
+            opacity: isReady.value,
+        }),
+        []
+    ); // Empty dependency array optimization
 
     // Full animations for phase 2+
     const animations = useDerivedValue(() => {
@@ -211,40 +260,63 @@ const Details = () => {
         };
     }, [scrollY, animationPhase, scrollDistance, minimizedHeaderHeight]);
 
-    // Create animated styles that will only be active when animation phase advances
-    const headerAnimatedStyle = useAnimatedStyle(() => ({
-        height: animations.value.headerHeight,
-        opacity: isReady.value,
-    }));
+    // Optimized: Create animated styles with empty dependency arrays
+    const headerAnimatedStyle = useAnimatedStyle(
+        () => ({
+            height: animations.value.headerHeight,
+            opacity: isReady.value,
+        }),
+        []
+    );
 
-    const imageAnimatedStyle = useAnimatedStyle(() => ({
-        opacity: animations.value.imageOpacity,
-        transform: [{ scale: animations.value.imageScale }],
-    }));
+    const imageAnimatedStyle = useAnimatedStyle(
+        () => ({
+            opacity: animations.value.imageOpacity,
+            transform: [{ scale: animations.value.imageScale }],
+        }),
+        []
+    );
 
-    const minimizedHeaderStyle = useAnimatedStyle(() => ({
-        opacity: animations.value.minimizedHeaderOpacity,
-    }));
+    const minimizedHeaderStyle = useAnimatedStyle(
+        () => ({
+            opacity: animations.value.minimizedHeaderOpacity,
+        }),
+        []
+    );
 
-    const floatingBackButtonStyle = useAnimatedStyle(() => ({
-        opacity: animations.value.backButtonOpacity,
-    }));
+    const floatingBackButtonStyle = useAnimatedStyle(
+        () => ({
+            opacity: animations.value.backButtonOpacity,
+        }),
+        []
+    );
 
-    // Phased initialization with requestAnimationFrame
+    // Optimized: Phased initialization with improved layout loading strategy
     useEffect(() => {
-        // Stage 1: Basic fade-in (immediately)
-        isReady.value = withTiming(0.6, { duration: 50 });
-        setAnimationPhase(1);
+        // Stage 1: Show minimal UI immediately
+        isReady.value = 0;
 
-        // Stage 2: Schedule complex animations (via requestAnimationFrame)
+        // Use requestAnimationFrame for smoother initial render
         animFrameRef.current = requestAnimationFrame(() => {
-            isReady.value = withTiming(1, { duration: 200 });
-            setAnimationPhase(2); // Enable full animations
+            // // Stage 2: Basic fade-in
+            // isReady.value = withTiming(0.6, { duration: 50 });
+            // setAnimationPhase(1);
 
-            // Stage 3: Load non-critical UI elements (via setTimeout)
-            timeoutRef.current = setTimeout(() => {
+            // Stage 3: Enable animations after small delay
+            // const timer1 = setTimeout(() => {
+            //     isReady.value = withTiming(1, { duration: 200 });
+            //     setAnimationPhase(2); // Enable full animations
+            // }, 100);
+            // timeoutRef.current.push(timer1);
+
+            // Stage 5: Load non-critical UI elements last
+            InteractionManager.runAfterInteractions(() => {
                 setShowSimilar(true);
-            }, 500);
+                setShowFeatures(true);
+                // Stage 4: Finalize animations
+                isReady.value = withTiming(1, { duration: 200 });
+                setAnimationPhase(2); // Enable full animations
+            });
         });
 
         return () => {
@@ -257,14 +329,12 @@ const Details = () => {
                 cancelAnimationFrame(animFrameRef.current);
             }
 
-            // Clean up timeout
-            if (timeoutRef.current !== null) {
-                clearTimeout(timeoutRef.current);
-            }
+            // Clean up all timeouts
+            timeoutRef.current.forEach((timer) => clearTimeout(timer));
         };
     }, [isReady, scrollY]);
 
-    // Pre-render components
+    // Pre-render components with memoization to prevent rerenders
     const renderTitle = React.useMemo(
         () => (
             <View style={styles.titleSection}>
@@ -308,45 +378,67 @@ const Details = () => {
 
     const renderFeatures = React.useMemo(
         () => (
-            <View style={styles.featuresSection}>
-                <Text style={styles.sectionTitle}>Features</Text>
-                <View style={styles.separator} />
-                <View style={styles.featuresList}>
-                    {FEATURES.map((feature, index) => (
-                        <FeatureItem
-                            key={index}
-                            icon={feature.icon}
-                            text={feature.text}
-                        />
-                    ))}
+            <DelayedComponentLoader shouldRender={showFeatures} delay={50}>
+                <View style={styles.featuresSection}>
+                    <Text style={styles.sectionTitle}>Features</Text>
+                    <View style={styles.separator} />
+                    <View style={styles.featuresList}>
+                        {FEATURES.map((feature, index) => (
+                            <FeatureItem
+                                key={index}
+                                icon={feature.icon}
+                                text={feature.text}
+                            />
+                        ))}
+                    </View>
                 </View>
-            </View>
+            </DelayedComponentLoader>
         ),
-        []
+        [showFeatures]
     );
 
     const renderSimilarPlaces = React.useMemo(
         () => (
-            <View style={styles.similarSection}>
-                <Text style={styles.sectionTitle}>Similar Places</Text>
-                <View style={styles.separator} />
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.similarCardsContainer}
-                    removeClippedSubviews={true}
-                >
-                    {[1, 2, 3].map((item) => (
-                        <SimilarCard
-                            key={item}
-                            item={item}
-                            shouldRender={showSimilar}
-                        />
-                    ))}
-                </ScrollView>
-            </View>
+            <DelayedComponentLoader shouldRender={showSimilar} delay={50}>
+                <View style={styles.similarSection}>
+                    <Text style={styles.sectionTitle}>Similar Places</Text>
+                    <View style={styles.separator} />
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.similarCardsContainer}
+                        removeClippedSubviews={true}
+                    >
+                        {[1, 2, 3].map((item) => (
+                            <SimilarCard
+                                key={item}
+                                item={item}
+                                shouldRender={showSimilar}
+                            />
+                        ))}
+                    </ScrollView>
+                </View>
+            </DelayedComponentLoader>
         ),
         [showSimilar]
+    );
+
+    // Compute static styles once
+    const staticStyles = React.useMemo(
+        () => ({
+            minimizedHeaderContainer: {
+                height: minimizedHeaderHeight,
+                paddingTop: insets.top,
+                backgroundColor: "#1a2432",
+            },
+            floatingBackButtonContainer: {
+                top: insets.top + 10,
+            },
+            scrollContentContainer: {
+                paddingTop: HEADER_MAX_HEIGHT,
+            },
+        }),
+        [insets.top, minimizedHeaderHeight]
     );
 
     // Choose which animation styles to use based on the current phase
@@ -362,10 +454,10 @@ const Details = () => {
                     <FastImage
                         source={{
                             uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+                            priority: FastImage.priority.high,
                         }}
                         style={styles.headerImage}
-                        contentFit="cover"
-                        priority={FastImage.priority.high}
+                        resizeMode={FastImage.resizeMode.cover}
                     />
                 </Animated.View>
 
@@ -373,12 +465,8 @@ const Details = () => {
                     <Animated.View
                         style={[
                             styles.minimizedHeader,
+                            staticStyles.minimizedHeaderContainer,
                             minimizedHeaderStyle,
-                            {
-                                height: minimizedHeaderHeight,
-                                paddingTop: insets.top,
-                                backgroundColor: "#1a2432",
-                            },
                         ]}
                     >
                         <TouchableOpacity
@@ -401,8 +489,8 @@ const Details = () => {
                 <Animated.View
                     style={[
                         styles.floatingBackButton,
+                        staticStyles.floatingBackButtonContainer,
                         animationPhase >= 2 ? floatingBackButtonStyle : {},
-                        { top: insets.top + 10 },
                     ]}
                 >
                     <TouchableOpacity onPress={handleBack}>
@@ -414,7 +502,7 @@ const Details = () => {
             <Animated.ScrollView
                 contentContainerStyle={[
                     styles.scrollViewContent,
-                    { paddingTop: HEADER_MAX_HEIGHT },
+                    staticStyles.scrollContentContainer,
                 ]}
                 showsVerticalScrollIndicator={false}
                 onScroll={scrollHandler}
