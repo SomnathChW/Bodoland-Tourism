@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
-import { Image } from "expo-image";
+import FastImage from "react-native-fast-image";
 
 type Props = {
     item: {
@@ -34,7 +34,7 @@ const CardVertical = ({ item }: Props) => {
                     })
                 }
             >
-                <Image source={item.image} style={styles.image} />
+                <FastImage source={item.image} style={styles.image} />
                 {item.title && (
                     <View style={styles.textView}>
                         <View style={styles.textView}>

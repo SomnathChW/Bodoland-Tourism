@@ -8,7 +8,7 @@ import {
 import React from "react";
 import { useRouter } from "expo-router";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
-import { Image } from "expo-image";
+import FastImage from "react-native-fast-image";
 
 type Props = {
     item: {
@@ -46,7 +46,7 @@ const ProductCard = ({ item, index }: Props) => {
                     })
                 }
             >
-                <Image source={{ uri: item.image }} style={styles.image} />
+                <FastImage source={{ uri: item.image }} style={styles.image} />
                 {item.title && (
                     <View style={styles.infoView}>
                         <View style={styles.textView}>

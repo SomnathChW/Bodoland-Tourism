@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Image } from "expo-image";
+import FastImage from "react-native-fast-image";
 
 type Props = {
     item: {
@@ -36,7 +36,7 @@ const VrCard = ({ item, index }: Props) => {
                     })
                 }
             >
-                <Image source={{ uri: item.image }} style={styles.image} />
+                <FastImage source={{ uri: item.image }} style={styles.image} />
                 {item.title && (
                     <View style={styles.infoView}>
                         <View style={styles.textView}>

@@ -7,7 +7,7 @@ import Animated, {
     SharedValue,
     useAnimatedStyle,
 } from "react-native-reanimated";
-import { Image } from "expo-image";
+import FastImage from "react-native-fast-image";
 
 type Props = {
     item: any;
@@ -55,7 +55,7 @@ const CarouselCard = ({ item, index, scrollX }: Props) => {
 
     return (
         <Animated.View style={[styles.card, animatedStyle]}>
-            <Image source={item.image} style={styles.image} />
+            <FastImage source={item.image} style={styles.image} />
             <LinearGradient
                 colors={["transparent", " rgba(0, 0, 0, 0.6)"]}
                 style={styles.textView}

@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { Image } from "expo-image";
+import FastImage from "react-native-fast-image";
 
 type Props = {
     item: any;
@@ -23,7 +23,7 @@ const CardHorizontal = ({ item }: Props) => {
                     })
                 }
             >
-                <Image source={item.image} style={styles.image} />
+                <FastImage source={item.image} style={styles.image} />
                 <LinearGradient
                     colors={["transparent", " rgba(0, 0, 0, 0.6)"]}
                     style={styles.textView}

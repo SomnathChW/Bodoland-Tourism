@@ -21,7 +21,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Image } from "expo-image";
+import FastImage from "react-native-fast-image";
 
 const { height } = Dimensions.get("screen");
 const HEADER_MAX_HEIGHT = height * 0.45;
@@ -93,7 +93,7 @@ const LazyImage = React.memo(
                 <Animated.View
                     style={[StyleSheet.absoluteFill, animatedStyles]}
                 >
-                    <Image
+                    <FastImage
                         source={source}
                         style={StyleSheet.absoluteFill}
                         contentFit={contentFit}
@@ -306,7 +306,7 @@ const Details = React.memo(() => {
         <View style={styles.container}>
             <Animated.View style={[styles.header, headerAnimatedStyle]}>
                 <Animated.View style={imageAnimatedStyle}>
-                    <Image
+                    <FastImage
                         source={{
                             uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
                         }}

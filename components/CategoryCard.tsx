@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
-import { Image } from "expo-image";
+import FastImage from "react-native-fast-image";
 
 type Props = {
     item: any;
@@ -33,7 +33,7 @@ const DistrictCards = ({ item }: Props) => {
                 style={{ alignItems: "center" }}
             >
                 <View style={styles.imageContainer}>
-                    <Image source={item.image} style={styles.image} />
+                    <FastImage source={item.image} style={styles.image} />
                 </View>
                 <Text style={styles.title}>{item.title}</Text>
             </Pressable>
