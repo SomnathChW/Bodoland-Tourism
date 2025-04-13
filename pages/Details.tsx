@@ -79,7 +79,7 @@ const LazyImage = React.memo(
                     <FastImage
                         source={{
                             ...source,
-                            priority: FastImage.priority[priority]
+                            priority: FastImage.priority[priority],
                         }}
                         style={StyleSheet.absoluteFill}
                         resizeMode={FastImage.resizeMode.cover}
@@ -293,31 +293,28 @@ const Details = () => {
 
     // Optimized: Phased initialization with improved layout loading strategy
     useEffect(() => {
-        // Stage 1: Show minimal UI immediately
+        // Initial setup only
         isReady.value = 0;
 
-        // Use requestAnimationFrame for smoother initial render
-        animFrameRef.current = requestAnimationFrame(() => {
-            // // Stage 2: Basic fade-in
-            // isReady.value = withTiming(0.6, { duration: 50 });
-            // setAnimationPhase(1);
+        // Stage 1: Basic UI - immediate
+        const timer1 = setTimeout(() => {
+            isReady.value = withTiming(0.6, { duration: 100 });
+            setAnimationPhase(1);
+        }, 10);
 
-            // Stage 3: Enable animations after small delay
-            // const timer1 = setTimeout(() => {
-            //     isReady.value = withTiming(1, { duration: 200 });
-            //     setAnimationPhase(2); // Enable full animations
-            // }, 100);
-            // timeoutRef.current.push(timer1);
+        // Stage 2: Enable animations after navigation completes
+        const timer2 = setTimeout(() => {
+            setAnimationPhase(2);
+            isReady.value = withTiming(1, { duration: 100 });
+        }, 300);
 
-            // Stage 5: Load non-critical UI elements last
-            InteractionManager.runAfterInteractions(() => {
-                setShowSimilar(true);
-                setShowFeatures(true);
-                // Stage 4: Finalize animations
-                isReady.value = withTiming(1, { duration: 200 });
-                setAnimationPhase(2); // Enable full animations
-            });
+        // Stage 3: Load non-critical UI elements last
+        const timer3 = InteractionManager.runAfterInteractions(() => {
+            setShowFeatures(true);
+            setTimeout(() => setShowSimilar(true), 100);
         });
+
+        timeoutRef.current = [timer1, timer2];
 
         return () => {
             // Clean up animations
@@ -331,6 +328,7 @@ const Details = () => {
 
             // Clean up all timeouts
             timeoutRef.current.forEach((timer) => clearTimeout(timer));
+            timer3?.cancel?.();
         };
     }, [isReady, scrollY]);
 
