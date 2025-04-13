@@ -17,7 +17,7 @@ const StackLayout = () => {
                 initialRouteName="(tabs)"
                 screenOptions={{
                     animation: "ios_from_right",
-                    statusBarAnimation: "fade",
+                    statusBarAnimation: "slide",
                     animationDuration: 300,
                 }}
             >

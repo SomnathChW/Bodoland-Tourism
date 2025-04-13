@@ -4,13 +4,10 @@ import {
     Text,
     View,
     Dimensions,
-    StatusBar,
     TouchableOpacity,
     ScrollView,
-    Platform,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import * as NavigationBar from "expo-navigation-bar";
+import { useRouter } from "expo-router";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -110,8 +107,9 @@ const LazyImage = React.memo(
     }
 );
 
-const Details = () => {
-    const identifier = useLocalSearchParams().identifier;
+const Details = React.memo(() => {
+    // const identifier = useLocalSearchParams().identifier;
+    const identifier = "Sample Place"; // Placeholder for identifier
     const router = useRouter();
     const insets = useSafeAreaInsets();
 
@@ -139,74 +137,78 @@ const Details = () => {
     const handleBack = useCallback(() => {
         router.back();
     }, [router]);
-    function useScrollAnimations(
-        scrollY: SharedValue<number>,
-        scrollDistance: number,
-        minimizedHeaderHeight: number, 
-        isReady: SharedValue<number>
-    ) {
-        // Calculate all animations in a single derived value
-        const animations = useDerivedValue(() => {
+
+    const useScrollAnimations = useCallback(
+        (
+            scrollY: SharedValue<number>,
+            scrollDistance: number,
+            minimizedHeaderHeight: number,
+            isReady: SharedValue<number>
+        ) => {
+            // Calculate all animations in a single derived value
+            const animations = useDerivedValue(() => {
+                return {
+                    headerHeight: interpolate(
+                        scrollY.value,
+                        [0, scrollDistance],
+                        [HEADER_MAX_HEIGHT, minimizedHeaderHeight],
+                        Extrapolation.CLAMP
+                    ),
+                    imageOpacity: interpolate(
+                        scrollY.value,
+                        [0, scrollDistance],
+                        [1, 0],
+                        Extrapolation.CLAMP
+                    ),
+                    imageScale: interpolate(
+                        scrollY.value,
+                        [0, scrollDistance],
+                        [1, 1.2],
+                        Extrapolation.CLAMP
+                    ),
+                    minimizedHeaderOpacity: interpolate(
+                        scrollY.value,
+                        [scrollDistance * 0.7, scrollDistance],
+                        [0, 1],
+                        Extrapolation.CLAMP
+                    ),
+                    backButtonOpacity: interpolate(
+                        scrollY.value,
+                        [0, scrollDistance * 0.5],
+                        [1, 0],
+                        Extrapolation.CLAMP
+                    ),
+                };
+            });
+
+            // Create individual styles from the shared calculations
+            const headerAnimatedStyle = useAnimatedStyle(() => ({
+                height: animations.value.headerHeight,
+                opacity: isReady.value,
+            }));
+
+            const imageAnimatedStyle = useAnimatedStyle(() => ({
+                opacity: animations.value.imageOpacity,
+                transform: [{ scale: animations.value.imageScale }],
+            }));
+
+            const minimizedHeaderStyle = useAnimatedStyle(() => ({
+                opacity: animations.value.minimizedHeaderOpacity,
+            }));
+
+            const floatingBackButtonStyle = useAnimatedStyle(() => ({
+                opacity: animations.value.backButtonOpacity,
+            }));
+
             return {
-                headerHeight: interpolate(
-                    scrollY.value,
-                    [0, scrollDistance],
-                    [HEADER_MAX_HEIGHT, minimizedHeaderHeight],
-                    Extrapolation.CLAMP
-                ),
-                imageOpacity: interpolate(
-                    scrollY.value,
-                    [0, scrollDistance],
-                    [1, 0],
-                    Extrapolation.CLAMP
-                ),
-                imageScale: interpolate(
-                    scrollY.value,
-                    [0, scrollDistance],
-                    [1, 1.2],
-                    Extrapolation.CLAMP
-                ),
-                minimizedHeaderOpacity: interpolate(
-                    scrollY.value,
-                    [scrollDistance * 0.7, scrollDistance],
-                    [0, 1],
-                    Extrapolation.CLAMP
-                ),
-                backButtonOpacity: interpolate(
-                    scrollY.value,
-                    [0, scrollDistance * 0.5],
-                    [1, 0],
-                    Extrapolation.CLAMP
-                ),
+                headerAnimatedStyle,
+                imageAnimatedStyle,
+                minimizedHeaderStyle,
+                floatingBackButtonStyle,
             };
-        });
-
-        // Create individual styles from the shared calculations
-        const headerAnimatedStyle = useAnimatedStyle(() => ({
-            height: animations.value.headerHeight,
-            opacity: isReady.value,
-        }));
-
-        const imageAnimatedStyle = useAnimatedStyle(() => ({
-            opacity: animations.value.imageOpacity,
-            transform: [{ scale: animations.value.imageScale }],
-        }));
-
-        const minimizedHeaderStyle = useAnimatedStyle(() => ({
-            opacity: animations.value.minimizedHeaderOpacity,
-        }));
-
-        const floatingBackButtonStyle = useAnimatedStyle(() => ({
-            opacity: animations.value.backButtonOpacity,
-        }));
-
-        return {
-            headerAnimatedStyle,
-            imageAnimatedStyle,
-            minimizedHeaderStyle,
-            floatingBackButtonStyle,
-        };
-    }
+        },
+        []
+    );
 
     const {
         headerAnimatedStyle,
@@ -218,6 +220,86 @@ const Details = () => {
         scrollDistance,
         minimizedHeaderHeight,
         isReady
+    );
+
+    const renderTitle = React.useMemo(
+        () => (
+            <View style={styles.titleSection}>
+                <Text style={styles.title}>{identifier}</Text>
+                <View style={styles.ratingContainer}>
+                    {Array(5)
+                        .fill(0)
+                        .map((_, index) => (
+                            <Ionicons
+                                key={index}
+                                name="star"
+                                size={16}
+                                color="#FFD700"
+                            />
+                        ))}
+                    <Text style={styles.ratingText}>4.8 (240 reviews)</Text>
+                </View>
+                <View style={styles.locationContainer}>
+                    <Ionicons name="location" size={16} color="#646f7e" />
+                    <Text style={styles.locationText}>Assam, India</Text>
+                </View>
+            </View>
+        ),
+        [identifier]
+    );
+
+    const renderAbout = React.useMemo(
+        () => (
+            <View style={styles.detailsSection}>
+                <Text style={styles.sectionTitle}>About</Text>
+                <View style={styles.separator} />
+                <Text style={styles.details}>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Nulla facilisis, nunc vel tincidunt vestibulum, risus leo
+                    varius nisl, a dignissim velit massa eu mauris.
+                </Text>
+            </View>
+        ),
+        []
+    );
+
+    const renderFeatures = React.useMemo(
+        () => (
+            <View style={styles.featuresSection}>
+                <Text style={styles.sectionTitle}>Features</Text>
+                <View style={styles.separator} />
+                <View style={styles.featuresList}>
+                    {FEATURES.map((feature, index) => (
+                        <FeatureItem
+                            key={index}
+                            icon={feature.icon}
+                            text={feature.text}
+                        />
+                    ))}
+                </View>
+            </View>
+        ),
+        []
+    );
+
+    const renderSimilarPlaces = React.useMemo(
+        () => (
+            <View style={styles.similarSection}>
+                <Text style={styles.sectionTitle}>Similar Places</Text>
+                <View style={styles.separator} />
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.similarCardsContainer}
+                    removeClippedSubviews={true}
+                >
+                    {[1, 2, 3].map((item) => (
+                        <SimilarCard key={item} item={item} />
+                    ))}
+                </ScrollView>
+            </View>
+        ),
+        []
     );
 
     return (
@@ -279,73 +361,15 @@ const Details = () => {
                 scrollEventThrottle={16}
                 removeClippedSubviews={true}
                 overScrollMode="never"
-                maxToRenderPerBatch={4}
-                windowSize={5}
-                updateCellsBatchingPeriod={50}
             >
-                <View style={styles.titleSection}>
-                    <Text style={styles.title}>{identifier}</Text>
-                    <View style={styles.ratingContainer}>
-                        {Array(5)
-                            .fill(0)
-                            .map((_, index) => (
-                                <Ionicons
-                                    key={index}
-                                    name="star"
-                                    size={16}
-                                    color="#FFD700"
-                                />
-                            ))}
-                        <Text style={styles.ratingText}>4.8 (240 reviews)</Text>
-                    </View>
-                    <View style={styles.locationContainer}>
-                        <Ionicons name="location" size={16} color="#646f7e" />
-                        <Text style={styles.locationText}>Assam, India</Text>
-                    </View>
-                </View>
-
-                <View style={styles.detailsSection}>
-                    <Text style={styles.sectionTitle}>About</Text>
-                    <View style={styles.separator} />
-                    <Text style={styles.details}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Nulla facilisis, nunc vel tincidunt vestibulum, risus
-                        leo varius nisl, a dignissim velit massa eu mauris.
-                    </Text>
-                </View>
-
-                <View style={styles.featuresSection}>
-                    <Text style={styles.sectionTitle}>Features</Text>
-                    <View style={styles.separator} />
-                    <View style={styles.featuresList}>
-                        {FEATURES.map((feature, index) => (
-                            <FeatureItem
-                                key={index}
-                                icon={feature.icon}
-                                text={feature.text}
-                            />
-                        ))}
-                    </View>
-                </View>
-
-                <View style={styles.similarSection}>
-                    <Text style={styles.sectionTitle}>Similar Places</Text>
-                    <View style={styles.separator} />
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.similarCardsContainer}
-                        removeClippedSubviews={true}
-                    >
-                        {[1, 2, 3].map((item) => (
-                            <SimilarCard key={item} item={item} />
-                        ))}
-                    </ScrollView>
-                </View>
+                {renderTitle}
+                {renderAbout}
+                {renderFeatures}
+                {renderSimilarPlaces}
             </Animated.ScrollView>
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {
