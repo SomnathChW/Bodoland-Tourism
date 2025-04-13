@@ -25,6 +25,7 @@ const StackLayout = () => {
                     name="(tabs)"
                     options={{
                         headerShown: false,
+                        navigationBarColor: "#000000",
                     }}
                 />
                 {screens.map((items) => (
