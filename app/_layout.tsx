@@ -40,6 +40,9 @@ function RootLayoutContent() {
                 initialRouteName="signin"
                 screenOptions={{
                     contentStyle: { backgroundColor: "#0d1116" },
+                    navigationBarColor: "#0d1116",
+                    animation: "ios_from_right",
+                    statusBarAnimation: "slide",
                 }}
             >
                 {["(protected)", "signin", "password_recovery"].map((name) => (

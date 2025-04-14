@@ -1,88 +1,140 @@
-import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
-import React from "react";
-import { useLocalSearchParams } from "expo-router";
-import * as NavigationBar from "expo-navigation-bar";
-import Animated from "react-native-reanimated";
+import React, { useEffect, useState, useRef } from "react";
+import { StyleSheet, View, Dimensions, InteractionManager } from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import Animated, {
+    useSharedValue,
+    useAnimatedScrollHandler,
+    cancelAnimation,
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import HeaderSection from "@/components/UI/Details/HeaderSection";
+import TitleSection from "@/components/UI/Details/TitleSection";
+import AboutSection from "@/components/UI/Details/AboutSection";
+import { DelayedComponentLoader } from "@/components/UI/Details/DelayedComponentLoader";
+import FeaturesSection from "@/components/UI/Details/FeaturesSection";
+import SimilarPlacesSection from "@/components/UI/Details/SimilarPlacesSection";
 
 const { height } = Dimensions.get("screen");
-
-const Hotels = () => {
-    NavigationBar.setBackgroundColorAsync("#0d1116");
-
-    return (
-        <View style={styles.full}>
-            <Image
-                source={require("@/assets/images/app_images/manas-national-park.jpg")}
-                resizeMode="contain"
-                style={styles.displayImage}
-            />
-            <Text style={styles.text}>Hotels</Text>
-            <Text style={styles.subText}>About</Text>
-            <View style={{ height: 2, backgroundColor: "#646f7e" }}></View>
-            <Text style={styles.details}>
-                Lorem Ipsum Dolor Set Ametadfgrtdhyjukiukyjtrgewerty
-                trheyuiryeewr rytiuuyretewrq rweyeuukyjtrhregtet eryutetrs
-                ertyuy
-            </Text>
-        </View>
-    );
-};
+const HEADER_MAX_HEIGHT = height * 0.45;
+const HEADER_MIN_HEIGHT = 55;
 
 const Details = () => {
-    const identifier = useLocalSearchParams().identifier;
+    const params = useLocalSearchParams();
+    const identifier = params?.identifier || "Sample Place";
+    const router = useRouter();
+    const insets = useSafeAreaInsets();
 
-    NavigationBar.setBackgroundColorAsync("#0d1116");
+    // State for phased loading
+    const [animationPhase, setAnimationPhase] = useState(0); // 0: initial, 1: basic, 2: full
+    const [showSimilar, setShowSimilar] = useState(false);
+    const [showFeatures, setShowFeatures] = useState(false);
+
+    // Performance tracking
+    const isInitialRender = useRef(true);
+
+    const minimizedHeaderHeight = HEADER_MIN_HEIGHT + insets.top;
+    const scrollDistance = HEADER_MAX_HEIGHT - minimizedHeaderHeight;
+
+    // Animation values
+    const scrollY = useSharedValue(0);
+    const isReady = useSharedValue(0);
+
+    // Optimized scroll handler
+    const scrollHandler = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            "worklet";
+            scrollY.value = event.contentOffset.y;
+        },
+    });
+
+    // Progressive loading strategy
+    useEffect(() => {
+        if (isInitialRender.current) {
+            isInitialRender.current = false;
+
+            // Phase 1: Minimal UI with basic animations
+            requestAnimationFrame(() => {
+                isReady.value = 0.6;
+                setAnimationPhase(1);
+
+                // Phase 2: Enable full animations after navigation completes
+                InteractionManager.runAfterInteractions(() => {
+                    setAnimationPhase(2);
+                    isReady.value = 1;
+
+                    setShowFeatures(true);
+                    setShowSimilar(true);
+                });
+            });
+        }
+
+        return () => {
+            cancelAnimation(scrollY);
+            cancelAnimation(isReady);
+        };
+    }, [isReady]);
+
+    // Static styles calculated once
+    const staticStyles = React.useMemo(
+        () => ({
+            scrollContentContainer: {
+                paddingTop: HEADER_MAX_HEIGHT,
+            },
+        }),
+        []
+    );
 
     return (
-        <View style={styles.full}>
-            <Image
-                source={require("@/assets/images/app_images/manas-national-park.jpg")}
-                resizeMode="contain"
-                style={styles.displayImage}
+        <View style={styles.container}>
+            <HeaderSection
+                scrollY={scrollY}
+                isReady={isReady}
+                animationPhase={animationPhase}
+                minimizedHeaderHeight={minimizedHeaderHeight}
+                scrollDistance={scrollDistance}
+                identifier={identifier as string}
+                onBack={() => router.back()}
+                insets={insets}
             />
-            <Text style={styles.text}>{identifier}</Text>
-            <Text style={styles.subText}>About</Text>
-            <View style={{ height: 2, backgroundColor: "#646f7e" }}></View>
-            <Text style={styles.details}>
-                Lorem Ipsum Dolor Set Ametadfgrtdhyjukiukyjtrgewerty
-                trheyuiryeewr rytiuuyretewrq rweyeuukyjtrhregtet eryutetrs
-                ertyuy
-            </Text>
+
+            <Animated.ScrollView
+                contentContainerStyle={[
+                    styles.scrollViewContent,
+                    staticStyles.scrollContentContainer,
+                ]}
+                showsVerticalScrollIndicator={false}
+                onScroll={scrollHandler}
+                scrollEventThrottle={16}
+                removeClippedSubviews={true}
+                overScrollMode="never"
+                keyboardShouldPersistTaps="handled"
+            >
+                <TitleSection identifier={identifier as string} />
+                <AboutSection />
+
+                {/* Delayed loading for Features */}
+                <DelayedComponentLoader shouldRender={showFeatures} delay={50}>
+                    <FeaturesSection />
+                </DelayedComponentLoader>
+
+                {/* Delayed loading for Similar Places */}
+                <DelayedComponentLoader shouldRender={showSimilar} delay={50}>
+                    <SimilarPlacesSection />
+                </DelayedComponentLoader>
+            </Animated.ScrollView>
         </View>
     );
 };
 
-export default Details;
-
 const styles = StyleSheet.create({
-    full: {
+    container: {
         flex: 1,
-        paddingHorizontal: 20,
         backgroundColor: "#0d1116",
     },
-    displayImage: {
-        alignSelf: "center",
-        height: height * 0.4,
-        marginBottom: 20,
-    },
-    text: {
-        color: "#fff",
-        fontFamily: "SfProMedium",
-        fontSize: 24,
-        fontWeight: "bold",
-    },
-    subText: {
-        color: "#646f7e",
-        fontFamily: "SfProMedium",
-        fontSize: 18,
-        fontWeight: "bold",
-        marginBottom: 5,
-    },
-    details: {
-        color: "#fff",
-        fontFamily: "SfProMedium",
-        fontSize: 16,
-        fontWeight: "bold",
-        lineHeight: 25,
+    scrollViewContent: {
+        paddingHorizontal: 20,
     },
 });
+
+export default Details;
