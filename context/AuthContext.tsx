@@ -14,6 +14,7 @@ import { toast } from "sonner-native";
 import { account, ID } from "@/lib/appwrite";
 
 import { mockAccount } from "@/dev_helpers/mockAccount";
+import { Platform } from "react-native";
 
 const AuthContext = createContext<{
     user: Models.User<{}> | null;
@@ -83,7 +84,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        SystemUI.setBackgroundColorAsync("#0d1116");
+        if (Platform.OS === "android") {
+            SystemUI.setBackgroundColorAsync("#0d1116");
+        }
+
         if (!hasInitialized.current) {
             init();
             hasInitialized.current = true;

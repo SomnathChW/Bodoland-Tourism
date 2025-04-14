@@ -5,7 +5,6 @@ import {
     Dimensions,
     TouchableOpacity,
     Text,
-    Image,
     ScrollView,
     StatusBar,
     Platform,
@@ -20,6 +19,7 @@ import Animated, {
     Extrapolation,
 } from "react-native-reanimated";
 import { Feather, MaterialIcons, FontAwesome } from "@expo/vector-icons";
+import FastImage from "react-native-fast-image";
 
 const { width } = Dimensions.get("window");
 const DRAWER_WIDTH: number = width * 0.6;
@@ -178,7 +178,7 @@ export default function Drawer(): JSX.Element {
                 {/* User Profile Section - naturally sized */}
                 <View style={styles.profileSection}>
                     <View style={styles.profileContent}>
-                        <Image
+                        <FastImage
                             source={{
                                 uri: `https://randomuser.me/api/portraits/men/${randomUserNumber}.jpg`,
                             }}

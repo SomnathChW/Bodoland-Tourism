@@ -13,11 +13,19 @@ const StackLayout = () => {
 
     return (
         <>
-            <Stack initialRouteName="(tabs)">
+            <Stack
+                initialRouteName="(tabs)"
+                screenOptions={{
+                    animation: "ios_from_right",
+                    statusBarAnimation: "slide",
+                    animationDuration: 300,
+                }}
+            >
                 <Stack.Screen
                     name="(tabs)"
                     options={{
                         headerShown: false,
+                        navigationBarColor: "#000000",
                     }}
                 />
                 {screens.map((items) => (
@@ -27,6 +35,7 @@ const StackLayout = () => {
                         options={{
                             title: items.title,
                             headerShown: false,
+                            navigationBarColor: "#0d1116",
                         }}
                     />
                 ))}
