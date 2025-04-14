@@ -2,12 +2,12 @@ import {
     StyleSheet,
     Text,
     View,
-    Image,
     Dimensions,
     Pressable,
 } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
+import FastImage from "react-native-fast-image";
 
 type Props = {
     item: {
@@ -28,13 +28,13 @@ const CardVertical = ({ item }: Props) => {
         <View style={[styles.card]}>
             <Pressable
                 onPress={() =>
-                    router.navigate({
+                    router.push({
                         pathname: "/details",
                         params: { identifier: item.identifier },
                     })
                 }
             >
-                <Image source={item.image} style={styles.image} />
+                <FastImage source={item.image} style={styles.image} />
                 {item.title && (
                     <View style={styles.textView}>
                         <View style={styles.textView}>
