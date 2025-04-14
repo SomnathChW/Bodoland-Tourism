@@ -1,4 +1,10 @@
-import React, { useEffect, useCallback, useState, useRef } from "react";
+import React, {
+    useEffect,
+    useCallback,
+    useState,
+    useRef,
+    useMemo,
+} from "react";
 import {
     StyleSheet,
     Text,
@@ -91,7 +97,6 @@ const LazyImage = React.memo(
     }
 );
 
-// Memoized feature item component
 const FeatureItem = React.memo(
     ({ icon, text }: { icon: any; text: string }) => (
         <View style={styles.featureItem}>
@@ -101,7 +106,6 @@ const FeatureItem = React.memo(
     )
 );
 
-// DelayedComponentLoader for progressive UI rendering
 const DelayedComponentLoader = ({
     shouldRender = false,
     delay = 0,
@@ -127,7 +131,6 @@ const DelayedComponentLoader = ({
     return children;
 };
 
-// Memoized similar card component with optional rendering
 const SimilarCard = React.memo(
     ({ item, shouldRender = true }: { item: any; shouldRender?: boolean }) => {
         if (!shouldRender) return null;
@@ -163,29 +166,24 @@ const SimilarCard = React.memo(
 );
 
 const Details = () => {
-    // Use real params when available
     const params = useLocalSearchParams();
     const identifier = params?.identifier || "Sample Place";
     const router = useRouter();
     const insets = useSafeAreaInsets();
 
-    // State for deferred loading phases
-    const [animationPhase, setAnimationPhase] = useState(0); // 0: initial, 1: basic animations, 2: full animations
+    const [animationPhase, setAnimationPhase] = useState(0); 
     const [showSimilar, setShowSimilar] = useState(false);
     const [showFeatures, setShowFeatures] = useState(false);
 
-    // Refs to track animation frame and timeouts
     const animFrameRef = useRef<number | null>(null);
     const timeoutRef = useRef<NodeJS.Timeout[]>([]);
 
     const minimizedHeaderHeight = HEADER_MIN_HEIGHT + insets.top;
     const scrollDistance = HEADER_MAX_HEIGHT - minimizedHeaderHeight;
 
-    // Animation values
     const scrollY = useSharedValue(0);
     const isReady = useSharedValue(0);
 
-    // Optimized: Scroll handler with empty dependency array
     const scrollHandler = useAnimatedScrollHandler(
         {
             onScroll: (event) => {
@@ -195,27 +193,20 @@ const Details = () => {
         []
     );
 
-    // Back button handler
     const handleBack = useCallback(() => {
         router.back();
     }, [router]);
 
-    // All animations defined at top level, but with conditional rendering based on phase
-    // This allows us to defer the creation of complex animations while respecting Rules of Hooks
-
-    // Define basic animations for phase 1 (minimal setup)
     const basicHeaderStyle = useAnimatedStyle(
         () => ({
             height: HEADER_MAX_HEIGHT,
             opacity: isReady.value,
         }),
         []
-    ); // Empty dependency array optimization
+    );
 
-    // Full animations for phase 2+
     const animations = useDerivedValue(() => {
         if (animationPhase < 2) {
-            // Return default values for initial phase
             return {
                 headerHeight: HEADER_MAX_HEIGHT,
                 imageOpacity: 1,
@@ -225,7 +216,6 @@ const Details = () => {
             };
         }
 
-        // Full animations for phase 2+
         return {
             headerHeight: interpolate(
                 scrollY.value,
@@ -260,7 +250,6 @@ const Details = () => {
         };
     }, [scrollY, animationPhase, scrollDistance, minimizedHeaderHeight]);
 
-    // Optimized: Create animated styles with empty dependency arrays
     const headerAnimatedStyle = useAnimatedStyle(
         () => ({
             height: animations.value.headerHeight,
@@ -291,30 +280,26 @@ const Details = () => {
         []
     );
 
-    // Optimized: Phased initialization with improved layout loading strategy
     useEffect(() => {
-        // Initial setup only
         isReady.value = 0;
 
-        // Stage 1: Basic UI - immediate
-        const timer1 = setTimeout(() => {
-            isReady.value = withTiming(0.6, { duration: 100 });
-            setAnimationPhase(1);
-        }, 10);
+        const interactionPromise = InteractionManager.runAfterInteractions(
+            () => {
+                setAnimationPhase(1);
+                isReady.value = withTiming(0.6, { duration: 100 });
 
-        // Stage 2: Enable animations after navigation completes
-        const timer2 = setTimeout(() => {
-            setAnimationPhase(2);
-            isReady.value = withTiming(1, { duration: 100 });
-        }, 300);
+                const timer2 = setTimeout(() => {
+                    setAnimationPhase(2);
+                    isReady.value = withTiming(1, { duration: 100 });
 
-        // Stage 3: Load non-critical UI elements last
-        const timer3 = InteractionManager.runAfterInteractions(() => {
-            setShowFeatures(true);
-            setTimeout(() => setShowSimilar(true), 100);
-        });
+                    setShowFeatures(true);
+                    setShowSimilar(true);
 
-        timeoutRef.current = [timer1, timer2];
+                }, 200);
+
+                timeoutRef.current.push(timer2);
+            }
+        );
 
         return () => {
             // Clean up animations
@@ -328,12 +313,45 @@ const Details = () => {
 
             // Clean up all timeouts
             timeoutRef.current.forEach((timer) => clearTimeout(timer));
-            timer3?.cancel?.();
+
+            // Cancel interaction promise
+            interactionPromise.cancel();
         };
     }, [isReady, scrollY]);
 
-    // Pre-render components with memoization to prevent rerenders
-    const renderTitle = React.useMemo(
+    // Compute static styles once
+    const staticStyles = useMemo(
+        () => ({
+            minimizedHeaderContainer: {
+                height: minimizedHeaderHeight,
+                paddingTop: insets.top,
+                backgroundColor: "#1a2432",
+            },
+            floatingBackButtonContainer: {
+                top: insets.top + 10,
+            },
+            scrollContentContainer: {
+                paddingTop: HEADER_MAX_HEIGHT,
+            },
+        }),
+        [insets.top, minimizedHeaderHeight]
+    );
+
+    const renderHeaderImage = useMemo(() => {
+        return (
+            <View style={{ width: "100%", height: "100%" }}>
+                <LazyImage
+                    source={{
+                        uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+                    }}
+                    style={{ width: "100%", height: "100%" }}
+                    priority="high"
+                />
+            </View>
+        );
+    }, []);
+
+    const renderTitle = useMemo(
         () => (
             <View style={styles.titleSection}>
                 <Text style={styles.title}>{identifier}</Text>
@@ -359,7 +377,7 @@ const Details = () => {
         [identifier]
     );
 
-    const renderAbout = React.useMemo(
+    const renderAbout = useMemo(
         () => (
             <View style={styles.detailsSection}>
                 <Text style={styles.sectionTitle}>About</Text>
@@ -374,9 +392,9 @@ const Details = () => {
         []
     );
 
-    const renderFeatures = React.useMemo(
+    const renderFeatures = useMemo(
         () => (
-            <DelayedComponentLoader shouldRender={showFeatures} delay={50}>
+            <DelayedComponentLoader shouldRender={showFeatures}>
                 <View style={styles.featuresSection}>
                     <Text style={styles.sectionTitle}>Features</Text>
                     <View style={styles.separator} />
@@ -395,9 +413,9 @@ const Details = () => {
         [showFeatures]
     );
 
-    const renderSimilarPlaces = React.useMemo(
+    const renderSimilarPlaces = useMemo(
         () => (
-            <DelayedComponentLoader shouldRender={showSimilar} delay={50}>
+            <DelayedComponentLoader shouldRender={showSimilar}>
                 <View style={styles.similarSection}>
                     <Text style={styles.sectionTitle}>Similar Places</Text>
                     <View style={styles.separator} />
@@ -421,42 +439,18 @@ const Details = () => {
         [showSimilar]
     );
 
-    // Compute static styles once
-    const staticStyles = React.useMemo(
-        () => ({
-            minimizedHeaderContainer: {
-                height: minimizedHeaderHeight,
-                paddingTop: insets.top,
-                backgroundColor: "#1a2432",
-            },
-            floatingBackButtonContainer: {
-                top: insets.top + 10,
-            },
-            scrollContentContainer: {
-                paddingTop: HEADER_MAX_HEIGHT,
-            },
-        }),
-        [insets.top, minimizedHeaderHeight]
-    );
-
-    // Choose which animation styles to use based on the current phase
-    const currentHeaderStyle =
-        animationPhase >= 2 ? headerAnimatedStyle : basicHeaderStyle;
-
     return (
         <View style={styles.container}>
-            <Animated.View style={[styles.header, currentHeaderStyle]}>
+            <Animated.View
+                style={[
+                    styles.header,
+                    animationPhase < 2 ? basicHeaderStyle : headerAnimatedStyle,
+                ]}
+            >
                 <Animated.View
                     style={animationPhase >= 2 ? imageAnimatedStyle : {}}
                 >
-                    <FastImage
-                        source={{
-                            uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-                            priority: FastImage.priority.high,
-                        }}
-                        style={styles.headerImage}
-                        resizeMode={FastImage.resizeMode.cover}
-                    />
+                    {renderHeaderImage}
                 </Animated.View>
 
                 {animationPhase >= 2 && (
