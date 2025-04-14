@@ -6,6 +6,7 @@ export const souvenirData = [
         original_price: "1000",
         price: "900",
         image: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaefb3001a7efb4c03/view?project=bodoland-tourism",
+        rating: 4.8,
     },
     {
         identifier: "souvenir-gamusa",
@@ -14,6 +15,7 @@ export const souvenirData = [
         original_price: "500",
         price: "425",
         image: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf0b5002895c5d022/view?project=bodoland-tourism",
+        rating: 4.5,
     },
     {
         identifier: "souvenir-xorai",
@@ -22,6 +24,7 @@ export const souvenirData = [
         original_price: "800",
         price: "640",
         image: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+        rating: 4.7,
     },
     {
         identifier: "souvenir-assam-tea",
@@ -38,6 +41,7 @@ export const souvenirData = [
         original_price: "2000",
         price: "1760",
         image: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf0b5002895c5d022/view?project=bodoland-tourism",
+        rating: 4.6,
     },
     {
         identifier: "souvenir-bamboo-craft",
@@ -46,5 +50,6 @@ export const souvenirData = [
         original_price: "1200",
         price: "1104",
         image: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+        rating: 4.4,
     },
 ];

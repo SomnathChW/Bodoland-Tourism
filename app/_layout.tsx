@@ -93,8 +93,8 @@ export default function RootLayout() {
 
 const styles = StyleSheet.create({
     overlay: {
-        ...StyleSheet.absoluteFillObject, // Covers the entire screen
-        backgroundColor: "rgba(0,0,0, 0.5)", // Semi-transparent black
+        ...StyleSheet.absoluteFillObject, 
+        backgroundColor: "rgba(0,0,0, 0.5)", 
         justifyContent: "center",
         alignItems: "center",
         position: "absolute",

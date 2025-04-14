@@ -1,10 +1,46 @@
-import { Text, View, StyleSheet, StatusBar } from "react-native";
+import { Text, View, StyleSheet, StatusBar, Dimensions } from "react-native";
 import React from "react";
+import { useDrawer } from "@/context/DrawerContext";
+import { Ionicons } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
+import AttractionsCard from "@/components/AttractionsCard";
+import { attractionsData } from "@/data/attractions_data";
 
 const Attractions = () => {
+    const { toggleDrawer } = useDrawer();
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Attractions Tab</Text>
+            <View style={styles.content}>
+                <View style={styles.header}>
+                    <View style={styles.logo}>
+                        <Ionicons
+                            name="menu"
+                            size={30}
+                            style={styles.buttons}
+                            onPress={toggleDrawer}
+                        />
+                        <View>
+                            <Text style={styles.headingText}>Attractions</Text>
+                            <Text style={styles.mainSubHeaddingText}>
+                                Discover exciting places to visit
+                            </Text>
+                        </View>
+                    </View>
+                    <Ionicons name="search" size={30} style={styles.buttons} />
+                </View>
+                <FlashList
+                    data={attractionsData}
+                    renderItem={({ item, index }) => (
+                        <AttractionsCard item={item} index={index} />
+                    )}
+                    horizontal={false}
+                    showsVerticalScrollIndicator={false}
+                    numColumns={2}
+                    estimatedItemSize={30}
+                    keyExtractor={(item) => item.identifier}
+                    contentContainerStyle={{}}
+                />
+            </View>
         </View>
     );
 };
@@ -15,14 +51,37 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        alignItems: "center",
-        justifyContent: "center",
         paddingTop: StatusBar.currentHeight,
     },
-    text: {
+    content: {
+        flex: 1,
+        backgroundColor: "transparent",
+    },
+    header: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+    },
+    logo: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 20,
+    },
+    buttons: {
         color: "#fff",
+    },
+    headingText: {
         fontSize: 24,
         fontWeight: "bold",
         fontFamily: "SfProMedium",
+        color: "#fff",
+    },
+    mainSubHeaddingText: {
+        fontSize: 14,
+        fontWeight: "bold",
+        color: "#646f7e",
     },
 });

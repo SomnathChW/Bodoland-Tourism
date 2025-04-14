@@ -1,31 +1,46 @@
 import { Text, View, StyleSheet, StatusBar, Dimensions } from "react-native";
-import {
-    Canvas,
-    Rect,
-    Paint,
-    RadialGradient,
-} from "@shopify/react-native-skia";
 import React from "react";
 import { useDrawer } from "@/context/DrawerContext";
-
-const { height, width } = Dimensions.get("screen");
+import { Ionicons } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
+import StaysCard from "@/components/StaysCard";
+import { staysData } from "@/data/stays_data";
 
 const Stays = () => {
     const { toggleDrawer } = useDrawer();
     return (
         <View style={styles.container}>
-            <Canvas style={{ flex: 1 }}>
-                <Rect x={0} y={0} width={width} height={height}>
-                    <RadialGradient
-                        c={{
-                            x: width / 2,
-                            y: height / 2 - (StatusBar.currentHeight || 0),
-                        }}
-                        r={width / 2}
-                        colors={["violet", "black"]}
-                    />
-                </Rect>
-            </Canvas>
+            <View style={styles.content}>
+                <View style={styles.header}>
+                    <View style={styles.logo}>
+                        <Ionicons
+                            name="menu"
+                            size={30}
+                            style={styles.buttons}
+                            onPress={toggleDrawer}
+                        />
+                        <View>
+                            <Text style={styles.headingText}>Stays</Text>
+                            <Text style={styles.mainSubHeaddingText}>
+                                Find your perfect accommodation
+                            </Text>
+                        </View>
+                    </View>
+                    <Ionicons name="search" size={30} style={styles.buttons} />
+                </View>
+                <FlashList
+                    data={staysData}
+                    renderItem={({ item, index }) => (
+                        <StaysCard item={item} index={index} />
+                    )}
+                    horizontal={false}
+                    showsVerticalScrollIndicator={false}
+                    numColumns={2}
+                    estimatedItemSize={30}
+                    keyExtractor={(item) => item.identifier}
+                    contentContainerStyle={{}}
+                />
+            </View>
         </View>
     );
 };
@@ -38,10 +53,35 @@ const styles = StyleSheet.create({
         backgroundColor: "#0d1116",
         paddingTop: StatusBar.currentHeight,
     },
-    text: {
+    content: {
+        flex: 1,
+        backgroundColor: "transparent",
+    },
+    header: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+    },
+    logo: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 20,
+    },
+    buttons: {
         color: "#fff",
+    },
+    headingText: {
         fontSize: 24,
         fontWeight: "bold",
         fontFamily: "SfProMedium",
+        color: "#fff",
+    },
+    mainSubHeaddingText: {
+        fontSize: 14,
+        fontWeight: "bold",
+        color: "#646f7e",
     },
 });

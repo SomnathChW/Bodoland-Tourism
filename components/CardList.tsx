@@ -3,9 +3,9 @@ import { FlashList } from "@shopify/flash-list";
 import React from "react";
 
 type CardListProps = {
-    itemList: any[]; // Adjust the type as needed
-    CardComponent: React.ElementType; // The card component to be rendered
-    horizontal?: boolean; // Optional prop to control horizontal or vertical layout
+    itemList: any[];  
+    CardComponent: React.ElementType; 
+    horizontal?: boolean; 
 };
 
 const CardList = ({

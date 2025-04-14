@@ -1,10 +1,4 @@
-import {
-    StyleSheet,
-    Text,
-    View,
-    Dimensions,
-    Pressable,
-} from "react-native";
+import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
@@ -18,6 +12,7 @@ type Props = {
         discount_percentage?: string;
         original_price?: string;
         price: string;
+        rating?: number; 
     };
     index: number;
 };
@@ -29,15 +24,44 @@ const NUM_CARDS_ON_SCREEN = 2;
 const CARD_WIDTH =
     (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
     NUM_CARDS_ON_SCREEN;
-const CARD_HEIGHT = height * 0.25;
+
+const MIN_CARD_HEIGHT = height * 0.25;
+const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
 
 const ProductCard = ({ item, index }: Props) => {
     const router = useRouter();
-
     const [isBookmarked, setIsBookmarked] = React.useState(false);
 
+    const renderSimpleRating = () => (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <FontAwesome
+                name="star"
+                size={12}
+                color="#FFD700"
+                style={{ marginRight: 4 }}
+            />
+            <Text style={styles.rating}>
+                {item.rating ? item.rating.toFixed(1) : "N/A"}
+            </Text>
+        </View>
+    );
+
     return (
-        <View style={index % 2 === 0 ? styles.cardLeft : styles.cardRight}>
+        <View
+            style={{
+                width: CARD_WIDTH,
+                minHeight: MIN_CARD_HEIGHT,
+                backgroundColor: "rgba(52, 52, 52, 0.35)",
+                borderRadius: 10,
+                shadowOffset: { width: 10, height: 0 },
+                marginVertical: 10,
+                marginLeft: index % 2 === 0 ? PADDING : GAP / 2,
+                marginRight: index % 2 === 0 ? GAP / 2 : PADDING,
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+            }}
+        >
             <Pressable
                 onPress={() =>
                     router.navigate({
@@ -45,45 +69,107 @@ const ProductCard = ({ item, index }: Props) => {
                         params: { identifier: item.identifier },
                     })
                 }
+                style={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                }}
             >
-                <FastImage source={{ uri: item.image }} style={styles.image} />
+                <FastImage
+                    source={{ uri: item.image }}
+                    style={{
+                        width: CARD_WIDTH,
+                        minHeight: MIN_IMAGE_HEIGHT,
+                        flexGrow: 3,
+                        flexShrink: 0,
+                        flexBasis: MIN_IMAGE_HEIGHT,
+                    }}
+                    resizeMode="cover"
+                />
+
                 {item.title && (
-                    <View style={styles.infoView}>
+                    <View
+                        style={{
+                            width: CARD_WIDTH,
+                            flexGrow: 1,
+                            flexShrink: 0,
+                            flexBasis: "auto",
+                            paddingHorizontal: 10,
+                            paddingVertical: 8,
+                        }}
+                    >
                         <View style={styles.textView}>
                             <Text style={styles.title} numberOfLines={1}>
                                 {item.title}
                             </Text>
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <View style={styles.offerView}>
-                                    <AntDesign
-                                        name="arrowdown"
-                                        size={10}
-                                        color="lime"
-                                        style={{
-                                            marginRight: 2,
-                                        }}
+
+                            {item.rating ? (
+                                <View style={styles.ratingRow}>
+                                    {renderSimpleRating()}
+                                </View>
+                            ) : (
+                                <View style={styles.ratingRow}>
+                                    <FontAwesome
+                                        name="star"
+                                        size={12}
+                                        color="gray"
+                                        style={{ marginRight: 4 }}
                                     />
-                                    <Text style={styles.offerPercentageText}>
-                                        {item.discount_percentage + "%"}
+                                    <Text
+                                        style={[
+                                            styles.rating,
+                                            { color: "gray" },
+                                        ]}
+                                    >
+                                        {"No Ratings"}
                                     </Text>
                                 </View>
-                                <Text style={styles.price}>
-                                    {"₹ " + item.price}
-                                </Text>
-                                <Text style={styles.discount}>
-                                    {"₹ " + item.original_price}
-                                </Text>
+                            )}
+
+                            <View style={styles.priceContainer}>
+                                {item.discount_percentage && (
+                                    <View style={styles.offerView}>
+                                        <AntDesign
+                                            name="arrowdown"
+                                            size={10}
+                                            color="lime"
+                                            style={{ marginRight: 2 }}
+                                        />
+                                        <Text
+                                            style={styles.offerPercentageText}
+                                        >
+                                            {item.discount_percentage + "%"}
+                                        </Text>
+                                    </View>
+                                )}
+                                <View style={styles.priceAlignContainer}>
+                                    <Text style={styles.price}>
+                                        {"₹ " + item.price}
+                                    </Text>
+                                    {item.original_price && (
+                                        <Text style={styles.discount}>
+                                            {"₹ " + item.original_price}
+                                        </Text>
+                                    )}
+                                </View>
                             </View>
                         </View>
                     </View>
                 )}
+
                 <Pressable
-                    style={styles.tagCard}
+                    style={{
+                        position: "absolute",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: MIN_IMAGE_HEIGHT * 0.24,
+                        width: MIN_IMAGE_HEIGHT * 0.24,
+                        top: MIN_IMAGE_HEIGHT * 0.08,
+                        right: CARD_WIDTH * 0.05,
+                        alignSelf: "flex-start",
+                        borderRadius: 10,
+                        backgroundColor: "rgba(52, 52, 52, 0.24)",
+                    }}
                     onPress={() => setIsBookmarked(!isBookmarked)}
                 >
                     <FontAwesome
@@ -104,88 +190,53 @@ const ProductCard = ({ item, index }: Props) => {
 export default ProductCard;
 
 const styles = StyleSheet.create({
-    cardLeft: {
-        width: CARD_WIDTH,
-        height: CARD_HEIGHT,
-        backgroundColor: "rgba(52, 52, 52, 0.35)",
-        borderRadius: 10,
-        shadowOffset: { width: 10, height: 0 },
-        marginVertical: 10,
-        marginLeft: PADDING,
-        marginRight: GAP / 2,
-        overflow: "hidden",
-    },
-    cardRight: {
-        width: CARD_WIDTH,
-        height: CARD_HEIGHT,
-        backgroundColor: "rgba(52, 52, 52, 0.35)",
-        borderRadius: 10,
-        shadowOffset: { width: 10, height: 0 },
-        marginVertical: 10,
-        marginLeft: GAP / 2,
-        marginRight: PADDING,
-        overflow: "hidden",
-    },
-    tagCard: {
-        position: "absolute",
-        alignItems: "center",
-        justifyContent: "center",
-        height: CARD_HEIGHT * 0.15,
-        width: CARD_HEIGHT * 0.15,
-        top: CARD_HEIGHT * 0.05,
-        right: CARD_WIDTH * 0.05,
-        alignSelf: "flex-start",
-        borderRadius: 10,
-        backgroundColor: "rgba(52, 52, 52, 0.24)",
-    },
-    image: {
-        width: CARD_WIDTH,
-        height: CARD_HEIGHT * 0.75,
-    },
-    infoView: {
-        width: CARD_WIDTH,
-        height: CARD_HEIGHT * 0.25,
-        justifyContent: "space-between",
-        flexDirection: "row",
-        alignItems: "center",
-        paddingHorizontal: 10,
-    },
     textView: {
         flex: 1,
-        justifyContent: "center",
+        justifyContent: "space-between",
+    },
+    priceContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 4,
+    },
+    priceAlignContainer: {
+        flexDirection: "row",
+        alignItems: "baseline", 
     },
     title: {
         fontFamily: "SfProMedium",
         fontSize: 14,
         fontWeight: "bold",
         color: "white",
-        marginHorizontal: 5,
-        marginBottom: 4,
-        textAlignVertical: "center",
+        marginBottom: 2,
+    },
+    ratingRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginVertical: 2,
+    },
+    rating: {
+        fontFamily: "SfProMedium",
+        fontSize: 12,
+        color: "#FFD700",
     },
     price: {
         fontFamily: "SfProMedium",
         fontSize: 12,
         color: "white",
         marginHorizontal: 4,
-        textAlignVertical: "bottom",
-        lineHeight: 12,
     },
     discount: {
         fontFamily: "SfProMedium",
         fontSize: 10,
         color: "#646f7e",
-        marginLeft: 4,
+        marginLeft: 2,
         textDecorationLine: "line-through",
-        textAlignVertical: "bottom",
-        lineHeight: 12,
     },
     offerView: {
-        // backgroundColor: "rgba(84, 224, 126, 0.4)",
         paddingVertical: 1,
         paddingHorizontal: 3,
         borderRadius: 3,
-        marginLeft: 0,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
@@ -195,7 +246,5 @@ const styles = StyleSheet.create({
         fontSize: 10,
         color: "lime",
         textAlign: "center",
-        textAlignVertical: "bottom",
-        lineHeight: 12,
     },
 });
