@@ -1,10 +1,4 @@
-import React, {
-    useEffect,
-    useCallback,
-    useState,
-    useRef,
-    useMemo,
-} from "react";
+import React, { useEffect, useCallback, useState, useRef } from "react";
 import {
     StyleSheet,
     Text,
@@ -13,6 +7,7 @@ import {
     TouchableOpacity,
     ScrollView,
     InteractionManager,
+    Platform,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import Animated, {
@@ -24,6 +19,7 @@ import Animated, {
     withTiming,
     cancelAnimation,
     useDerivedValue,
+    runOnJS,
 } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -48,7 +44,7 @@ interface LazyImageProps {
     priority?: "low" | "normal" | "high";
 }
 
-// Optimized LazyImage component with preloading for high-priority images
+// Optimized LazyImage component with proper loading states
 const LazyImage = React.memo(
     ({
         source,
@@ -58,15 +54,13 @@ const LazyImage = React.memo(
     }: LazyImageProps) => {
         const isLoaded = useSharedValue(0);
 
-        // Optimized: Memoized animated style to prevent recreation
-        const animatedStyles = useAnimatedStyle(
-            () => ({
-                opacity: isLoaded.value,
-            }),
-            []
-        );
+        // Optimized animated style with worklet
+        const animatedStyles = useAnimatedStyle(() => {
+            "worklet";
+            return { opacity: isLoaded.value };
+        }, []);
 
-        // Optimized: Pre-cache high priority images
+        // Preload only high priority images
         useEffect(() => {
             if (priority === "high") {
                 FastImage.preload([{ uri: source.uri }]);
@@ -86,6 +80,7 @@ const LazyImage = React.memo(
                         source={{
                             ...source,
                             priority: FastImage.priority[priority],
+                            cache: FastImage.cacheControl.immutable,
                         }}
                         style={StyleSheet.absoluteFill}
                         resizeMode={FastImage.resizeMode.cover}
@@ -97,6 +92,7 @@ const LazyImage = React.memo(
     }
 );
 
+// Memoized feature item component
 const FeatureItem = React.memo(
     ({ icon, text }: { icon: any; text: string }) => (
         <View style={styles.featureItem}>
@@ -106,6 +102,7 @@ const FeatureItem = React.memo(
     )
 );
 
+// Optimized component loader - only renders when needed
 const DelayedComponentLoader = ({
     shouldRender = false,
     delay = 0,
@@ -131,39 +128,32 @@ const DelayedComponentLoader = ({
     return children;
 };
 
-const SimilarCard = React.memo(
-    ({ item, shouldRender = true }: { item: any; shouldRender?: boolean }) => {
-        if (!shouldRender) return null;
-
-        return (
-            <View style={styles.similarCard}>
-                <LazyImage
-                    source={{
-                        uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-                    }}
-                    style={styles.similarCardImage}
-                    priority="low"
-                />
-                <View style={styles.similarCardContent}>
-                    <Text style={styles.similarCardTitle}>
-                        Related Place {item}
-                    </Text>
-                    <View style={styles.similarRatingContainer}>
-                        {[0, 1, 2].map((_, index) => (
-                            <Ionicons
-                                key={index}
-                                name="star"
-                                size={12}
-                                color="#FFD700"
-                            />
-                        ))}
-                        <Text style={styles.similarCardRating}>4.7</Text>
-                    </View>
-                </View>
+// Optimized similar card component with reduced re-renders
+const SimilarCard = React.memo(({ item }: { item: any }) => (
+    <View style={styles.similarCard}>
+        <LazyImage
+            source={{
+                uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+            }}
+            style={styles.similarCardImage}
+            priority="low"
+        />
+        <View style={styles.similarCardContent}>
+            <Text style={styles.similarCardTitle}>Related Place {item}</Text>
+            <View style={styles.similarRatingContainer}>
+                {[0, 1, 2].map((_, index) => (
+                    <Ionicons
+                        key={index}
+                        name="star"
+                        size={12}
+                        color="#FFD700"
+                    />
+                ))}
+                <Text style={styles.similarCardRating}>4.7</Text>
             </View>
-        );
-    }
-);
+        </View>
+    </View>
+));
 
 const Details = () => {
     const params = useLocalSearchParams();
@@ -171,41 +161,72 @@ const Details = () => {
     const router = useRouter();
     const insets = useSafeAreaInsets();
 
-    const [animationPhase, setAnimationPhase] = useState(0); 
+    // State for phased loading
+    const [animationPhase, setAnimationPhase] = useState(0); // 0: initial, 1: basic, 2: full
     const [showSimilar, setShowSimilar] = useState(false);
     const [showFeatures, setShowFeatures] = useState(false);
 
-    const animFrameRef = useRef<number | null>(null);
-    const timeoutRef = useRef<NodeJS.Timeout[]>([]);
+    // Reference tracking
+    const isInitialRender = useRef(true);
 
     const minimizedHeaderHeight = HEADER_MIN_HEIGHT + insets.top;
     const scrollDistance = HEADER_MAX_HEIGHT - minimizedHeaderHeight;
 
+    // Animation values
     const scrollY = useSharedValue(0);
     const isReady = useSharedValue(0);
 
-    const scrollHandler = useAnimatedScrollHandler(
-        {
-            onScroll: (event) => {
-                scrollY.value = event.contentOffset.y;
-            },
+    // Optimized scroll handler with worklet
+    const scrollHandler = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            "worklet";
+            scrollY.value = event.contentOffset.y;
         },
-        []
-    );
+    });
 
+    // Navigation back handler
     const handleBack = useCallback(() => {
         router.back();
     }, [router]);
 
-    const basicHeaderStyle = useAnimatedStyle(
-        () => ({
-            height: HEADER_MAX_HEIGHT,
-            opacity: isReady.value,
-        }),
-        []
-    );
+    // Progressive animation loading
+    useEffect(() => {
+        // Skip heavy animations on first render
+        if (isInitialRender.current) {
+            isInitialRender.current = false;
 
+            // Phase 1: Just show the basic UI (minimal animations)
+            requestAnimationFrame(() => {
+                isReady.value = withTiming(0.6, { duration: 0 });
+                setAnimationPhase(1);
+
+                // Phase 2: Enable full animations after navigation completes
+                setTimeout(() => {
+                    InteractionManager.runAfterInteractions(() => {
+                        setAnimationPhase(2);
+                        isReady.value = withTiming(1, { duration: 200 });
+
+                        // Phase 3: Load non-critical UI elements last
+                        setTimeout(() => {
+                            setShowFeatures(true);
+                            setTimeout(() => setShowSimilar(true), 100);
+                        }, 100);
+                    });
+                }, 300);
+            });
+        }
+
+        return () => {
+            cancelAnimation(scrollY);
+            cancelAnimation(isReady);
+        };
+    }, [isReady, scrollY]);
+
+    // Optimized derived animations with worklet
     const animations = useDerivedValue(() => {
+        "worklet";
+
+        // During initial load, use simplified animation values
         if (animationPhase < 2) {
             return {
                 headerHeight: HEADER_MAX_HEIGHT,
@@ -216,6 +237,7 @@ const Details = () => {
             };
         }
 
+        // Full animations for phase 2+
         return {
             headerHeight: interpolate(
                 scrollY.value,
@@ -248,110 +270,40 @@ const Details = () => {
                 Extrapolation.CLAMP
             ),
         };
-    }, [scrollY, animationPhase, scrollDistance, minimizedHeaderHeight]);
+    }, [animationPhase, scrollDistance, minimizedHeaderHeight]);
 
-    const headerAnimatedStyle = useAnimatedStyle(
-        () => ({
+    const headerAnimatedStyle = useAnimatedStyle(() => {
+        "worklet";
+        return {
             height: animations.value.headerHeight,
             opacity: isReady.value,
-        }),
-        []
-    );
-
-    const imageAnimatedStyle = useAnimatedStyle(
-        () => ({
-            opacity: animations.value.imageOpacity,
-            transform: [{ scale: animations.value.imageScale }],
-        }),
-        []
-    );
-
-    const minimizedHeaderStyle = useAnimatedStyle(
-        () => ({
-            opacity: animations.value.minimizedHeaderOpacity,
-        }),
-        []
-    );
-
-    const floatingBackButtonStyle = useAnimatedStyle(
-        () => ({
-            opacity: animations.value.backButtonOpacity,
-        }),
-        []
-    );
-
-    useEffect(() => {
-        isReady.value = 0;
-
-        const interactionPromise = InteractionManager.runAfterInteractions(
-            () => {
-                setAnimationPhase(1);
-                isReady.value = withTiming(0.6, { duration: 100 });
-
-                const timer2 = setTimeout(() => {
-                    setAnimationPhase(2);
-                    isReady.value = withTiming(1, { duration: 100 });
-
-                    setShowFeatures(true);
-                    setShowSimilar(true);
-
-                }, 200);
-
-                timeoutRef.current.push(timer2);
-            }
-        );
-
-        return () => {
-            // Clean up animations
-            cancelAnimation(scrollY);
-            cancelAnimation(isReady);
-
-            // Clean up requestAnimationFrame
-            if (animFrameRef.current !== null) {
-                cancelAnimationFrame(animFrameRef.current);
-            }
-
-            // Clean up all timeouts
-            timeoutRef.current.forEach((timer) => clearTimeout(timer));
-
-            // Cancel interaction promise
-            interactionPromise.cancel();
         };
-    }, [isReady, scrollY]);
-
-    // Compute static styles once
-    const staticStyles = useMemo(
-        () => ({
-            minimizedHeaderContainer: {
-                height: minimizedHeaderHeight,
-                paddingTop: insets.top,
-                backgroundColor: "#1a2432",
-            },
-            floatingBackButtonContainer: {
-                top: insets.top + 10,
-            },
-            scrollContentContainer: {
-                paddingTop: HEADER_MAX_HEIGHT,
-            },
-        }),
-        [insets.top, minimizedHeaderHeight]
-    );
-
-    const renderHeaderImage = useMemo(() => {
-        return (
-            <View style={{ width: "100%", height: "100%" }}>
-                <LazyImage
-                    source={{
-                        uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-                    }}
-                    style={{ width: "100%", height: "100%" }}
-                    priority="high"
-                />
-            </View>
-        );
     }, []);
 
-    const renderTitle = useMemo(
+    const imageAnimatedStyle = useAnimatedStyle(() => {
+        "worklet";
+        return {
+            opacity: animations.value.imageOpacity,
+            transform: [{ scale: animations.value.imageScale }],
+        };
+    }, []);
+
+    const minimizedHeaderStyle = useAnimatedStyle(() => {
+        "worklet";
+        return {
+            opacity: animations.value.minimizedHeaderOpacity,
+        };
+    }, []);
+
+    const floatingBackButtonStyle = useAnimatedStyle(() => {
+        "worklet";
+        return {
+            opacity: animations.value.backButtonOpacity,
+        };
+    }, []);
+
+    // Memoized content components
+    const renderTitle = React.useMemo(
         () => (
             <View style={styles.titleSection}>
                 <Text style={styles.title}>{identifier}</Text>
@@ -377,7 +329,7 @@ const Details = () => {
         [identifier]
     );
 
-    const renderAbout = useMemo(
+    const renderAbout = React.useMemo(
         () => (
             <View style={styles.detailsSection}>
                 <Text style={styles.sectionTitle}>About</Text>
@@ -392,7 +344,7 @@ const Details = () => {
         []
     );
 
-    const renderFeatures = useMemo(
+    const renderFeatures = React.useMemo(
         () => (
             <DelayedComponentLoader shouldRender={showFeatures}>
                 <View style={styles.featuresSection}>
@@ -413,7 +365,7 @@ const Details = () => {
         [showFeatures]
     );
 
-    const renderSimilarPlaces = useMemo(
+    const renderSimilarPlaces = React.useMemo(
         () => (
             <DelayedComponentLoader shouldRender={showSimilar}>
                 <View style={styles.similarSection}>
@@ -423,15 +375,11 @@ const Details = () => {
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={styles.similarCardsContainer}
-                        removeClippedSubviews={true}
                     >
-                        {[1, 2, 3].map((item) => (
-                            <SimilarCard
-                                key={item}
-                                item={item}
-                                shouldRender={showSimilar}
-                            />
-                        ))}
+                        {showSimilar &&
+                            [1, 2, 3].map((item) => (
+                                <SimilarCard key={item} item={item} />
+                            ))}
                     </ScrollView>
                 </View>
             </DelayedComponentLoader>
@@ -439,18 +387,49 @@ const Details = () => {
         [showSimilar]
     );
 
+    // Static styles calculated once
+    const staticStyles = React.useMemo(
+        () => ({
+            minimizedHeaderContainer: {
+                height: minimizedHeaderHeight,
+                paddingTop: insets.top,
+                backgroundColor: "#1a2432",
+            },
+            floatingBackButtonContainer: {
+                top: insets.top + 10,
+            },
+            scrollContentContainer: {
+                paddingTop: HEADER_MAX_HEIGHT,
+            },
+        }),
+        [insets.top, minimizedHeaderHeight]
+    );
+
+    // Select appropriate animation style based on phase
+    const currentHeaderStyle =
+        animationPhase >= 2
+            ? headerAnimatedStyle
+            : {
+                  height: HEADER_MAX_HEIGHT,
+                  opacity: isReady.value,
+              };
+
     return (
         <View style={styles.container}>
-            <Animated.View
-                style={[
-                    styles.header,
-                    animationPhase < 2 ? basicHeaderStyle : headerAnimatedStyle,
-                ]}
-            >
+            <Animated.View style={[styles.header, currentHeaderStyle]}>
+                {/* Use preloaded image for header to prevent flashing */}
                 <Animated.View
                     style={animationPhase >= 2 ? imageAnimatedStyle : {}}
                 >
-                    {renderHeaderImage}
+                    <FastImage
+                        source={{
+                            uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+                            priority: FastImage.priority.high,
+                            cache: FastImage.cacheControl.immutable,
+                        }}
+                        style={styles.headerImage}
+                        resizeMode={FastImage.resizeMode.cover}
+                    />
                 </Animated.View>
 
                 {animationPhase >= 2 && (
@@ -464,6 +443,7 @@ const Details = () => {
                         <TouchableOpacity
                             style={styles.headerBackButton}
                             onPress={handleBack}
+                            activeOpacity={0.8}
                         >
                             <Ionicons
                                 name="arrow-back"
@@ -485,7 +465,7 @@ const Details = () => {
                         animationPhase >= 2 ? floatingBackButtonStyle : {},
                     ]}
                 >
-                    <TouchableOpacity onPress={handleBack}>
+                    <TouchableOpacity onPress={handleBack} activeOpacity={0.8}>
                         <Ionicons name="arrow-back" size={24} color="#fff" />
                     </TouchableOpacity>
                 </Animated.View>
@@ -501,6 +481,7 @@ const Details = () => {
                 scrollEventThrottle={16}
                 removeClippedSubviews={true}
                 overScrollMode="never"
+                keyboardShouldPersistTaps="handled"
             >
                 {renderTitle}
                 {renderAbout}
