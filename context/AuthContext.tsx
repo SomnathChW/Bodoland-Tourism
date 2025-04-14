@@ -14,6 +14,7 @@ import { toast } from "sonner-native";
 import { account, ID } from "@/lib/appwrite";
 
 import { mockAccount } from "@/dev_helpers/mockAccount";
+import { Platform } from "react-native";
 
 const AuthContext = createContext<{
     user: Models.User<{}> | null;
@@ -72,10 +73,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                     SecureStore.deleteItemAsync("loggedIn");
                     toast.error("Please sign in to continue");
                 }
-                setSession(null);
-                setUser(null);
                 await SecureStore.deleteItemAsync("session");
                 await SecureStore.deleteItemAsync("user");
+                setSession(null);
+                setUser(null);
             } else {
                 toast.error("Error checking your account");
             }
@@ -83,7 +84,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        SystemUI.setBackgroundColorAsync("#0d1116");
+        if (Platform.OS === "android") {
+            SystemUI.setBackgroundColorAsync("#0d1116");
+        }
+
         if (!hasInitialized.current) {
             init();
             hasInitialized.current = true;
@@ -208,11 +212,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 "type" in error &&
                 (error as any).type.includes("general_unauthorized_scope")
             ) {
-                setSession(null);
-                setUser(null);
                 await SecureStore.deleteItemAsync("session");
                 await SecureStore.deleteItemAsync("user");
                 await SecureStore.deleteItemAsync("loggedIn");
+                setSession(null);
+                setUser(null);
             } else {
                 toast.error("Error signing out", { id: toast_id });
             }

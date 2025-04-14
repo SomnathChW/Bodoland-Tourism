@@ -31,8 +31,7 @@ const SignInPage = () => {
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
 
-    NavigationBar.setBackgroundColorAsync("#0d1116");
-
+    
     const handleSignIn = () => {
         if (!validateAuthInputs({ email, password, name: "signin" })) {
             return;

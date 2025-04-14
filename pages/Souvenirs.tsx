@@ -2,26 +2,46 @@ import { StyleSheet, StatusBar, View, Text, ScrollView } from "react-native";
 import React from "react";
 
 import { souvenirData } from "@/data/souvenir_data";
+import ProductCard from "@/components/ProductCard";
 
-import CardListPage from "@/components/CardListPage";
 import { Ionicons } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
+import { useDrawer } from "@/context/DrawerContext";
 
 const Souvenirs = () => {
+    const { toggleDrawer } = useDrawer();
     return (
         <View style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logo}>
+                        <Ionicons
+                            name="menu"
+                            size={30}
+                            style={styles.buttons}
+                            onPress={toggleDrawer}
+                        />
                         <View>
                             <Text style={styles.headingText}>Souvenirs</Text>
                             <Text style={styles.mainSubHeaddingText}>
-                                Take some memories with you
+                                Take a piece of Bodoland with you
                             </Text>
                         </View>
                     </View>
                     <Ionicons name="search" size={30} style={styles.buttons} />
                 </View>
-                <CardListPage itemList={souvenirData} />
+                <FlashList
+                    data={souvenirData}
+                    renderItem={({ item, index }) => (
+                        <ProductCard item={item} index={index} />
+                    )}
+                    horizontal={false}
+                    showsVerticalScrollIndicator={false}
+                    numColumns={2}
+                    estimatedItemSize={30}
+                    keyExtractor={(item) => item.identifier}
+                    contentContainerStyle={{}}
+                />
             </View>
         </View>
     );
@@ -38,13 +58,13 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         backgroundColor: "transparent",
-        paddingHorizontal: 20,
     },
     header: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
         paddingVertical: 10,
+        paddingHorizontal: 20,
     },
     logo: {
         flexDirection: "row",
