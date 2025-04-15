@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
-import { Entypo, FontAwesome } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import FastImage from "react-native-fast-image";
 
 type Props = {
@@ -9,8 +9,7 @@ type Props = {
         identifier: string;
         name: string;
         image: any;
-        location: string;
-        price?: string; // Optional price
+        "short-desc": string;
     };
     index: number;
 };
@@ -29,7 +28,7 @@ const MIN_CARD_HEIGHT = height * 0.25;
 // Set minimum image height to 75% of minimum card height
 const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
 
-const AttractionsCard = ({ item, index }: Props) => {
+const CuisineCard = ({ item, index }: Props) => {
     const router = useRouter();
     const [isFavorite, setIsFavorite] = React.useState(false);
 
@@ -84,35 +83,9 @@ const AttractionsCard = ({ item, index }: Props) => {
                             {item.name}
                         </Text>
 
-                        <View style={styles.locationRow}>
-                            <Entypo
-                                name="location-pin"
-                                size={12}
-                                color="#646f7e"
-                                style={{ marginRight: 2 }}
-                            />
-                            <Text style={styles.location} numberOfLines={1}>
-                                {item.location}
-                            </Text>
-                        </View>
-
-                        <View style={styles.priceRow}>
-                            <FontAwesome
-                                name="ticket"
-                                size={12}
-                                color="#646f7e"
-                                style={{ marginRight: 4 }}
-                            />
-                            <Text
-                                style={
-                                    !item.price
-                                        ? styles.freePrice
-                                        : styles.price
-                                }
-                            >
-                                {item.price ? "₹ " + item.price : "Free"}
-                            </Text>
-                        </View>
+                        <Text style={styles.desc} numberOfLines={1}>
+                            {item["short-desc"]}
+                        </Text>
                     </View>
                 </View>
 
@@ -147,7 +120,7 @@ const AttractionsCard = ({ item, index }: Props) => {
     );
 };
 
-export default AttractionsCard;
+export default CuisineCard;
 
 const styles = StyleSheet.create({
     topSection: {
@@ -161,36 +134,12 @@ const styles = StyleSheet.create({
         color: "white",
         marginBottom: 2,
     },
-    locationRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 2,
-    },
-    location: {
+    desc: {
         fontFamily: "SfProMedium",
         fontSize: 12,
         color: "#646f7e",
         flex: 1,
-    },
-    mapIconContainer: {
-        padding: 3,
-        marginLeft: 5,
-    },
-    priceRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 3,
-        marginTop: 2, // Added top margin as requested
-    },
-    price: {
-        fontFamily: "SfProMedium",
-        fontSize: 12,
-        color: "white",
-    },
-    freePrice: {
-        // New style for free price in green
-        fontFamily: "SfProMedium",
-        fontSize: 12,
-        color: "#4CD964", // Green color
+        marginBottom: 2,
+        paddingRight: 10,
     },
 });
