@@ -29,8 +29,8 @@ const STATUS_BAR_HEIGHT =
 
 const drawerItems = [
     {
-        label: "Profile",
-        key: "profile",
+        label: "Home",
+        key: "/(protected)/",
         icon: "user",
     },
     {
@@ -171,14 +171,25 @@ export default function Drawer(): JSX.Element {
 
     const router = useRouter();
 
+    const { currentPath } = useDrawer();
+
     const handleMenuItemPress = (key: string) => {
-        if (key.startsWith("/")) {
-            router.push(key as any);
-            drawerProgress.value = 0; //close the drawer instantly to avoid flicker
-        } else {
-            console.log(`Selected: ${key}`);
+        if (key === currentPath) {
             toggleDrawer();
+            return;
         }
+
+        if (router.canGoBack()) {
+            try {
+                router.dismissTo(key as any);
+            } catch {
+                router.push(key as any);
+            }
+        } else {
+            router.push(key as any);
+        }
+        drawerProgress.value = 0;
+        toggleDrawer();
     };
 
     return (
