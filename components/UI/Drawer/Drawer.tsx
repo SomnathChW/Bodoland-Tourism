@@ -174,17 +174,22 @@ export default function Drawer(): JSX.Element {
     const { currentPath } = useDrawer();
 
     const handleMenuItemPress = (key: string) => {
-        if (key === currentPath) {
-            toggleDrawer();
-            return;
-        }
-
         const isInSomeOtherTab = [
             "attractions",
             "stays",
             "souvenirs",
             "vrview",
         ].some((path) => currentPath.includes(path));
+
+        if (key === currentPath) {
+            toggleDrawer();
+            return;
+        }
+
+        if (isInSomeOtherTab && key === "/(protected)/") {
+            toggleDrawer();
+            return;
+        }
 
         if (router.canGoBack() && !isInSomeOtherTab) {
             try {

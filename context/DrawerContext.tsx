@@ -27,8 +27,11 @@ export function DrawerProvider({ children }: DrawerProviderProps): JSX.Element {
     const pathname = usePathname();
 
     useEffect(() => {
-        setCurrentPath("/(protected)" + pathname); // auto-sync with current route
-        // console.log("Current Path:", "/(protected)" + pathname);
+        const timeout = setTimeout(() => {
+            setCurrentPath("/(protected)" + pathname);
+        }, 150); // delay just enough to avoid blocking tab switch
+
+        return () => clearTimeout(timeout);
     }, [pathname]);
 
     const toggleDrawer = (): void => {
