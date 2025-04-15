@@ -179,7 +179,14 @@ export default function Drawer(): JSX.Element {
             return;
         }
 
-        if (router.canGoBack()) {
+        const isInSomeOtherTab = [
+            "attractions",
+            "stays",
+            "souvenirs",
+            "vrview",
+        ].some((path) => currentPath.includes(path));
+
+        if (router.canGoBack() && !isInSomeOtherTab) {
             try {
                 router.dismissTo(key as any);
             } catch {
