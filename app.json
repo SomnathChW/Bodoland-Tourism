@@ -2,7 +2,7 @@
     "expo": {
         "name": "BTR Tourism",
         "slug": "btr-tourism",
-        "version": "0.0.2",
+        "version": "0.0.3",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
         "scheme": "btrtourism",
@@ -27,7 +27,7 @@
             },
             "package": "in.coolidance.btrtourism",
             "userInterfaceStyle": "dark",
-            "versionCode": 2
+            "versionCode": 3
         },
         "web": {
             "bundler": "metro",
@@ -50,6 +50,16 @@
                 {
                     "configureAndroidBackup": true,
                     "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID to store passwords securely."
+                }
+            ],
+            [
+                "expo-build-properties",
+                {
+                    "android": {
+                        "enableProguardInReleaseBuilds": true,
+                        "extraProguardRules": "-keep public class com.dylanvann.fastimage.* {*;}\n-keep public class com.dylanvann.fastimage.** {*;}\n-keep public class * implements com.bumptech.glide.module.GlideModule\n-keep public class * extends com.bumptech.glide.module.AppGlideModule\n-keep public enum com.bumptech.glide.load.ImageHeaderParser$** {\n  **[] $VALUES;\n  public *;\n}",
+                        "enableShrinkResourcesInReleaseBuilds": true
+                    }
                 }
             ]
         ],

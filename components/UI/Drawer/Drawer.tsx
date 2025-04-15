@@ -20,9 +20,10 @@ import Animated, {
 } from "react-native-reanimated";
 import { Feather, MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import FastImage from "react-native-fast-image";
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
-const DRAWER_WIDTH: number = width * 0.6;
+const DRAWER_WIDTH: number = width * 0.65;
 const STATUS_BAR_HEIGHT =
     Platform.OS === "ios" ? 44 : StatusBar.currentHeight || 24;
 
@@ -30,6 +31,16 @@ const drawerItems = [
     {
         label: "Profile",
         key: "profile",
+        icon: "user",
+    },
+    {
+        label: "Festivals",
+        key: "/(protected)/festivals",
+        icon: "user",
+    },
+    {
+        label: "Cuisine",
+        key: "/(protected)/cuisine",
         icon: "user",
     },
     {
@@ -42,7 +53,6 @@ const drawerItems = [
         key: "about",
         icon: "info",
     },
-    // Add more items to test scrolling
     {
         label: "Notifications",
         key: "notifications",
@@ -159,6 +169,18 @@ export default function Drawer(): JSX.Element {
 
     const randomUserNumber = Math.floor(Math.random() * 100);
 
+    const router = useRouter();
+
+    const handleMenuItemPress = (key: string) => {
+        if (key.startsWith("/")) {
+            router.push(key as any);
+            drawerProgress.value = 0; //close the drawer instantly to avoid flicker
+        } else {
+            console.log(`Selected: ${key}`);
+            toggleDrawer();
+        }
+    };
+
     return (
         <>
             <StatusBar translucent backgroundColor="transparent" />
@@ -205,7 +227,7 @@ export default function Drawer(): JSX.Element {
                             key={item.key}
                             style={styles.menuItem}
                             activeOpacity={0.8}
-                            onPress={() => console.log(`Selected: ${item.key}`)}
+                            onPress={() => handleMenuItemPress(item.key)}
                         >
                             {renderIcon(item.icon)}
                             <Text style={styles.menuItemText}>

@@ -1,9 +1,8 @@
 import { Text, View, StyleSheet } from "react-native";
 import React from "react";
-import * as NavigationBar from "expo-navigation-bar";
 
 const Festivals = () => {
-    NavigationBar.setBackgroundColorAsync("#0d1116");
+    console.log("Festivals Tab");
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Festivals Tab</Text>
