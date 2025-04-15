@@ -28,6 +28,7 @@ export function DrawerProvider({ children }: DrawerProviderProps): JSX.Element {
 
     useEffect(() => {
         setCurrentPath("/(protected)" + pathname); // auto-sync with current route
+        // console.log("Current Path:", "/(protected)" + pathname);
     }, [pathname]);
 
     const toggleDrawer = (): void => {
