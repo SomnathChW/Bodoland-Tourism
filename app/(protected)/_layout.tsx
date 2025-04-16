@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import Drawer from "@/components/UI/Drawer/Drawer";
 import { DrawerProvider } from "@/context/DrawerContext";
 
-const StackLayout = () => {
+const StackLayout = React.memo(() => {
     const screens = [
         { name: "details", title: "Details" },
         { name: "festivals", title: "Festivals" },
@@ -43,7 +43,7 @@ const StackLayout = () => {
             <Drawer />
         </>
     );
-};
+});
 
 const _layout = () => {
     const { session } = useAuth();

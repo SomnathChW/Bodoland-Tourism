@@ -39,6 +39,7 @@ const Stays = () => {
                     estimatedItemSize={30}
                     keyExtractor={(item) => item.identifier}
                     contentContainerStyle={{}}
+                    removeClippedSubviews={true}
                 />
             </View>
         </View>

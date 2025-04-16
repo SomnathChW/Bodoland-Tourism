@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback, memo } from "react";
 import {
     View,
     StyleSheet,
@@ -88,10 +88,83 @@ const drawerFooterItems = [
     },
 ];
 
-export default function Drawer(): JSX.Element {
-    const { isDrawerOpen, toggleDrawer } = useDrawer();
+// Memoized MenuItem component
+interface MenuItemProps {
+    item: { key: string; label: string; icon: string };
+    isActive: boolean;
+    onPress: (key: string) => void;
+    renderIcon: (iconName: string) => React.ReactNode;
+}
 
+const MenuItem = memo(
+    ({ item, isActive, onPress, renderIcon }: MenuItemProps) => {
+        return (
+            <TouchableOpacity
+                key={item.key}
+                style={[styles.menuItem, isActive && styles.activeMenuItem]}
+                activeOpacity={0.8}
+                onPress={() => onPress(item.key)}
+            >
+                {renderIcon(item.icon)}
+                <Text
+                    style={[
+                        styles.menuItemText,
+                        isActive && styles.activeMenuItemText,
+                    ]}
+                >
+                    {item.label}
+                </Text>
+            </TouchableOpacity>
+        );
+    }
+);
+
+// Memoized FooterItem component
+interface FooterItemProps {
+    item: { key: string; label: string; icon: string };
+    renderIcon: (iconName: string) => React.ReactNode;
+}
+
+const FooterItem = memo(({ item, renderIcon }: FooterItemProps) => {
+    return (
+        <TouchableOpacity
+            key={item.key}
+            style={styles.footerItem}
+            activeOpacity={0.8}
+            onPress={() => console.log(`Selected footer: ${item.key}`)}
+        >
+            {renderIcon(item.icon)}
+            <Text style={styles.menuItemText}>{item.label}</Text>
+        </TouchableOpacity>
+    );
+});
+
+// Memoized ProfileSection component
+const ProfileSection = memo(() => {
+    const randomUserNumber = Math.floor(Math.random() * 100);
+
+    return (
+        <View style={styles.profileSection}>
+            <View style={styles.profileContent}>
+                <FastImage
+                    source={{
+                        uri: `https://randomuser.me/api/portraits/men/${randomUserNumber}.jpg`,
+                    }}
+                    style={styles.profileImage}
+                />
+                <View style={styles.profileInfo}>
+                    <Text style={styles.profileName}>Somnath Chowdhury</Text>
+                    <Text style={styles.profileEmail}>somnath@test.com</Text>
+                </View>
+            </View>
+        </View>
+    );
+});
+
+function DrawerComponent(): JSX.Element {
+    const { isDrawerOpen, toggleDrawer, currentPath } = useDrawer();
     const drawerProgress = useSharedValue(0);
+    const router = useRouter();
 
     useEffect(() => {
         drawerProgress.value = withTiming(isDrawerOpen ? 1 : 0, {
@@ -120,7 +193,7 @@ export default function Drawer(): JSX.Element {
         };
     });
 
-    const renderIcon = (iconName: string) => {
+    const renderIcon = useCallback((iconName: string) => {
         switch (iconName) {
             case "user":
             case "phone":
@@ -165,44 +238,68 @@ export default function Drawer(): JSX.Element {
                     />
                 );
         }
-    };
+    }, []);
 
-    const randomUserNumber = Math.floor(Math.random() * 100);
+    const handleMenuItemPress = useCallback(
+        (key: string) => {
+            if (!key.startsWith("/")) {
+                console.log(`Selected item: ${key}`);
+                toggleDrawer();
+                return;
+            }
 
-    const router = useRouter();
+            const isInSomeOtherTab = [
+                "attractions",
+                "stays",
+                "souvenirs",
+                "vrview",
+            ].some((path) => currentPath.includes(path));
 
-    const { currentPath } = useDrawer();
+            if (key === currentPath) {
+                toggleDrawer();
+                return;
+            }
 
-    const handleMenuItemPress = (key: string) => {
-        const isInSomeOtherTab = [
-            "attractions",
-            "stays",
-            "souvenirs",
-            "vrview",
-        ].some((path) => currentPath.includes(path));
+            if (isInSomeOtherTab && key === "/(protected)/") {
+                toggleDrawer();
+                return;
+            }
 
-        if (key === currentPath) {
-            toggleDrawer();
-            return;
-        }
-
-        if (isInSomeOtherTab && key === "/(protected)/") {
-            toggleDrawer();
-            return;
-        }
-
-        if (router.canGoBack() && !isInSomeOtherTab) {
-            try {
-                router.dismissTo(key as any);
-            } catch {
+            if (router.canGoBack() && !isInSomeOtherTab) {
+                try {
+                    router.dismissTo(key as any);
+                } catch {
+                    router.push(key as any);
+                }
+            } else {
                 router.push(key as any);
             }
-        } else {
-            router.push(key as any);
-        }
-        drawerProgress.value = 0;
-        toggleDrawer();
-    };
+            drawerProgress.value = 0;
+            toggleDrawer();
+        },
+        [currentPath, toggleDrawer, router, drawerProgress]
+    );
+
+    const isMenuItemActive = useCallback(
+        (itemKey: string) => {
+            if (currentPath === itemKey) {
+                return true;
+            }
+            if (itemKey === "/(protected)/") {
+                if (currentPath.startsWith("/(protected)/")) {
+                    
+                    const matchesOtherMenuItem = drawerItems.some(
+                        (item) =>
+                            item.key !== "/(protected)/" && 
+                            currentPath.startsWith(item.key) 
+                    );
+                    return !matchesOtherMenuItem;
+                }
+            }
+            return false;
+        },
+        [currentPath, drawerItems]
+    );
 
     return (
         <>
@@ -221,24 +318,7 @@ export default function Drawer(): JSX.Element {
                 <View style={styles.statusBarSpacer} />
 
                 {/* User Profile Section - naturally sized */}
-                <View style={styles.profileSection}>
-                    <View style={styles.profileContent}>
-                        <FastImage
-                            source={{
-                                uri: `https://randomuser.me/api/portraits/men/${randomUserNumber}.jpg`,
-                            }}
-                            style={styles.profileImage}
-                        />
-                        <View style={styles.profileInfo}>
-                            <Text style={styles.profileName}>
-                                Somnath Chowdhury
-                            </Text>
-                            <Text style={styles.profileEmail}>
-                                somnath@test.com
-                            </Text>
-                        </View>
-                    </View>
-                </View>
+                <ProfileSection />
 
                 {/* Scrollable Menu Items */}
                 <ScrollView
@@ -246,17 +326,13 @@ export default function Drawer(): JSX.Element {
                     showsVerticalScrollIndicator={false}
                 >
                     {drawerItems.map((item) => (
-                        <TouchableOpacity
+                        <MenuItem
                             key={item.key}
-                            style={styles.menuItem}
-                            activeOpacity={0.8}
-                            onPress={() => handleMenuItemPress(item.key)}
-                        >
-                            {renderIcon(item.icon)}
-                            <Text style={styles.menuItemText}>
-                                {item.label}
-                            </Text>
-                        </TouchableOpacity>
+                            item={item}
+                            isActive={isMenuItemActive(item.key)}
+                            onPress={handleMenuItemPress}
+                            renderIcon={renderIcon}
+                        />
                     ))}
                     {/* Add extra padding at the bottom to prevent cutoff */}
                     <View style={styles.scrollBottomPadding} />
@@ -265,25 +341,22 @@ export default function Drawer(): JSX.Element {
                 {/* Sticky Footer */}
                 <View style={styles.drawerFooter}>
                     {drawerFooterItems.map((item) => (
-                        <TouchableOpacity
+                        <FooterItem
                             key={item.key}
-                            style={styles.footerItem}
-                            activeOpacity={0.8}
-                            onPress={() =>
-                                console.log(`Selected footer: ${item.key}`)
-                            }
-                        >
-                            {renderIcon(item.icon)}
-                            <Text style={styles.menuItemText}>
-                                {item.label}
-                            </Text>
-                        </TouchableOpacity>
+                            item={item}
+                            renderIcon={renderIcon}
+                        />
                     ))}
                 </View>
             </Animated.View>
         </>
     );
 }
+
+// Memoize the entire Drawer component
+const Drawer = memo(DrawerComponent);
+
+export default Drawer;
 
 const styles = StyleSheet.create({
     overlay: {
@@ -367,6 +440,11 @@ const styles = StyleSheet.create({
         borderBottomColor: "rgba(255, 255, 255, 0.15)",
         backgroundColor: "transparent",
     },
+    activeMenuItem: {
+        backgroundColor: "#1e252e",
+        borderRadius: 8,
+        paddingHorizontal: 8,
+    },
     menuItemIcon: {
         marginRight: 12,
     },
@@ -375,6 +453,9 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: "SfProMedium",
         fontWeight: "bold",
+    },
+    activeMenuItemText: {
+        color: "white",
     },
     drawerFooter: {
         borderTopWidth: 1,

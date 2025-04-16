@@ -1,24 +1,23 @@
 import { View, StyleSheet, LayoutChangeEvent } from "react-native";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import TabBarButton from "./TabBarButton";
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 
-export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+export const TabBar = memo(({ state, descriptors, navigation }: BottomTabBarProps) => {
     const [dimensions, setDimensions] = useState({ height: 0, width: 0 });
 
-    const onTabBarLayout = (e: LayoutChangeEvent) => {
+    const onTabBarLayout = useCallback((e: LayoutChangeEvent) => {
         setDimensions({
             height: e.nativeEvent.layout.height,
             width: e.nativeEvent.layout.width,
         });
-    };
+    }, []);
 
     return (
         <View onLayout={onTabBarLayout} style={styles.tabBar}>
             {state.routes.map((route, index) => {
                 const { options } = descriptors[route.key];
                 const label = options.title || route.name;
-
                 const isFocused = state.index === index;
 
                 const onPress = () => {
@@ -54,7 +53,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             })}
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     tabBar: {

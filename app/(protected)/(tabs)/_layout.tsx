@@ -16,6 +16,7 @@ const _layout = () => {
             backBehavior="initialRoute"
             initialRouteName="index"
             tabBar={(props) => <TabBar {...props} />}
+            detachInactiveScreens={false}
         >
             {screens.map((items) => (
                 <Tabs.Screen

@@ -3,7 +3,7 @@ export const staysData = [
     {
         identifier: "hotel-001",
         name: "Oceanview Resort & Spa",
-        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000&auto=format&fit=crop",
         location: "South Mumbai, India",
         rating: 4.8,
         price: "8,999",
@@ -14,7 +14,7 @@ export const staysData = [
     {
         identifier: "hotel-002",
         name: "City Center Hotel",
-        image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa",
+        image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1000&auto=format&fit=crop",
         location: "Bandra, Mumbai",
         rating: 4.2,
         price: "5,499",
@@ -25,7 +25,7 @@ export const staysData = [
     {
         identifier: "hotel-003",
         name: "Mountain View Lodge",
-        image: "https://images.unsplash.com/photo-1455587734955-081b22074882",
+        image: "https://images.unsplash.com/photo-1455587734955-081b22074882?q=80&w=1000&auto=format&fit=crop",
         location: "Lonavala, Maharashtra",
         rating: 4.5,
         price: "7,299",
@@ -36,7 +36,7 @@ export const staysData = [
     {
         identifier: "hotel-004",
         name: "Beachfront Paradise",
-        image: "https://images.unsplash.com/photo-1540541338287-41700207dee6",
+        image: "https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=1000&auto=format&fit=crop",
         location: "Goa, India",
         rating: 4.9,
         price: "12,499",
@@ -47,7 +47,7 @@ export const staysData = [
     {
         identifier: "hotel-005",
         name: "Heritage Grand",
-        image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb",
+        image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1000&auto=format&fit=crop",
         location: "Jaipur, Rajasthan",
         rating: 4.7,
         price: "9,999",
@@ -58,7 +58,7 @@ export const staysData = [
     {
         identifier: "hotel-006",
         name: "Lakeside Retreat",
-        image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4",
+        image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1000&auto=format&fit=crop",
         location: "Udaipur, Rajasthan",
         rating: 4.6,
         price: "8,499",
@@ -69,7 +69,7 @@ export const staysData = [
     {
         identifier: "hotel-007",
         name: "Urban Luxury Suites",
-        image: "https://images.unsplash.com/photo-1590490360182-c33d57733427",
+        image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=1000&auto=format&fit=crop",
         location: "Bangalore, Karnataka",
         rating: 4.4,
         price: "6,999",
@@ -80,7 +80,7 @@ export const staysData = [
     {
         identifier: "hotel-008",
         name: "Backwater Resort",
-        image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9",
+        image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=1000&auto=format&fit=crop",
         location: "Alleppey, Kerala",
         rating: 4.8,
         price: "7,999",
@@ -91,7 +91,7 @@ export const staysData = [
     {
         identifier: "hotel-009",
         name: "Himalayan Heights",
-        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000&auto=format&fit=crop",
         location: "Shimla, Himachal Pradesh",
         rating: 4.3,
         price: "5,999",
@@ -102,7 +102,7 @@ export const staysData = [
     {
         identifier: "hotel-010",
         name: "Desert Oasis Resort",
-        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000&auto=format&fit=crop",
         location: "Jaisalmer, Rajasthan",
         rating: 4.5,
         price: "6,499",
@@ -113,7 +113,7 @@ export const staysData = [
     {
         identifier: "hotel-011",
         name: "Riverside Cottage",
-        image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7",
+        image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?q=80&w=1000&auto=format&fit=crop",
         location: "Rishikesh, Uttarakhand",
         rating: 4.2,
         price: "4,999",
@@ -124,7 +124,7 @@ export const staysData = [
     {
         identifier: "hotel-012",
         name: "Royal Palace Hotel",
-        image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa",
+        image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1000&auto=format&fit=crop",
         location: "Mysore, Karnataka",
         rating: 4.7,
         price: "7,499",
@@ -135,7 +135,7 @@ export const staysData = [
     {
         identifier: "hotel-013",
         name: "Coastal Breeze Inn",
-        image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4",
+        image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1000&auto=format&fit=crop",
         location: "Kochi, Kerala",
         rating: 4.0,
         price: "4,499",
@@ -146,7 +146,7 @@ export const staysData = [
     {
         identifier: "hotel-014",
         name: "Tea Garden Retreat",
-        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000&auto=format&fit=crop",
         location: "Darjeeling, West Bengal",
         rating: 4.6,
         price: "5,499",
@@ -157,7 +157,7 @@ export const staysData = [
     {
         identifier: "hotel-015",
         name: "Downtown Business Hotel",
-        image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa",
+        image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1000&auto=format&fit=crop",
         location: "Pune, Maharashtra",
         rating: 4.1,
         price: "4,999",
@@ -168,7 +168,7 @@ export const staysData = [
     {
         identifier: "hotel-016",
         name: "Temple View Towers",
-        image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb",
+        image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1000&auto=format&fit=crop",
         location: "Madurai, Tamil Nadu",
         rating: 4.3,
         price: "3,999",
@@ -177,14 +177,3 @@ export const staysData = [
         amenities: ["Temple View", "Restaurant", "Cultural Tours"],
     },
 ];
-
-// Example of how to use this data in your component
-/*
-import { staysData } from './stays_data';
-import HotelCard from './HotelCard';
-
-// In your component render function:
-{staysData.map((hotel, index) => (
-  <HotelCard key={hotel.identifier} item={hotel} index={index} />
-))}
-*/
