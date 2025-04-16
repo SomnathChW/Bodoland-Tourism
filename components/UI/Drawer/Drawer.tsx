@@ -31,12 +31,12 @@ const drawerItems = [
     {
         label: "Home",
         key: "/(protected)/",
-        icon: "user",
+        icon: "home",
     },
     {
         label: "Festivals",
         key: "/(protected)/festivals",
-        icon: "user",
+        icon: "",
     },
     {
         label: "Cuisine",
@@ -201,6 +201,7 @@ function DrawerComponent(): JSX.Element {
             case "bell":
             case "settings":
             case "help-circle":
+            case "home":
             case "log-out":
                 return (
                     <Feather
@@ -287,11 +288,10 @@ function DrawerComponent(): JSX.Element {
             }
             if (itemKey === "/(protected)/") {
                 if (currentPath.startsWith("/(protected)/")) {
-                    
                     const matchesOtherMenuItem = drawerItems.some(
                         (item) =>
-                            item.key !== "/(protected)/" && 
-                            currentPath.startsWith(item.key) 
+                            item.key !== "/(protected)/" &&
+                            currentPath.startsWith(item.key)
                     );
                     return !matchesOtherMenuItem;
                 }
@@ -353,7 +353,6 @@ function DrawerComponent(): JSX.Element {
     );
 }
 
-// Memoize the entire Drawer component
 const Drawer = memo(DrawerComponent);
 
 export default Drawer;
@@ -436,8 +435,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: "rgba(255, 255, 255, 0.15)",
+        // borderBottomWidth: 1,
+        // borderBottomColor: "rgba(255, 255, 255, 0.15)",
         backgroundColor: "transparent",
     },
     activeMenuItem: {

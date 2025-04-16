@@ -1,4 +1,11 @@
-import { Text, View, StyleSheet, StatusBar, ScrollView } from "react-native";
+import {
+    Text,
+    View,
+    StyleSheet,
+    StatusBar,
+    ScrollView,
+    TouchableOpacity,
+} from "react-native";
 import { useState } from "react";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -38,12 +45,18 @@ const Home = () => {
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logo}>
-                        <Ionicons
-                            name="menu"
-                            size={30}
-                            style={styles.buttons}
+                        <TouchableOpacity
+                            activeOpacity={1}
                             onPress={toggleDrawer}
-                        />
+                            hitSlop={20}
+                        >
+                            <Ionicons
+                                name="menu"
+                                size={30}
+                                style={styles.buttons}
+                                onPress={toggleDrawer}
+                            />
+                        </TouchableOpacity>
                         <View>
                             <Text style={styles.headingText}>
                                 Bodoland Tourism
