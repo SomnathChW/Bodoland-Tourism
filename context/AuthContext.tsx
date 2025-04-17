@@ -58,9 +58,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             const responseSession = await account.getSession("current");
             // const responseSession = await mockAccount.getSession();
-            setSession(responseSession);
             const responseUser = await account.get();
             // const responseUser = await mockAccount.get();
+            setSession(responseSession);
             setUser(responseUser);
         } catch (error) {
             if (
@@ -101,10 +101,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     const checkAuth = async () => {
         try {
             const sessionString = await SecureStore.getItemAsync("session");
+            const userString = await SecureStore.getItemAsync("user");
             if (sessionString) {
                 setSession(JSON.parse(sessionString));
             }
-            const userString = await SecureStore.getItemAsync("user");
             if (userString) {
                 setUser(JSON.parse(userString));
             }
@@ -112,6 +112,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             checkUserFromBackend();
         } catch (error) {
             toast.error("Error checking your account");
+            setLoading(false);
         }
     };
 
@@ -187,9 +188,14 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             await account.create(ID.unique(), email, password, name);
             // await mockAccount.create(ID.unique(), email, password, name);
             toast.success("Signed up", { id: toast_id });
-            await signIn({ email, password, isSignup: true });
         } catch (error) {
-            toast.error("Error signing up");
+            toast.error("Error signing up", { id: toast_id });
+        }
+
+        try {
+            await signIn({ email, password, isSignup: true });
+        } catch {
+            toast.error("Please Sign in Now", { id: toast_id });
         }
         setLoading(false);
     };

@@ -1,8 +1,10 @@
 import React from "react";
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import { TabBar } from "@/components/UI/TabBar/TabBar";
 
-const _layout = () => {
+import * as Linking from "expo-linking";
+
+const _layout = React.memo(() => {
     const screens = [
         { name: "attractions", title: "Attractions" },
         { name: "stays", title: "Stays" },
@@ -30,6 +32,6 @@ const _layout = () => {
             ))}
         </Tabs>
     );
-};
+});
 
 export default _layout;

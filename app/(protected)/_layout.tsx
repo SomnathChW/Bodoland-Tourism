@@ -45,7 +45,7 @@ const StackLayout = React.memo(() => {
     );
 });
 
-const _layout = () => {
+const _layout = React.memo(() => {
     const { session } = useAuth();
 
     return !session ? (
@@ -55,6 +55,6 @@ const _layout = () => {
             <StackLayout />
         </DrawerProvider>
     );
-};
+});
 
 export default _layout;

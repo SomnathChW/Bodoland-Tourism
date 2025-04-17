@@ -18,7 +18,7 @@ import LottieView from "lottie-react-native";
 
 SplashScreen.preventAutoHideAsync();
 
-function RootLayoutContent() {
+const RootLayoutContent = React.memo(() => {
     const [loaded] = useFonts({
         SfProMedium: require("../assets/fonts/sf-pro-display-medium.otf"),
     });
@@ -67,7 +67,7 @@ function RootLayoutContent() {
             )}
         </ThemeProvider>
     );
-}
+});
 
 export default function RootLayout() {
     return (
@@ -93,8 +93,8 @@ export default function RootLayout() {
 
 const styles = StyleSheet.create({
     overlay: {
-        ...StyleSheet.absoluteFillObject, 
-        backgroundColor: "rgba(0,0,0, 0.5)", 
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "rgba(0,0,0, 0.5)",
         justifyContent: "center",
         alignItems: "center",
         position: "absolute",
