@@ -89,6 +89,7 @@ export default function RootLayout() {
                         position="bottom-center"
                         visibleToasts={1}
                         swipeToDismissDirection="left"
+                        theme="dark"
                     />
                 </AuthProvider>
             </GestureHandlerRootView>

@@ -14,11 +14,11 @@ type Props = {
     item: any;
 };
 
-const { width, height } = Dimensions.get("screen");
+const { width } = Dimensions.get("screen");
 const DIMENSION_RATIO = 0.17;
 const NUM_CARDS_ON_SCREEN = 4.8;
 
-const DistrictCards = ({ item }: Props) => {
+const CategoryCard = ({ item }: Props) => {
     const router = useRouter();
 
     return (
@@ -41,7 +41,7 @@ const DistrictCards = ({ item }: Props) => {
     );
 };
 
-export default DistrictCards;
+export default CategoryCard;
 
 const styles = StyleSheet.create({
     card: {

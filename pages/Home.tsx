@@ -11,11 +11,12 @@ import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
-import Section from "@/components/UI/Section";
-import CardVertical from "@/components/CardVertical";
-import CardHorizontal from "@/components/CardHorizontal";
+import Section from "@/components/UI/Section/Section";
+import QuickLinks from "@/components/UI/QuickLinks/QuickLinksSection";
+import CardVertical from "@/components/UI/Section/CardVertical";
+import CardHorizontal from "@/components/UI/Section/CardHorizontal";
 import Carousel from "@/components/UI/Carousel/Carousel";
-import CardSquare from "@/components/CategoryCard";
+import CategoryCard from "@/components/UI/QuickLinks/CategoryCard";
 
 import { carouselData } from "@/data/slider_data";
 import { districtData } from "@/data/district_data";
@@ -80,11 +81,12 @@ const Home = () => {
                     showsVerticalScrollIndicator={false}
                 >
                     <Carousel itemList={carouselData} />
-                    <Section
+                    <QuickLinks
                         style={{ backgroundColor: "#0d1116", marginTop: 10 }}
                         data={categoryData}
-                        cardComponent={CardSquare}
-                    ></Section>
+                        cardComponent={CategoryCard}
+                        itemsPerRow={4}
+                    ></QuickLinks>
                     <Section
                         subHeading="Districts"
                         data={districtData}
