@@ -4,6 +4,22 @@ import { TabBar } from "@/components/UI/TabBar/TabBar";
 
 import * as Linking from "expo-linking";
 
+const validPages = [
+    "attractions",
+    "stays",
+    "index",
+    "vrview",
+    "souvenirs",
+    "festivals",
+    "cuisine",
+    "details",
+];
+
+const isValidRoute = (page: string | undefined) => {
+    if (page === undefined || page === null) return false;
+    return validPages.includes(page);
+};
+
 const _layout = React.memo(() => {
     const screens = [
         { name: "attractions", title: "Attractions" },
@@ -12,14 +28,15 @@ const _layout = React.memo(() => {
         { name: "vrview", title: "Virtual Tour" },
         { name: "souvenirs", title: "Souvenirs" },
     ];
-
     const url = Linking.useLinkingURL();
-    console.log("URL", url);
 
     const router = useRouter();
 
     const handleDeepLink = (url: string) => {
         const route = url.split("/").pop();
+        if (!isValidRoute(route)) {
+            return;
+        }
         if (route) {
             router.push(("/" + route) as any);
         }
@@ -30,13 +47,14 @@ const _layout = React.memo(() => {
     };
 
     React.useEffect(() => {
-        if (!url) return;
-        handleUrl({ url: url });
-        const subscription = Linking.addEventListener("url", handleUrl);
-        return () => {
-            subscription.remove();
-        };
-    }, [url]);
+        if (url) {
+            handleUrl({ url: url });
+            const subscription = Linking.addEventListener("url", handleUrl);
+            return () => {
+                subscription.remove();
+            };
+        }
+    }, []);
 
     return (
         <Tabs

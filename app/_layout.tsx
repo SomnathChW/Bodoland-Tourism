@@ -45,7 +45,12 @@ const RootLayoutContent = React.memo(() => {
                     statusBarAnimation: "slide",
                 }}
             >
-                {["(protected)", "signin", "password_recovery"].map((name) => (
+                {[
+                    "(protected)",
+                    "signin",
+                    "password_recovery",
+                    "+not-found",
+                ].map((name) => (
                     <Stack.Screen
                         key={name}
                         name={name}
