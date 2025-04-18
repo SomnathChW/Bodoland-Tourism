@@ -32,31 +32,31 @@ export const festivalsData = [
     {
         identifier: "fest6",
         name: "Me-Dum-Me-Phi",
-        image: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Me_Dum_Me_Phi_Assam_Ahom.jpg",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Bihu_dance.jpg/640px-Bihu_dance.jpg",
         "short-desc": "Ancestral worship",
     },
     {
         identifier: "fest7",
         name: "Kati Bihu",
-        image: "https://upload.wikimedia.org/wikipedia/commons/0/09/Kati_Bihu_Lamps_Assam.jpg",
+        image: "https://upload.wikimedia.org/wikipedia/commons/d/dc/Kamakhya_Temple%2C_Guwahati.jpg",
         "short-desc": "Autumn lamp festival",
     },
     {
         identifier: "fest8",
         name: "Jonbeel Mela",
-        image: "https://upload.wikimedia.org/wikipedia/commons/9/97/Jonbeel_Mela_Assam.jpg",
+        image: "https://upload.wikimedia.org/wikipedia/commons/a/ad/Ali-ai-ligang.jpg",
         "short-desc": "Ancient barter fair",
     },
     {
         identifier: "fest9",
         name: "Deodhani Dance",
-        image: "https://upload.wikimedia.org/wikipedia/commons/0/0e/Deodhani_Dance_Assam.jpg",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Boro_bwisagu_dance.jpg/640px-Boro_bwisagu_dance.jpg",
         "short-desc": "Shamanistic rituals",
     },
     {
         identifier: "fest10",
         name: "Wanchuwa Festival",
-        image: "https://upload.wikimedia.org/wikipedia/commons/6/6d/Wanchuwa_Tiwa_Festival_Assam.jpg",
+        image: "https://upload.wikimedia.org/wikipedia/commons/d/dc/Kamakhya_Temple%2C_Guwahati.jpg",
         "short-desc": "Tiwa harvest ritual",
     },
     {
@@ -68,7 +68,7 @@ export const festivalsData = [
     {
         identifier: "fest12",
         name: "Majuli Raas Mahotsav",
-        image: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Majuli_Raas_Mahotsav_Mask_Dance.jpg",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Magh_Bihu_Celebration.jpg/640px-Magh_Bihu_Celebration.jpg",
         "short-desc": "Mask dance drama",
     },
 ];
