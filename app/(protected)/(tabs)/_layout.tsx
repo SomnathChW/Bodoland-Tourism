@@ -13,6 +13,31 @@ const _layout = React.memo(() => {
         { name: "souvenirs", title: "Souvenirs" },
     ];
 
+    const url = Linking.useLinkingURL();
+    console.log("URL", url);
+
+    const router = useRouter();
+
+    const handleDeepLink = (url: string) => {
+        const route = url.split("/").pop();
+        if (route) {
+            router.push(("/" + route) as any);
+        }
+    };
+    const handleUrl = (event: { url: string }) => {
+        const { url } = event;
+        handleDeepLink(url);
+    };
+
+    React.useEffect(() => {
+        if (!url) return;
+        handleUrl({ url: url });
+        const subscription = Linking.addEventListener("url", handleUrl);
+        return () => {
+            subscription.remove();
+        };
+    }, [url]);
+
     return (
         <Tabs
             backBehavior="initialRoute"

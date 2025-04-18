@@ -170,7 +170,7 @@ const StaysCard = ({ item, index }: Props) => {
                             </View>
                         </View>
                     </View>
-                    {renderAmenities()}
+                    {/* {renderAmenities()} */}
                 </View>
 
                 {/* Favorite button */}
