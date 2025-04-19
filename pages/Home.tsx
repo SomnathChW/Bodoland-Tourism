@@ -3,11 +3,10 @@ import {
     View,
     StyleSheet,
     StatusBar,
-    ScrollView,
     TouchableOpacity,
+    Platform,
 } from "react-native";
 import { useState } from "react";
-
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
@@ -24,6 +23,29 @@ import { categoryData } from "@/data/category_data";
 import { useAuth } from "@/context/AuthContext";
 import AlertDialog from "@/components/UI/AlertDialog";
 import { useDrawer } from "@/context/DrawerContext";
+import Animated from "react-native-reanimated";
+
+type ListItem =
+    | {
+          type: "carousel";
+          id: string;
+          data: typeof carouselData;
+      }
+    | {
+          type: "quicklinks";
+          id: string;
+          data: typeof categoryData;
+          cardComponent: typeof CategoryCard;
+          itemsPerRow: number;
+      }
+    | {
+          type: "section";
+          id: string;
+          subHeading: string;
+          data: typeof districtData;
+          cardComponent: typeof CardVertical | typeof CardHorizontal;
+          viewAll: () => void;
+      };
 
 const Home = () => {
     const router = useRouter();
@@ -41,9 +63,89 @@ const Home = () => {
         await signOut();
     };
 
+    const listData: ListItem[] = [
+        {
+            type: "carousel",
+            id: "carousel",
+            data: carouselData,
+        },
+        {
+            type: "quicklinks",
+            id: "quicklinks",
+            data: categoryData,
+            cardComponent: CategoryCard,
+            itemsPerRow: 4,
+        },
+        {
+            type: "section",
+            id: "districts",
+            subHeading: "Districts",
+            data: districtData,
+            cardComponent: CardVertical,
+            viewAll: () => router.push("/vrview"),
+        },
+        {
+            type: "section",
+            id: "360view",
+            subHeading: "360 View",
+            data: districtData,
+            cardComponent: CardHorizontal,
+            viewAll: () => router.push("/vrview"),
+        },
+        {
+            type: "section",
+            id: "souvenirs",
+            subHeading: "Souvenirs",
+            data: districtData,
+            cardComponent: CardHorizontal,
+            viewAll: () => router.push("/souvenirs"),
+        },
+        {
+            type: "section",
+            id: "attractions",
+            subHeading: "Attractions",
+            data: districtData,
+            cardComponent: CardVertical,
+            viewAll: () => router.push("/attractions"),
+        },
+    ];
+
+    const renderItem = ({ item }: { item: ListItem }) => {
+        switch (item.type) {
+            case "carousel":
+                return (
+                    <View style={{ paddingBottom: 10 }}>
+                        <Carousel itemList={item.data} />
+                    </View>
+                );
+            case "quicklinks":
+                return (
+                    <QuickLinks
+                        style={styles.quicklink}
+                        data={item.data}
+                        cardComponent={item.cardComponent}
+                        itemsPerRow={item.itemsPerRow}
+                    />
+                );
+            case "section":
+                return (
+                    <Section
+                        subHeading={item.subHeading}
+                        data={item.data}
+                        cardComponent={item.cardComponent}
+                        viewAll={item.viewAll}
+                    />
+                );
+            default:
+                return null;
+        }
+    };
+    // --- End Render Item Function ---
+
     return (
         <View style={styles.container}>
             <View style={styles.content}>
+                {/* Header remains the same */}
                 <View style={styles.header}>
                     <View style={styles.logo}>
                         <TouchableOpacity
@@ -55,7 +157,6 @@ const Home = () => {
                                 name="menu"
                                 size={30}
                                 style={styles.buttons}
-                                onPress={toggleDrawer}
                             />
                         </TouchableOpacity>
                         <View>
@@ -74,45 +175,22 @@ const Home = () => {
                         onPress={handleDialog}
                     />
                 </View>
-                <ScrollView
-                    style={styles.scrollPadding}
-                    contentContainerStyle={{ paddingBottom: 20 }}
-                    stickyHeaderIndices={[1]}
-                    showsVerticalScrollIndicator={false}
-                >
-                    <Carousel itemList={carouselData} />
-                    <QuickLinks
-                        style={{ backgroundColor: "#0d1116", marginTop: 10 }}
-                        data={categoryData}
-                        cardComponent={CategoryCard}
-                        itemsPerRow={4}
-                    ></QuickLinks>
-                    <Section
-                        subHeading="Districts"
-                        data={districtData}
-                        cardComponent={CardVertical}
-                        viewAll={() => router.push("/vrview")}
-                    />
 
-                    <Section
-                        subHeading="360 View"
-                        data={districtData}
-                        cardComponent={CardHorizontal}
-                        viewAll={() => router.push("/vrview")}
-                    />
-                    <Section
-                        subHeading="Souvenirs"
-                        data={districtData}
-                        cardComponent={CardHorizontal}
-                        viewAll={() => router.push("/souvenirs")}
-                    />
-                    <Section
-                        subHeading="Attractions"
-                        data={districtData}
-                        cardComponent={CardVertical}
-                        viewAll={() => router.push("/attractions")}
-                    />
-                </ScrollView>
+                {/* Carousel removed from here */}
+
+                {/* FlashList now includes the Carousel */}
+                <Animated.FlatList
+                    style={{ flex: 1 }}
+                    data={listData}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id}
+                    // estimatedItemSize={10}
+                    // stickyHeaderIndices={[1]}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.listContentContainer}
+                />
+
+                {/* AlertDialog remains the same */}
                 <AlertDialog
                     visible={showDialog}
                     title="Sign Out"
@@ -131,11 +209,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        paddingTop: StatusBar.currentHeight,
-        justifyContent: "center",
-        alignItems: "center",
-        alignContent: "center",
-        alignSelf: "center",
+        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     },
     content: {
         flex: 1,
@@ -157,7 +231,8 @@ const styles = StyleSheet.create({
     buttons: {
         color: "#fff",
     },
-    scrollPadding: {
+    listContentContainer: {
+        // paddingBottom: 20,
         // paddingTop: 10,
     },
     headingText: {
@@ -171,6 +246,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "#646f7e",
     },
+    // Styles for Section component (remain unchanged)
     subHeaddingView: {
         justifyContent: "space-between",
         flexDirection: "row",
@@ -187,5 +263,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: "#646f7e",
         paddingTop: 5,
+    },
+    
+    quicklink: {
+        backgroundColor: "#0d1116",
     },
 });

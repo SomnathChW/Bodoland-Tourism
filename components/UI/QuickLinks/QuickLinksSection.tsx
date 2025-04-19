@@ -3,8 +3,8 @@ import { StyleSheet, Text, View, Dimensions } from "react-native";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
-    withSpring,
     ReduceMotion,
+    withTiming,
 } from "react-native-reanimated";
 import ShowMoreCard from "./ShowMoreCard";
 
@@ -66,40 +66,22 @@ const QuickLinks = React.memo(
         const toggleExpanded = useCallback(() => {
             if (expanded) {
                 // Collapse
-                height.value = withSpring(0, {
-                    duration: 200,
-                    dampingRatio: 1,
-                    stiffness: 1,
-                    overshootClamping: true,
-                    restDisplacementThreshold: 0.01,
-                    restSpeedThreshold: 2,
+                height.value = withTiming(0, {
+                    duration: 100,
                     reduceMotion: ReduceMotion.Never,
                 });
-                opacity.value = withSpring(0, {
-                    duration: 300,
-                    dampingRatio: 1,
-                    stiffness: 1,
-                    overshootClamping: true,
+                opacity.value = withTiming(0, {
+                    duration: 150,
                     reduceMotion: ReduceMotion.Never,
                 });
             } else {
                 // Expand using the calculated target height
-                height.value = withSpring(targetHeight, {
-                    duration: 200,
-                    dampingRatio: 1,
-                    stiffness: 1,
-                    overshootClamping: true,
-                    restDisplacementThreshold: 0.01,
-                    restSpeedThreshold: 2,
+                height.value = withTiming(targetHeight, {
+                    duration: 100,
                     reduceMotion: ReduceMotion.Never,
                 });
-                opacity.value = withSpring(1, {
-                    duration: 150,
-                    dampingRatio: 1,
-                    stiffness: 1,
-                    overshootClamping: true,
-                    restDisplacementThreshold: 0.01,
-                    restSpeedThreshold: 2,
+                opacity.value = withTiming(1, {
+                    duration: 50,
                     reduceMotion: ReduceMotion.Never,
                 });
             }
