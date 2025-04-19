@@ -1,16 +1,39 @@
-import { Text, View, StyleSheet, StatusBar, Dimensions } from "react-native";
-import React from "react";
+import {
+    Text,
+    View,
+    StyleSheet,
+    StatusBar,
+    Dimensions,
+    FlatList,
+} from "react-native";
+import React, { useState, useEffect } from "react";
 import { useDrawer } from "@/context/DrawerContext";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import StaysCard from "@/components/StaysCard";
+import StaysCardLoader from "@/components/StaysCardLoader";
 import { staysData } from "@/data/stays_data";
 
 const { width, height } = Dimensions.get("window");
 
 const Stays = React.memo(() => {
     const { toggleDrawer } = useDrawer();
-    console.log("Stays component rendered");
+    const [loading, setLoading] = useState(true);
+
+    // Create array of 6 placeholder items
+    const loaderItems = Array(10)
+        .fill(null)
+        .map((_, i) => ({ id: `loader-${i}` }));
+
+    useEffect(() => {
+        // Simulate loading for 1000ms
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1500);
+
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
         <View style={styles.container}>
             <View style={styles.content}>
@@ -31,24 +54,42 @@ const Stays = React.memo(() => {
                     </View>
                     <Ionicons name="search" size={30} style={styles.buttons} />
                 </View>
-                <FlashList
-                    data={staysData}
-                    renderItem={({ item, index }) => (
-                        <StaysCard
-                            item={item}
-                            index={index}
-                            width={width}
-                            height={height}
-                        />
-                    )}
-                    horizontal={false}
-                    showsVerticalScrollIndicator={false}
-                    numColumns={2}
-                    estimatedItemSize={300}
-                    keyExtractor={(item) => item.identifier}
-                    contentContainerStyle={{}}
-                    removeClippedSubviews={true}
-                />
+
+                {loading ? (
+                    <FlatList
+                        data={loaderItems}
+                        renderItem={({ index }) => (
+                            <StaysCardLoader
+                                index={index}
+                                width={width}
+                                height={height}
+                            />
+                        )}
+                        horizontal={false}
+                        showsVerticalScrollIndicator={false}
+                        numColumns={2}
+                        keyExtractor={(item) => item.id}
+                    />
+                ) : (
+                    <FlashList
+                        data={staysData}
+                        renderItem={({ item, index }) => (
+                            <StaysCard
+                                item={item}
+                                index={index}
+                                width={width}
+                                height={height}
+                            />
+                        )}
+                        horizontal={false}
+                        showsVerticalScrollIndicator={false}
+                        numColumns={2}
+                        estimatedItemSize={height * 0.25}
+                        keyExtractor={(item) => item.identifier}
+                        contentContainerStyle={{}}
+                        removeClippedSubviews={true}
+                    />
+                )}
             </View>
         </View>
     );
