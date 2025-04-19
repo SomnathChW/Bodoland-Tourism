@@ -6,8 +6,11 @@ import { FlashList } from "@shopify/flash-list";
 import StaysCard from "@/components/StaysCard";
 import { staysData } from "@/data/stays_data";
 
-const Stays = () => {
+const { width, height } = Dimensions.get("window");
+
+const Stays = React.memo(() => {
     const { toggleDrawer } = useDrawer();
+    console.log("Stays component rendered");
     return (
         <View style={styles.container}>
             <View style={styles.content}>
@@ -31,12 +34,17 @@ const Stays = () => {
                 <FlashList
                     data={staysData}
                     renderItem={({ item, index }) => (
-                        <StaysCard item={item} index={index} />
+                        <StaysCard
+                            item={item}
+                            index={index}
+                            width={width}
+                            height={height}
+                        />
                     )}
                     horizontal={false}
                     showsVerticalScrollIndicator={false}
                     numColumns={2}
-                    estimatedItemSize={30}
+                    estimatedItemSize={300}
                     keyExtractor={(item) => item.identifier}
                     contentContainerStyle={{}}
                     removeClippedSubviews={true}
@@ -44,7 +52,7 @@ const Stays = () => {
             </View>
         </View>
     );
-};
+});
 
 export default Stays;
 

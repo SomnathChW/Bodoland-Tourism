@@ -3,9 +3,9 @@ import { FlashList } from "@shopify/flash-list";
 import React from "react";
 
 type CardListProps = {
-    itemList: any[];  
-    CardComponent: React.ElementType; 
-    horizontal?: boolean; 
+    itemList: any[];
+    CardComponent: React.ElementType;
+    horizontal?: boolean;
 };
 
 const CardList = ({
@@ -22,7 +22,7 @@ const CardList = ({
                 showsHorizontalScrollIndicator={false}
                 removeClippedSubviews={false}
                 style={styles.flatList}
-                estimatedItemSize={15}
+                estimatedItemSize={150}
             />
         </View>
     );

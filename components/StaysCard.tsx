@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
 import { Entypo, FontAwesome } from "@expo/vector-icons";
@@ -17,25 +17,24 @@ type Props = {
         amenities?: string[];
     };
     index: number;
+    width: number;
+    height: number;
 };
 
-const { width, height } = Dimensions.get("screen");
 // Calculate base dimensions
 const PADDING = 15;
 const GAP = 15;
 const NUM_CARDS_ON_SCREEN = 2;
-const CARD_WIDTH =
-    (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
-    NUM_CARDS_ON_SCREEN;
 
-// Set minimum card height to 25% of screen height
-const MIN_CARD_HEIGHT = height * 0.25;
-// Set minimum image height to 75% of minimum card height
-const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
-
-const StaysCard = ({ item, index }: Props) => {
+const StaysCard = ({ item, index, width, height }: Props) => {
     const router = useRouter();
     const [isFavorite, setIsFavorite] = React.useState(false);
+
+    const CARD_WIDTH =
+        (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
+        NUM_CARDS_ON_SCREEN;
+    const MIN_CARD_HEIGHT = height * 0.25;
+    const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
 
     // Simplified star rating - just one star with rating value
     const renderSimpleRating = () => (

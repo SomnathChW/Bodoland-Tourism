@@ -111,7 +111,7 @@ const Attractions = () => {
                     horizontal={false}
                     showsVerticalScrollIndicator={false}
                     numColumns={2}
-                    estimatedItemSize={30}
+                    estimatedItemSize={300}
                     keyExtractor={(item) => item.identifier}
                     contentContainerStyle={{}}
                 />

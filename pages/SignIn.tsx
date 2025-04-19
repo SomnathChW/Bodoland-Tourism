@@ -10,7 +10,6 @@ import { useAuth } from "@/context/AuthContext";
 import { Redirect } from "expo-router";
 import { TextInput } from "react-native";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
-import * as NavigationBar from "expo-navigation-bar";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,

@@ -8,7 +8,7 @@ import { cuisineData } from "@/data/cuisine_data";
 
 const Cuisine = () => {
     const { toggleDrawer } = useDrawer();
-    
+
     return (
         <View style={styles.container}>
             <View style={styles.content}>
@@ -40,7 +40,7 @@ const Cuisine = () => {
                     horizontal={false}
                     showsVerticalScrollIndicator={false}
                     numColumns={2}
-                    estimatedItemSize={30}
+                    estimatedItemSize={300}
                     keyExtractor={(item) => item.identifier}
                     contentContainerStyle={{}}
                 />

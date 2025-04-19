@@ -23,7 +23,7 @@ import { categoryData } from "@/data/category_data";
 import { useAuth } from "@/context/AuthContext";
 import AlertDialog from "@/components/UI/AlertDialog";
 import { useDrawer } from "@/context/DrawerContext";
-import Animated from "react-native-reanimated";
+import { FlashList } from "@shopify/flash-list";
 
 type ListItem =
     | {
@@ -176,19 +176,17 @@ const Home = () => {
                     />
                 </View>
 
-                {/* Carousel removed from here */}
-
                 {/* FlashList now includes the Carousel */}
-                <Animated.FlatList
-                    style={{ flex: 1 }}
-                    data={listData}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item.id}
-                    // estimatedItemSize={10}
-                    // stickyHeaderIndices={[1]}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={styles.listContentContainer}
-                />
+                <View style={{ flex: 1 }}>
+                    <FlashList
+                        data={listData}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.id}
+                        estimatedItemSize={300}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={styles.listContentContainer}
+                    />
+                </View>
 
                 {/* AlertDialog remains the same */}
                 <AlertDialog
@@ -264,7 +262,7 @@ const styles = StyleSheet.create({
         color: "#646f7e",
         paddingTop: 5,
     },
-    
+
     quicklink: {
         backgroundColor: "#0d1116",
     },
