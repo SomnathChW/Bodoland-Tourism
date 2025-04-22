@@ -22,7 +22,7 @@ const CardList = ({
                 showsHorizontalScrollIndicator={false}
                 removeClippedSubviews={false}
                 style={styles.flatList}
-                estimatedItemSize={150}
+                estimatedItemSize={horizontal ? 300 : 100}
             />
         </View>
     );

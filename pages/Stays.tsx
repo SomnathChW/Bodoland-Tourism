@@ -11,7 +11,7 @@ import { useDrawer } from "@/context/DrawerContext";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import StaysCard from "@/components/StaysCard";
-import StaysCardLoader from "@/components/StaysCardLoader";
+import CardLoader from "@/components/CardLoader";
 import { staysData } from "@/data/stays_data";
 
 const { width, height } = Dimensions.get("window");
@@ -29,7 +29,7 @@ const Stays = React.memo(() => {
         // Simulate loading for 1000ms
         const timer = setTimeout(() => {
             setLoading(false);
-        }, 1500);
+        }, 15000);
 
         return () => clearTimeout(timer);
     }, []);
@@ -59,7 +59,7 @@ const Stays = React.memo(() => {
                     <FlatList
                         data={loaderItems}
                         renderItem={({ index }) => (
-                            <StaysCardLoader
+                            <CardLoader
                                 index={index}
                                 width={width}
                                 height={height}

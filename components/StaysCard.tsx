@@ -169,7 +169,7 @@ const StaysCard = ({ item, index, width, height }: Props) => {
                             </View>
                         </View>
                     </View>
-                    {/* {renderAmenities()} */}
+                    {renderAmenities()}
                 </View>
 
                 {/* Favorite button */}
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "nowrap",
         alignItems: "center",
-        marginTop: 3,
+        marginTop: 4,
         paddingBottom: 2,
     },
     amenityBadge: {
