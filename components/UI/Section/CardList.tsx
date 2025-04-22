@@ -8,25 +8,23 @@ type CardListProps = {
     horizontal?: boolean;
 };
 
-const CardList = ({
-    itemList,
-    CardComponent,
-    horizontal = true,
-}: CardListProps) => {
-    return (
-        <View>
-            <FlashList
-                data={itemList}
-                renderItem={({ item }) => <CardComponent item={item} />}
-                horizontal={horizontal}
-                showsHorizontalScrollIndicator={false}
-                removeClippedSubviews={false}
-                style={styles.flatList}
-                estimatedItemSize={horizontal ? 300 : 100}
-            />
-        </View>
-    );
-};
+const CardList = React.memo(
+    ({ itemList, CardComponent, horizontal = true }: CardListProps) => {
+        return (
+            <View>
+                <FlashList
+                    data={itemList}
+                    renderItem={({ item }) => <CardComponent item={item} />}
+                    horizontal={horizontal}
+                    showsHorizontalScrollIndicator={false}
+                    removeClippedSubviews={false}
+                    style={styles.flatList}
+                    estimatedItemSize={horizontal ? 300 : 100}
+                />
+            </View>
+        );
+    }
+);
 
 export default CardList;
 

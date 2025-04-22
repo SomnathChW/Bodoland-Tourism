@@ -5,6 +5,7 @@ import Animated, {
     useAnimatedStyle,
     ReduceMotion,
     withTiming,
+    Easing,
 } from "react-native-reanimated";
 import ShowMoreCard from "./ShowMoreCard";
 
@@ -67,22 +68,26 @@ const QuickLinks = React.memo(
             if (expanded) {
                 // Collapse
                 height.value = withTiming(0, {
-                    duration: 100,
+                    duration: 200,
                     reduceMotion: ReduceMotion.Never,
+                    easing: Easing.inOut(Easing.ease),
                 });
                 opacity.value = withTiming(0, {
-                    duration: 150,
+                    duration: 250,
                     reduceMotion: ReduceMotion.Never,
+                    easing: Easing.inOut(Easing.ease),
                 });
             } else {
                 // Expand using the calculated target height
                 height.value = withTiming(targetHeight, {
-                    duration: 100,
+                    duration: 200,
                     reduceMotion: ReduceMotion.Never,
+                    easing: Easing.inOut(Easing.ease),
                 });
                 opacity.value = withTiming(1, {
-                    duration: 50,
+                    duration: 250,
                     reduceMotion: ReduceMotion.Never,
+                    easing: Easing.inOut(Easing.ease),
                 });
             }
             setExpanded(!expanded);

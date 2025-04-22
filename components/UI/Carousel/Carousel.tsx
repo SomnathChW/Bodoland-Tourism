@@ -13,7 +13,7 @@ type Props = {
 
 const { width } = Dimensions.get("screen");
 
-const Carousel = ({ itemList }: Props) => {
+const Carousel = React.memo(({ itemList }: Props) => {
     const scrollX = useSharedValue(0);
     const flatListRef = useRef<FlatList>(null);
     const scrollPosition = useSharedValue(0);
@@ -74,7 +74,7 @@ const Carousel = ({ itemList }: Props) => {
             />
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: { marginTop: 10 },

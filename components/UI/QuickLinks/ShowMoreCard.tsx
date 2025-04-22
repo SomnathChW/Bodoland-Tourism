@@ -58,8 +58,8 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(52, 52, 52, 0.35)",
     },
     image: {
-        width: "50%",
-        height: "50%",
+        width: "60%",
+        height: "60%",
     },
     title: {
         fontFamily: "SfProMedium",
