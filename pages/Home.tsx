@@ -5,6 +5,7 @@ import {
     StatusBar,
     TouchableOpacity,
     Platform,
+    FlatList,
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,7 +24,6 @@ import { categoryData } from "@/data/category_data";
 import { useAuth } from "@/context/AuthContext";
 import AlertDialog from "@/components/UI/AlertDialog";
 import { useDrawer } from "@/context/DrawerContext";
-import { FlashList } from "@shopify/flash-list";
 
 type ListItem =
     | {
@@ -121,7 +121,6 @@ const Home = () => {
             case "quicklinks":
                 return (
                     <QuickLinks
-                        style={styles.quicklink}
                         data={item.data}
                         cardComponent={item.cardComponent}
                         itemsPerRow={item.itemsPerRow}
@@ -178,11 +177,11 @@ const Home = () => {
 
                 {/* FlashList now includes the Carousel */}
                 <View style={{ flex: 1 }}>
-                    <FlashList
+                    <FlatList
                         data={listData}
                         renderItem={renderItem}
                         keyExtractor={(item) => item.id}
-                        estimatedItemSize={300}
+                        // estimatedItemSize={300}
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={styles.listContentContainer}
                     />
@@ -261,9 +260,5 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: "#646f7e",
         paddingTop: 5,
-    },
-
-    quicklink: {
-        backgroundColor: "#0d1116",
     },
 });

@@ -3,7 +3,6 @@ import {
     Text,
     View,
     Dimensions,
-    Linking,
     Pressable,
 } from "react-native";
 import React from "react";

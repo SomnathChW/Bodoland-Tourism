@@ -62,6 +62,22 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             // const responseUser = await mockAccount.get();
             setSession(responseSession);
             setUser(responseUser);
+            // check if secure store has session and user, if not, set them
+            // in secure store
+            const sessionString = await SecureStore.getItemAsync("session");
+            const userString = await SecureStore.getItemAsync("user");
+            const loggedIn = await SecureStore.getItemAsync("loggedIn");
+            if (!sessionString || !userString || !loggedIn) {
+                await SecureStore.setItemAsync(
+                    "session",
+                    JSON.stringify(responseSession)
+                );
+                await SecureStore.setItemAsync(
+                    "user",
+                    JSON.stringify(responseUser)
+                );
+                await SecureStore.setItemAsync("loggedIn", true.toString());
+            }
         } catch (error) {
             if (
                 error instanceof Error &&

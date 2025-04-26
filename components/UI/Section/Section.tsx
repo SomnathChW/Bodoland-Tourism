@@ -10,31 +10,29 @@ type SectionProps = {
     style?: any;
 };
 
-const Section = ({
-    subHeading,
-    data,
-    cardComponent,
-    viewAll,
-    style,
-}: SectionProps) => {
-    return (
-        <View style={[{ marginBottom: 20 }, style]}>
-            <View style={styles.mainBodyPaddingView}>
-                <View style={styles.subHeaddingView}>
-                    {subHeading && (
-                        <Text style={styles.subHeaddings}>{subHeading}</Text>
-                    )}
-                    {viewAll && (
-                        <Text style={styles.links} onPress={viewAll}>
-                            View More
-                        </Text>
-                    )}
+const Section = React.memo(
+    ({ subHeading, data, cardComponent, viewAll, style }: SectionProps) => {
+        return (
+            <View style={[{ marginBottom: 20 }, style]}>
+                <View style={styles.mainBodyPaddingView}>
+                    <View style={styles.subHeaddingView}>
+                        {subHeading && (
+                            <Text style={styles.subHeaddings}>
+                                {subHeading}
+                            </Text>
+                        )}
+                        {viewAll && (
+                            <Text style={styles.links} onPress={viewAll}>
+                                View More
+                            </Text>
+                        )}
+                    </View>
                 </View>
+                <CardList itemList={data} CardComponent={cardComponent} />
             </View>
-            <CardList itemList={data} CardComponent={cardComponent} />
-        </View>
-    );
-};
+        );
+    }
+);
 
 export default Section;
 

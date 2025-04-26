@@ -29,7 +29,7 @@ const Stays = React.memo(() => {
         // Simulate loading for 1000ms
         const timer = setTimeout(() => {
             setLoading(false);
-        }, 15000);
+        }, 1500);
 
         return () => clearTimeout(timer);
     }, []);

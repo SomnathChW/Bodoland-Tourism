@@ -3,9 +3,7 @@ import { StyleSheet, Text, View, Dimensions } from "react-native";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
-    ReduceMotion,
     withTiming,
-    Easing,
 } from "react-native-reanimated";
 import ShowMoreCard from "./ShowMoreCard";
 
@@ -27,87 +25,36 @@ const QuickLinks = React.memo(
         cardComponent: CardComponent,
         viewAll,
         style,
-        itemsPerRow = 4, // Default to 4 items per row
+        itemsPerRow = 4,
     }: QuickLinksProps) => {
         const [expanded, setExpanded] = useState(false);
+        const contentHeight = useSharedValue(0);
 
-        // Animation values
-        const height = useSharedValue(0);
-        const opacity = useSharedValue(0);
-
-        // Calculate items to show in first row (3 items + show more button)
         const visibleItemsCount = itemsPerRow - 1;
 
-        // Memoize this calculation since screen width rarely changes
-        const getRowHeight = React.useMemo(() => {
-            return (screenWidth: number) => {
-                const DIMENSION_RATIO = 0.17;
-                const cardSize = Math.ceil(screenWidth * DIMENSION_RATIO);
-                const verticalPadding = 4 + 18;
-                const bottomMargin = 15;
-                return cardSize + verticalPadding + bottomMargin;
-            };
-        }, []);
-
-        // Memoize the data splitting to prevent unnecessary recalculations
-        const { firstRowItems, remainingItems, targetHeight } = useMemo(() => {
-            // Get first row items and remaining items
+        const { firstRowItems, remainingItems } = useMemo(() => {
             const firstItems = data.slice(0, visibleItemsCount);
             const remainingItems = data.slice(visibleItemsCount);
+            return { firstRowItems: firstItems, remainingItems };
+        }, [data, visibleItemsCount]);
 
-            // Calculate the target height for the hidden content
-            const targetHeight =
-                Math.ceil(remainingItems.length / itemsPerRow) *
-                getRowHeight(width);
-
-            return { firstRowItems: firstItems, remainingItems, targetHeight };
-        }, [data, visibleItemsCount, itemsPerRow, width]);
-
-        // Memoize the toggle function to prevent recreating on each render
         const toggleExpanded = useCallback(() => {
-            if (expanded) {
-                // Collapse
-                height.value = withTiming(0, {
-                    duration: 200,
-                    reduceMotion: ReduceMotion.Never,
-                    easing: Easing.inOut(Easing.ease),
-                });
-                opacity.value = withTiming(0, {
-                    duration: 250,
-                    reduceMotion: ReduceMotion.Never,
-                    easing: Easing.inOut(Easing.ease),
-                });
-            } else {
-                // Expand using the calculated target height
-                height.value = withTiming(targetHeight, {
-                    duration: 200,
-                    reduceMotion: ReduceMotion.Never,
-                    easing: Easing.inOut(Easing.ease),
-                });
-                opacity.value = withTiming(1, {
-                    duration: 250,
-                    reduceMotion: ReduceMotion.Never,
-                    easing: Easing.inOut(Easing.ease),
-                });
-            }
-            setExpanded(!expanded);
-        }, [expanded, height, opacity, targetHeight]);
+            setExpanded((prev) => {
+                if (prev) {
+                    contentHeight.value = withTiming(0, { duration: 100 });
+                } else {
+                    contentHeight.value = withTiming(110, { duration: 100 });
+                }
+                return !prev;
+            });
+        }, []);
 
-        // Memoize animated style to prevent recreating on each render
-        const hiddenContentStyle = useAnimatedStyle(() => ({
-            height: height.value,
-            opacity: opacity.value,
-            overflow: "hidden",
-        }));
-
-        // Memoize the view all handler
         const handleViewAll = useCallback(() => {
             if (viewAll) {
                 viewAll();
             }
         }, [viewAll]);
 
-        // Memoize the rendering of first row items
         const firstRowItemsComponent = useMemo(
             () =>
                 firstRowItems.map((item, index) => (
@@ -118,7 +65,6 @@ const QuickLinks = React.memo(
             [firstRowItems, CardComponent]
         );
 
-        // Memoize the rendering of remaining items
         const remainingItemsComponent = useMemo(
             () =>
                 remainingItems.map((item, index) => (
@@ -128,6 +74,11 @@ const QuickLinks = React.memo(
                 )),
             [remainingItems, CardComponent]
         );
+
+        const animatedStyle = useAnimatedStyle(() => ({
+            height: contentHeight.value,
+            overflow: "hidden",
+        }));
 
         return (
             <View style={[style]}>
@@ -146,11 +97,11 @@ const QuickLinks = React.memo(
                     </View>
                 </View>
 
-                {/* First row with items and Show More button */}
+                {/* First row */}
                 <View style={styles.gridContainer}>
                     {firstRowItemsComponent}
 
-                    {/* Show More button as the last item in the first row */}
+                    {/* Show More button */}
                     <View style={styles.gridItem}>
                         <ShowMoreCard
                             expanded={expanded}
@@ -159,8 +110,8 @@ const QuickLinks = React.memo(
                     </View>
                 </View>
 
-                {/* Animated hidden content shown */}
-                <Animated.View style={hiddenContentStyle}>
+                {/* Hidden content */}
+                <Animated.View style={[animatedStyle]}>
                     <View style={styles.gridContainer}>
                         {remainingItemsComponent}
                     </View>
@@ -170,7 +121,6 @@ const QuickLinks = React.memo(
     }
 );
 
-// Styles remain the same
 const styles = StyleSheet.create({
     mainBodyPaddingView: {
         paddingHorizontal: 20,
@@ -199,14 +149,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     gridItem: {
-        width: "25%", // 4 items per row
+        width: "25%",
         marginBottom: 15,
         alignItems: "center",
-    },
-    measureContainer: {
-        position: "absolute",
-        opacity: 0,
-        zIndex: -1,
     },
 });
 
