@@ -184,6 +184,7 @@ const Home = () => {
                         // estimatedItemSize={300}
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={styles.listContentContainer}
+                        removeClippedSubviews={false}
                     />
                 </View>
 

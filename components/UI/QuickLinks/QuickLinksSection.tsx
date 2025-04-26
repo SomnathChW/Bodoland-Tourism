@@ -4,6 +4,7 @@ import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withTiming,
+    Easing,
 } from "react-native-reanimated";
 import ShowMoreCard from "./ShowMoreCard";
 
@@ -41,9 +42,15 @@ const QuickLinks = React.memo(
         const toggleExpanded = useCallback(() => {
             setExpanded((prev) => {
                 if (prev) {
-                    contentHeight.value = withTiming(0, { duration: 100 });
+                    contentHeight.value = withTiming(0, {
+                        duration: 200,
+                        easing: Easing.inOut(Easing.ease),
+                    });
                 } else {
-                    contentHeight.value = withTiming(110, { duration: 100 });
+                    contentHeight.value = withTiming(110, {
+                        duration: 200,
+                        easing: Easing.inOut(Easing.ease),
+                    });
                 }
                 return !prev;
             });
