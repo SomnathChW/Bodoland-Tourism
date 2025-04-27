@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         width: width * 0.6,
         marginHorizontal: 10,
-        backgroundColor: "white",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
         borderRadius: 10,
         elevation: 5,
         shadowOffset: { width: 10, height: 0 },

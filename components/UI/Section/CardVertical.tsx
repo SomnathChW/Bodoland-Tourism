@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
             (width * (1 - WIDTH_RATIO * NUM_CARDS_ON_SCREEN)) /
                 (NUM_CARDS_ON_SCREEN * 2)
         ),
-        backgroundColor: "white",
+        backgroundColor: "ergba(0, 0, 0, 0.5)",
         borderRadius: 10,
         elevation: 5,
         shadowOffset: { width: 10, height: 0 },
