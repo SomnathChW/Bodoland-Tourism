@@ -17,7 +17,7 @@ type Props = {
 
 const { width, height } = Dimensions.get("screen");
 
-const CarouselCard = ({ item, index, scrollX }: Props) => {
+const CarouselCard = React.memo(({ item, index, scrollX }: Props) => {
     const animatedStyle = useAnimatedStyle(() => {
         return {
             transform: [
@@ -66,11 +66,13 @@ const CarouselCard = ({ item, index, scrollX }: Props) => {
                     </View>
                 )}
                 <Text style={styles.title}>{item.title}</Text>
-                <Text style={styles.description} numberOfLines={1} >{displayText}</Text>
+                <Text style={styles.description} numberOfLines={1}>
+                    {displayText}
+                </Text>
             </LinearGradient>
         </Animated.View>
     );
-};
+});
 
 export default CarouselCard;
 

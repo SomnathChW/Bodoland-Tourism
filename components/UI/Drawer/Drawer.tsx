@@ -10,6 +10,7 @@ import {
     Platform,
 } from "react-native";
 import { useDrawer } from "@/context/DrawerContext";
+import * as SecureStore from "expo-secure-store";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -18,7 +19,12 @@ import Animated, {
     interpolate,
     Extrapolation,
 } from "react-native-reanimated";
-import { Feather, MaterialIcons, FontAwesome } from "@expo/vector-icons";
+import {
+    Feather,
+    MaterialIcons,
+    FontAwesome,
+    FontAwesome6,
+} from "@expo/vector-icons";
 import FastImage from "react-native-fast-image";
 import { useRouter } from "expo-router";
 
@@ -36,12 +42,12 @@ const drawerItems = [
     {
         label: "Festivals",
         key: "/(protected)/festivals",
-        icon: "",
+        icon: "festival",
     },
     {
         label: "Cuisine",
         key: "/(protected)/cuisine",
-        icon: "user",
+        icon: "bowl-food",
     },
     {
         label: "Emergency Contacts",
@@ -141,20 +147,38 @@ const FooterItem = memo(({ item, renderIcon }: FooterItemProps) => {
 
 // Memoized ProfileSection component
 const ProfileSection = memo(() => {
-    const randomUserNumber = Math.floor(Math.random() * 100);
+    const user = SecureStore.getItem("user");
+    const user_json = JSON.parse(user || "{}");
+
+    const name = user_json.name || "";
+    const email = user_json.email || "";
+
+    // Get user initials from name
+    const getInitials = () => {
+        if (!name) return "?";
+        const nameParts = name
+            .split(" ")
+            .filter((part: string | any[]) => part.length > 0);
+        if (nameParts.length === 0) return "?";
+        if (nameParts.length === 1) {
+            return nameParts[0].charAt(0).toUpperCase();
+        } else {
+            return (
+                nameParts[0].charAt(0) +
+                nameParts[nameParts.length - 1].charAt(0)
+            ).toUpperCase();
+        }
+    };
 
     return (
         <View style={styles.profileSection}>
             <View style={styles.profileContent}>
-                <FastImage
-                    source={{
-                        uri: `https://randomuser.me/api/portraits/men/${randomUserNumber}.jpg`,
-                    }}
-                    style={styles.profileImage}
-                />
+                <View style={[styles.initialsAvatar]}>
+                    <Text style={styles.initialsText}>{getInitials()}</Text>
+                </View>
                 <View style={styles.profileInfo}>
-                    <Text style={styles.profileName}>Somnath Chowdhury</Text>
-                    <Text style={styles.profileEmail}>somnath@test.com</Text>
+                    <Text style={styles.profileName}>{name}</Text>
+                    <Text style={styles.profileEmail}>{email}</Text>
                 </View>
             </View>
         </View>
@@ -195,17 +219,35 @@ function DrawerComponent(): JSX.Element {
 
     const renderIcon = useCallback((iconName: string) => {
         switch (iconName) {
-            case "user":
+            case "</Text>user":
             case "phone":
             case "info":
             case "bell":
             case "settings":
             case "help-circle":
-            case "home":
             case "log-out":
                 return (
                     <Feather
+                        // @ts-ignore
                         name={iconName}
+                        size={18}
+                        color="#fff"
+                        style={styles.menuItemIcon}
+                    />
+                );
+            case "home":
+                return (
+                    <FontAwesome
+                        name="home"
+                        size={18}
+                        color="#fff"
+                        style={styles.menuItemIcon}
+                    />
+                );
+            case "bowl-food":
+                return (
+                    <FontAwesome6
+                        name="bowl-food"
                         size={18}
                         color="#fff"
                         style={styles.menuItemIcon}
@@ -224,6 +266,15 @@ function DrawerComponent(): JSX.Element {
                 return (
                     <FontAwesome
                         name="shield"
+                        size={18}
+                        color="#fff"
+                        style={styles.menuItemIcon}
+                    />
+                );
+            case "festival":
+                return (
+                    <MaterialIcons
+                        name="festival"
                         size={18}
                         color="#fff"
                         style={styles.menuItemIcon}
@@ -467,5 +518,19 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         marginBottom: 4,
         backgroundColor: "transparent",
+    },
+    initialsAvatar: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "gray",
+        marginBottom: 12,
+    },
+    initialsText: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "#fff",
     },
 });
