@@ -1,5 +1,11 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { StyleSheet, Text, View, Dimensions } from "react-native";
+import {
+    StyleSheet,
+    Text,
+    View,
+    Dimensions,
+    LayoutChangeEvent,
+} from "react-native";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -19,6 +25,53 @@ type QuickLinksProps = {
 
 const { width } = Dimensions.get("screen");
 
+// CollapsableContainer component (same concept as the first code)
+const CollapsableContainer = ({
+    children,
+    expanded,
+}: {
+    children: React.ReactNode;
+    expanded: boolean;
+}) => {
+    const [height, setHeight] = useState(0);
+    const animatedHeight = useSharedValue(0);
+
+    const onLayout = (event: LayoutChangeEvent) => {
+        const onLayoutHeight = event.nativeEvent.layout.height;
+
+        if (onLayoutHeight > 0 && height !== onLayoutHeight) {
+            setHeight(onLayoutHeight);
+        }
+    };
+
+    const collapsableStyle = useAnimatedStyle(() => {
+        animatedHeight.value = expanded
+            ? withTiming(height, {
+                  duration: 200,
+                  easing: Easing.inOut(Easing.ease),
+              })
+            : withTiming(0, {
+                  duration: 200,
+                  easing: Easing.inOut(Easing.ease),
+              });
+
+        return {
+            height: animatedHeight.value,
+        };
+    }, [expanded, height]);
+
+    return (
+        <Animated.View style={[collapsableStyle, { overflow: "hidden" }]}>
+            <View
+                style={{ position: "absolute", width: "100%" }}
+                onLayout={onLayout}
+            >
+                {children}
+            </View>
+        </Animated.View>
+    );
+};
+
 const QuickLinks = React.memo(
     ({
         subHeading,
@@ -29,8 +82,6 @@ const QuickLinks = React.memo(
         itemsPerRow = 4,
     }: QuickLinksProps) => {
         const [expanded, setExpanded] = useState(false);
-        const contentHeight = useSharedValue(0);
-
         const visibleItemsCount = itemsPerRow - 1;
 
         const { firstRowItems, remainingItems } = useMemo(() => {
@@ -40,20 +91,7 @@ const QuickLinks = React.memo(
         }, [data, visibleItemsCount]);
 
         const toggleExpanded = useCallback(() => {
-            setExpanded((prev) => {
-                if (prev) {
-                    contentHeight.value = withTiming(0, {
-                        duration: 200,
-                        easing: Easing.inOut(Easing.ease),
-                    });
-                } else {
-                    contentHeight.value = withTiming(110, {
-                        duration: 200,
-                        easing: Easing.inOut(Easing.ease),
-                    });
-                }
-                return !prev;
-            });
+            setExpanded((prev) => !prev);
         }, []);
 
         const handleViewAll = useCallback(() => {
@@ -81,11 +119,6 @@ const QuickLinks = React.memo(
                 )),
             [remainingItems, CardComponent]
         );
-
-        const animatedStyle = useAnimatedStyle(() => ({
-            height: contentHeight.value,
-            overflow: "hidden",
-        }));
 
         return (
             <View style={[style]}>
@@ -117,12 +150,12 @@ const QuickLinks = React.memo(
                     </View>
                 </View>
 
-                {/* Hidden content */}
-                <Animated.View style={[animatedStyle]}>
+                {/* Hidden content with CollapsableContainer */}
+                <CollapsableContainer expanded={expanded}>
                     <View style={styles.gridContainer}>
                         {remainingItemsComponent}
                     </View>
-                </Animated.View>
+                </CollapsableContainer>
             </View>
         );
     }
