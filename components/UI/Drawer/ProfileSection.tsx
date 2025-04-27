@@ -1,0 +1,86 @@
+import React, { memo } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import * as SecureStore from "expo-secure-store";
+
+// Memoized ProfileSection component
+const ProfileSection = memo(() => {
+    const user = SecureStore.getItem("user");
+    const user_json = JSON.parse(user || "{}");
+
+    const name = user_json.name || "";
+    const email = user_json.email || "";
+
+    // Get user initials from name
+    const getInitials = () => {
+        if (!name) return "?";
+        const nameParts = name
+            .split(" ")
+            .filter((part: string | any[]) => part.length > 0);
+        if (nameParts.length === 0) return "?";
+        if (nameParts.length === 1) {
+            return nameParts[0].charAt(0).toUpperCase();
+        } else {
+            return (
+                nameParts[0].charAt(0) +
+                nameParts[nameParts.length - 1].charAt(0)
+            ).toUpperCase();
+        }
+    };
+
+    return (
+        <View style={styles.profileSection}>
+            <View style={styles.profileContent}>
+                <View style={[styles.initialsAvatar]}>
+                    <Text style={styles.initialsText}>{getInitials()}</Text>
+                </View>
+                <View style={styles.profileInfo}>
+                    <Text style={styles.profileName}>{name}</Text>
+                    <Text style={styles.profileEmail}>{email}</Text>
+                </View>
+            </View>
+        </View>
+    );
+});
+
+const styles = StyleSheet.create({
+    profileSection: {
+        backgroundColor: "#1c2026",
+    },
+    profileContent: {
+        paddingHorizontal: 16,
+        paddingVertical: 20,
+        alignItems: "center",
+    },
+    profileInfo: {
+        alignItems: "center",
+    },
+    profileName: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#fff",
+        marginBottom: 3,
+        fontFamily: "SfProMedium",
+    },
+    profileEmail: {
+        fontSize: 12,
+        color: "#a0a0a0",
+        marginBottom: 3,
+        fontFamily: "SfProMedium",
+    },
+    initialsAvatar: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "gray",
+        marginBottom: 12,
+    },
+    initialsText: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "#fff",
+    },
+});
+
+export default ProfileSection;
