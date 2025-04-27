@@ -1,21 +1,43 @@
-import React, { memo } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import * as SecureStore from "expo-secure-store";
 
-// Memoized ProfileSection component
-const ProfileSection = memo(() => {
-    const user = SecureStore.getItem("user");
-    const user_json = JSON.parse(user || "{}");
+// Not memoized ProfileSection component
+const ProfileSection = () => {
+    const [userData, setUserData] = useState({
+        name: "",
+        email: "",
+    });
 
-    const name = user_json.name || "";
-    const email = user_json.email || "";
+    // Fetch user data from SecureStore
+    useEffect(() => {
+        const getUserData = async () => {
+            try {
+                const user = await SecureStore.getItemAsync("user");
+                if (user) {
+                    const user_json = JSON.parse(user);
+                    setUserData({
+                        name: user_json.name || "",
+                        email: user_json.email || "",
+                    });
+                }
+            } catch (error) {
+                console.error(
+                    "Error fetching user data from SecureStore:",
+                    error
+                );
+            }
+        };
+
+        getUserData();
+    }, []); // Empty dependency array means this runs once on mount
 
     // Get user initials from name
     const getInitials = () => {
-        if (!name) return "?";
-        const nameParts = name
+        if (!userData.name) return "?";
+        const nameParts = userData.name
             .split(" ")
-            .filter((part: string | any[]) => part.length > 0);
+            .filter((part) => part.length > 0);
         if (nameParts.length === 0) return "?";
         if (nameParts.length === 1) {
             return nameParts[0].charAt(0).toUpperCase();
@@ -34,13 +56,13 @@ const ProfileSection = memo(() => {
                     <Text style={styles.initialsText}>{getInitials()}</Text>
                 </View>
                 <View style={styles.profileInfo}>
-                    <Text style={styles.profileName}>{name}</Text>
-                    <Text style={styles.profileEmail}>{email}</Text>
+                    <Text style={styles.profileName}>{userData.name}</Text>
+                    <Text style={styles.profileEmail}>{userData.email}</Text>
                 </View>
             </View>
         </View>
     );
-});
+};
 
 const styles = StyleSheet.create({
     profileSection: {

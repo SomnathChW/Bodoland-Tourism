@@ -21,9 +21,9 @@ import Animated, {
 import { useRouter } from "expo-router";
 
 // Import separated components
-import MenuItem from "./MenuItem";
-import FooterItem from "./FooterItem";
-import ProfileSection from "./ProfileSection";
+import MenuItem from "@/components/UI/Drawer/MenuItem";
+import FooterItem from "@/components/UI/Drawer/FooterItem";
+import ProfileSection from "@/components/UI/Drawer/ProfileSection";
 import {
     drawerItems,
     drawerFooterItems,

@@ -158,18 +158,18 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             );
             // const responseSession =
             //     await mockAccount.createEmailPasswordSession(email, password);
-            setSession(responseSession);
             const responseUser = await account.get();
             // const responseUser = await mockAccount.get();
             setUser(responseUser);
+            await SecureStore.setItemAsync(
+                "user",
+                JSON.stringify(responseUser)
+            );
+            setSession(responseSession); // setting session here so that the user is already stored
 
             await SecureStore.setItemAsync(
                 "session",
                 JSON.stringify(responseSession)
-            );
-            await SecureStore.setItemAsync(
-                "user",
-                JSON.stringify(responseUser)
             );
             await SecureStore.setItemAsync("loggedIn", true.toString());
 
