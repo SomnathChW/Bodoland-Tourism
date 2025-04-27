@@ -1,4 +1,9 @@
-// Define drawer items in separate file for easier management
+type DrawerItemType = {
+    label: string;
+    key: string;
+    icon: string;
+};
+
 export const drawerItems = [
     {
         label: "Home",
@@ -15,6 +20,9 @@ export const drawerItems = [
         key: "/(protected)/cuisine",
         icon: "bowl-food",
     },
+];
+
+export const helpItems = [
     {
         label: "Emergency Contacts",
         key: "emergency",

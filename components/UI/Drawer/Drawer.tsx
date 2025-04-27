@@ -7,6 +7,7 @@ import {
     StatusBar,
     ScrollView,
     Platform,
+    Text,
 } from "react-native";
 import { useDrawer } from "@/context/DrawerContext";
 import Animated, {
@@ -19,11 +20,16 @@ import Animated, {
 } from "react-native-reanimated";
 import { useRouter } from "expo-router";
 
-import MenuItem from "@/components/UI/Drawer/MenuItem";
-import FooterItem from "@/components/UI/Drawer/FooterItem";
-import ProfileSection from "@/components/UI/Drawer/ProfileSection";
-import { drawerItems, drawerFooterItems } from "@/data/DrawerItems";
-import { useIconRenderer } from "@/components/UI/Drawer/IconRenderer";
+// Import separated components
+import MenuItem from "./MenuItem";
+import FooterItem from "./FooterItem";
+import ProfileSection from "./ProfileSection";
+import {
+    drawerItems,
+    drawerFooterItems,
+    helpItems,
+} from "@/constants/DrawerItems";
+import { useIconRenderer } from "./IconRenderer";
 
 const { width } = Dimensions.get("window");
 const DRAWER_WIDTH: number = width * 0.65;
@@ -112,6 +118,15 @@ function DrawerComponent(): JSX.Element {
         [toggleDrawer]
     );
 
+    const handleHelpItemPress = useCallback(
+        (key: string) => {
+            console.log(`Selected help item: ${key}`);
+            // Add specific handling for help items
+            toggleDrawer();
+        },
+        [toggleDrawer]
+    );
+
     const isMenuItemActive = useCallback(
         (itemKey: string) => {
             if (currentPath === itemKey) {
@@ -151,11 +166,12 @@ function DrawerComponent(): JSX.Element {
                 {/* User Profile Section */}
                 <ProfileSection />
 
-                {/* Scrollable Menu Items */}
+                {/* Scrollable Content */}
                 <ScrollView
                     style={styles.drawerContent}
                     showsVerticalScrollIndicator={false}
                 >
+                    {/* Main Menu Items */}
                     {drawerItems.map((item) => (
                         <MenuItem
                             key={item.key}
@@ -165,6 +181,34 @@ function DrawerComponent(): JSX.Element {
                             renderIcon={renderIcon}
                         />
                     ))}
+
+                    {/* Divider with horizontal padding */}
+                    <View
+                        style={{
+                            paddingHorizontal: 20,
+                            height: 2,
+                            backgroundColor: "#a0a0a0",
+                            marginTop: 30,
+                        }}
+                    />
+
+                    {/* Help Items Section with title */}
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionHeaderText}>
+                            HELP & SUPPORT
+                        </Text>
+                    </View>
+
+                    {helpItems.map((item) => (
+                        <MenuItem
+                            key={item.key}
+                            item={item}
+                            isActive={false}
+                            onPress={handleHelpItemPress}
+                            renderIcon={renderIcon}
+                        />
+                    ))}
+
                     {/* Add extra padding at the bottom to prevent cutoff */}
                     <View style={styles.scrollBottomPadding} />
                 </ScrollView>
@@ -232,8 +276,18 @@ const styles = StyleSheet.create({
         height: 20,
     },
     drawerFooter: {
-        borderTopWidth: 1,
-        borderTopColor: "rgba(255, 255, 255, 0.28)",
+        borderTopWidth: 2,
+        borderTopColor: "#a0a0a0",
         padding: 12,
+    },
+    sectionHeader: {
+        paddingVertical: 12,
+    },
+    sectionHeaderText: {
+        fontSize: 12,
+        color: "#a0a0a0",
+        fontWeight: "bold",
+        letterSpacing: 1,
+        fontFamily: "SfProMedium",
     },
 });
