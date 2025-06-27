@@ -24,13 +24,15 @@ const Carousel = React.memo(({ itemList }: Props) => {
         },
     });
 
-    const sortedItemList = [...itemList].sort((a, b) => {
-        if (a.tag && !b.tag) return -1;
-        if (!a.tag && b.tag) return 1;
-        return 0;
-    });
+    const sortedItemList = React.useMemo(() => {
+        return [...itemList].sort((a, b) => {
+            if (a.tag && !b.tag) return -1;
+            if (!a.tag && b.tag) return 1;
+            return 0;
+        });
+    }, [itemList]);
 
-    const autoScroll = () => {
+    const autoScroll = React.useCallback(() => {
         if (flatListRef.current) {
             const nextIndex =
                 (Math.floor(scrollPosition.value) + 1) % sortedItemList.length;
@@ -40,37 +42,55 @@ const Carousel = React.memo(({ itemList }: Props) => {
             });
             scrollPosition.value = nextIndex;
         }
-    };
+    }, [sortedItemList.length]);
+
+    const renderItem = React.useCallback(
+        ({ item, index }: { item: CarouselTypes; index: number }) => (
+            <CarouselCard item={item} index={index} scrollX={scrollX} />
+        ),
+        [scrollX]
+    );
+
+    const keyExtractor = React.useCallback(
+        (item: CarouselTypes, index: number) => `${item.title}-${index}`,
+        []
+    );
+
+    const getItemLayout = React.useCallback(
+        (data: any, index: number) => ({
+            length: width,
+            offset: width * index,
+            index,
+        }),
+        []
+    );
+
+    const onMomentumScrollEnd = React.useCallback((event: any) => {
+        const contentOffsetX = event.nativeEvent.contentOffset.x;
+        const currentIndex = Math.round(contentOffsetX / width);
+        scrollPosition.value = currentIndex;
+    }, []);
 
     useEffect(() => {
         const intervalId = setInterval(autoScroll, 3000);
         return () => clearInterval(intervalId);
-    }, []);
+    }, [autoScroll]);
 
     return (
         <View style={styles.container}>
             <Animated.FlatList
                 ref={flatListRef}
                 data={sortedItemList}
-                renderItem={({ item, index }) => (
-                    <CarouselCard item={item} index={index} scrollX={scrollX} />
-                )}
+                renderItem={renderItem}
+                keyExtractor={keyExtractor}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 pagingEnabled
                 onScroll={onScrollHandler}
                 removeClippedSubviews={false}
                 initialScrollIndex={0}
-                getItemLayout={(data, index) => ({
-                    length: width,
-                    offset: width * index,
-                    index,
-                })}
-                onMomentumScrollEnd={(event) => {
-                    const contentOffsetX = event.nativeEvent.contentOffset.x;
-                    const currentIndex = Math.round(contentOffsetX / width);
-                    scrollPosition.value = currentIndex;
-                }}
+                getItemLayout={getItemLayout}
+                onMomentumScrollEnd={onMomentumScrollEnd}
             />
         </View>
     );

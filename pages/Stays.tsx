@@ -87,7 +87,6 @@ const Stays = React.memo(() => {
                         estimatedItemSize={height * 0.25}
                         keyExtractor={(item) => item.identifier}
                         contentContainerStyle={{}}
-                        removeClippedSubviews={true}
                     />
                 )}
             </View>

@@ -33,7 +33,6 @@ interface HeaderSectionProps {
 
 const HeaderSection = ({
     scrollY,
-    isReady,
     animationPhase,
     minimizedHeaderHeight,
     scrollDistance,
@@ -89,18 +88,13 @@ const HeaderSection = ({
                 Extrapolation.CLAMP
             ),
         };
-    }, [
-        animationPhase,
-        scrollDistance,
-        minimizedHeaderHeight,
-    ]);
+    }, [animationPhase, scrollDistance, minimizedHeaderHeight]);
 
     // Create animated styles with worklets
     const headerAnimatedStyle = useAnimatedStyle(() => {
         "worklet";
         return {
             height: animations.value.headerHeight,
-            opacity: isReady.value,
         };
     }, []);
 
@@ -143,20 +137,21 @@ const HeaderSection = ({
 
     return (
         <Animated.View style={[styles.header, headerAnimatedStyle]}>
-            {/* Header Image */}
-            <Animated.View 
-                style={animationPhase >= 2 ? imageAnimatedStyle : {}}
-                entering={FadeIn.duration(250)} // Add fast fade-in animation
-            >
-                <FastImage
-                    source={{
-                        uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-                        priority: FastImage.priority.high,
-                        cache: FastImage.cacheControl.immutable,
-                    }}
-                    style={styles.headerImage}
-                    resizeMode={FastImage.resizeMode.cover}
-                />
+            {/* Header Image - Wrapper for layout animation */}
+            <Animated.View entering={FadeIn.duration(250)}>
+                <Animated.View
+                    style={animationPhase >= 2 ? imageAnimatedStyle : {}}
+                >
+                    <FastImage
+                        source={{
+                            uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+                            priority: FastImage.priority.high,
+                            cache: FastImage.cacheControl.immutable,
+                        }}
+                        style={styles.headerImage}
+                        resizeMode={FastImage.resizeMode.cover}
+                    />
+                </Animated.View>
             </Animated.View>
 
             {/* Minimized Header (appears when scrolling) */}

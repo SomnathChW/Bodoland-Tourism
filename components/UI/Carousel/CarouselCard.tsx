@@ -47,11 +47,15 @@ const CarouselCard = React.memo(({ item, index, scrollX }: Props) => {
                 },
             ],
         };
-    });
-    const displayText =
-        item.description.length > 50
-            ? `${item.description.slice(0, 50)}...`
-            : item.description;
+    }, [index]);
+
+    const displayText = React.useMemo(
+        () =>
+            item.description.length > 50
+                ? `${item.description.slice(0, 50)}...`
+                : item.description,
+        [item.description]
+    );
 
     return (
         <Animated.View style={[styles.card, animatedStyle]}>
@@ -74,7 +78,16 @@ const CarouselCard = React.memo(({ item, index, scrollX }: Props) => {
     );
 });
 
-export default CarouselCard;
+const areEqual = (prevProps: Props, nextProps: Props) => {
+    return (
+        prevProps.item.title === nextProps.item.title &&
+        prevProps.item.description === nextProps.item.description &&
+        prevProps.item.tag === nextProps.item.tag &&
+        prevProps.index === nextProps.index
+    );
+};
+
+export default React.memo(CarouselCard, areEqual);
 
 const styles = StyleSheet.create({
     card: {
