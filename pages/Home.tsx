@@ -97,7 +97,7 @@ const Home = () => {
             id: "souvenirs",
             subHeading: "Souvenirs",
             data: districtData,
-            cardComponent: CardHorizontal,
+            cardComponent: CardVertical,
             viewAll: () => router.push("/souvenirs"),
         },
         {
@@ -105,7 +105,7 @@ const Home = () => {
             id: "attractions",
             subHeading: "Attractions",
             data: districtData,
-            cardComponent: CardVertical,
+            cardComponent: CardHorizontal,
             viewAll: () => router.push("/attractions"),
         },
     ];

@@ -1,51 +1,44 @@
 export const categoryData = [
     {
-        identifier: "district-udalguri",
+        identifier: "category-souvenirs",
         title: "Souvenirs",
         image: require("@/assets/images/icons/souvenirs.png"),
-        location:
-            "https://www.google.com/maps/search/?api=1&query=Udalguri+District",
+        route: "/souvenirs",
     },
     {
-        identifier: "district-chirang",
+        identifier: "category-stays",
         title: "Stays",
         image: require("@/assets/images/icons/hotel.png"),
-        location:
-            "https://www.google.com/maps/search/?api=1&query=Chirang+District",
+        route: "/stays",
     },
     {
-        identifier: "district-baksa",
+        identifier: "category-transport",
         title: "Transport",
         image: require("@/assets/images/icons/transport.png"),
-        location:
-            "https://www.google.com/maps/search/?api=1&query=Baksa+District",
+        route: "/transport",
     },
     {
-        identifier: "district-udalguri",
+        identifier: "category-cuisine",
         title: "Cuisine",
         image: require("@/assets/images/icons/cuisine.png"),
-        location:
-            "https://www.google.com/maps/search/?api=1&query=Udalguri+District",
+        route: "/cuisine",
     },
     {
-        identifier: "district-udalguri",
+        identifier: "category-festivals",
         title: "Festivals",
         image: require("@/assets/images/icons/festival.png"),
-        location:
-            "https://www.google.com/maps/search/?api=1&query=Udalguri+District",
+        route: "/festivals",
     },
     {
-        identifier: "district-udalguri",
+        identifier: "category-attractions",
         title: "Attractions",
         image: require("@/assets/images/icons/attractions.png"),
-        location:
-            "https://www.google.com/maps/search/?api=1&query=Udalguri+District",
+        route: "/attractions",
     },
     {
-        identifier: "category-kokrajhar",
+        identifier: "category-about",
         title: "About",
         image: require("@/assets/images/icons/about.png"),
-        location:
-            "https://www.google.com/maps/search/?api=1&query=Kokrajhar+District",
+        route: "/attractions",
     },
 ];

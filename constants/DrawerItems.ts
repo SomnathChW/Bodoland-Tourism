@@ -20,6 +20,11 @@ export const drawerItems = [
         key: "/(protected)/cuisine",
         icon: "bowl-food",
     },
+    {
+        label: "Transport",
+        key: "/(protected)/transport",
+        icon: "transport",
+    },
 ];
 
 export const helpItems = [

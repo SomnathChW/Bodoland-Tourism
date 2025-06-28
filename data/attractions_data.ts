@@ -2,9 +2,28 @@ export const attractionsData = [
     {
         identifier: "attr1",
         name: "Taj Mahal",
+        short_description: "Iconic mausoleum and UNESCO World Heritage Site.",
+        long_description:
+            "The Taj Mahal, located in Agra, is a stunning mausoleum built by Mughal Emperor Shah Jahan in memory of his wife Mumtaz Mahal.",
         image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?q=80&w=1000&auto=format&fit=crop",
+        image_carousel: [
+            "https://images.unsplash.com/photo-1564507592333-c60657eea523?q=80&w=1000&auto=format&fit=crop",
+        ],
+        district: "",
+        linked_vr: ["vr-taj-mahal"],
+        packages: ["package-attr1-001"],
         location: "Agra, Uttar Pradesh",
+        latitude: 27.1751,
+        longitude: 78.0421,
+        geohash: "t1v8z",
         price: "1500",
+        timings: "6:00 AM - 7:00 PM",
+        days: "Monday to Sunday",
+        entry_pricing: {
+            adult: "1500",
+            child: "Free",
+        },
+        extra_details: "",
     },
     {
         identifier: "attr2",
@@ -12,6 +31,26 @@ export const attractionsData = [
         image: "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=1000&auto=format&fit=crop",
         location: "Jaipur, Rajasthan",
         price: "500",
+        short_description:
+            "Explore the beautiful Jaipur City Palace in Jaipur.",
+        long_description:
+            "Jaipur City Palace is a popular tourist attraction located in Jaipur, Rajasthan. It offers visitors a glimpse into the rich cultural and historical heritage of the region.",
+        image_carousel: [
+            "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=1000&auto=format&fit=crop",
+        ],
+        district: "",
+        linked_vr: [],
+        packages: [],
+        latitude: 0.0,
+        longitude: 0.0,
+        geohash: "",
+        timings: "9:00 AM - 6:00 PM",
+        days: "Monday to Sunday",
+        entry_pricing: {
+            adult: "500",
+            child: "Free",
+        },
+        extra_details: "",
     },
     {
         identifier: "attr3",
@@ -19,6 +58,25 @@ export const attractionsData = [
         image: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?q=80&w=1000&auto=format&fit=crop",
         location: "Mumbai, Maharashtra",
         price: "100",
+        short_description: "Explore the beautiful Gateway of India in Mumbai.",
+        long_description:
+            "Gateway of India is a popular tourist attraction located in Mumbai, Maharashtra. It offers visitors a glimpse into the rich cultural and historical heritage of the region.",
+        image_carousel: [
+            "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?q=80&w=1000&auto=format&fit=crop",
+        ],
+        district: "",
+        linked_vr: [],
+        packages: [],
+        latitude: 0.0,
+        longitude: 0.0,
+        geohash: "",
+        timings: "9:00 AM - 6:00 PM",
+        days: "Monday to Sunday",
+        entry_pricing: {
+            adult: "100",
+            child: "Free",
+        },
+        extra_details: "",
     },
     {
         identifier: "attr4",
@@ -26,6 +84,25 @@ export const attractionsData = [
         image: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?q=80&w=1000&auto=format&fit=crop",
         location: "Mysore, Karnataka",
         price: "250",
+        short_description: "Explore the beautiful Mysore Palace in Mysore.",
+        long_description:
+            "Mysore Palace is a popular tourist attraction located in Mysore, Karnataka. It offers visitors a glimpse into the rich cultural and historical heritage of the region.",
+        image_carousel: [
+            "https://images.unsplash.com/photo-1605649487212-47bdab064df7?q=80&w=1000&auto=format&fit=crop",
+        ],
+        district: "",
+        linked_vr: [],
+        packages: [],
+        latitude: 0.0,
+        longitude: 0.0,
+        geohash: "",
+        timings: "9:00 AM - 6:00 PM",
+        days: "Monday to Sunday",
+        entry_pricing: {
+            adult: "250",
+            child: "Free",
+        },
+        extra_details: "",
     },
     {
         identifier: "attr5",
@@ -33,6 +110,25 @@ export const attractionsData = [
         image: "https://images.unsplash.com/photo-1545126178-862cdb469409?q=80&w=1000&auto=format&fit=crop",
         location: "New Delhi, Delhi",
         price: "",
+        short_description: "Explore the beautiful Lotus Temple in New Delhi.",
+        long_description:
+            "Lotus Temple is a popular tourist attraction located in New Delhi, Delhi. It offers visitors a glimpse into the rich cultural and historical heritage of the region.",
+        image_carousel: [
+            "https://images.unsplash.com/photo-1545126178-862cdb469409?q=80&w=1000&auto=format&fit=crop",
+        ],
+        district: "",
+        linked_vr: [],
+        packages: [],
+        latitude: 0.0,
+        longitude: 0.0,
+        geohash: "",
+        timings: "9:00 AM - 6:00 PM",
+        days: "Monday to Sunday",
+        entry_pricing: {
+            adult: "Free",
+            child: "Free",
+        },
+        extra_details: "",
     },
     {
         identifier: "attr6",
@@ -40,6 +136,25 @@ export const attractionsData = [
         image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?q=80&w=1000&auto=format&fit=crop",
         location: "Aurangabad, Maharashtra",
         price: "600",
+        short_description: "Explore the beautiful Ellora Caves in Aurangabad.",
+        long_description:
+            "Ellora Caves is a popular tourist attraction located in Aurangabad, Maharashtra. It offers visitors a glimpse into the rich cultural and historical heritage of the region.",
+        image_carousel: [
+            "https://images.unsplash.com/photo-1564507592333-c60657eea523?q=80&w=1000&auto=format&fit=crop",
+        ],
+        district: "",
+        linked_vr: [],
+        packages: [],
+        latitude: 0.0,
+        longitude: 0.0,
+        geohash: "",
+        timings: "9:00 AM - 6:00 PM",
+        days: "Monday to Sunday",
+        entry_pricing: {
+            adult: "600",
+            child: "Free",
+        },
+        extra_details: "",
     },
     {
         identifier: "attr7",
@@ -47,6 +162,25 @@ export const attractionsData = [
         image: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?q=80&w=1000&auto=format&fit=crop",
         location: "Amritsar, Punjab",
         price: "",
+        short_description: "Explore the beautiful Golden Temple in Amritsar.",
+        long_description:
+            "Golden Temple is a popular tourist attraction located in Amritsar, Punjab. It offers visitors a glimpse into the rich cultural and historical heritage of the region.",
+        image_carousel: [
+            "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?q=80&w=1000&auto=format&fit=crop",
+        ],
+        district: "",
+        linked_vr: [],
+        packages: [],
+        latitude: 0.0,
+        longitude: 0.0,
+        geohash: "",
+        timings: "9:00 AM - 6:00 PM",
+        days: "Monday to Sunday",
+        entry_pricing: {
+            adult: "Free",
+            child: "Free",
+        },
+        extra_details: "",
     },
     {
         identifier: "attr8",
@@ -54,6 +188,25 @@ export const attractionsData = [
         image: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?q=80&w=1000&auto=format&fit=crop",
         location: "Jodhpur, Rajasthan",
         price: "200",
+        short_description: "Explore the beautiful Mehrangarh Fort in Jodhpur.",
+        long_description:
+            "Mehrangarh Fort is a popular tourist attraction located in Jodhpur, Rajasthan. It offers visitors a glimpse into the rich cultural and historical heritage of the region.",
+        image_carousel: [
+            "https://images.unsplash.com/photo-1605649487212-47bdab064df7?q=80&w=1000&auto=format&fit=crop",
+        ],
+        district: "",
+        linked_vr: [],
+        packages: [],
+        latitude: 0.0,
+        longitude: 0.0,
+        geohash: "",
+        timings: "9:00 AM - 6:00 PM",
+        days: "Monday to Sunday",
+        entry_pricing: {
+            adult: "200",
+            child: "Free",
+        },
+        extra_details: "",
     },
     {
         identifier: "attr9",
@@ -61,6 +214,26 @@ export const attractionsData = [
         image: "https://images.unsplash.com/photo-1587474260584-136574528ed5?q=80&w=1000&auto=format&fit=crop",
         location: "Kolkata, West Bengal",
         price: "100",
+        short_description:
+            "Explore the beautiful Victoria Memorial in Kolkata.",
+        long_description:
+            "Victoria Memorial is a popular tourist attraction located in Kolkata, West Bengal. It offers visitors a glimpse into the rich cultural and historical heritage of the region.",
+        image_carousel: [
+            "https://images.unsplash.com/photo-1587474260584-136574528ed5?q=80&w=1000&auto=format&fit=crop",
+        ],
+        district: "",
+        linked_vr: [],
+        packages: [],
+        latitude: 0.0,
+        longitude: 0.0,
+        geohash: "",
+        timings: "9:00 AM - 6:00 PM",
+        days: "Monday to Sunday",
+        entry_pricing: {
+            adult: "100",
+            child: "Free",
+        },
+        extra_details: "",
     },
     {
         identifier: "attr10",
@@ -68,5 +241,24 @@ export const attractionsData = [
         image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=1000&auto=format&fit=crop",
         location: "North Goa, Goa",
         price: "",
+        short_description: "Explore the beautiful Goa Beaches in North Goa.",
+        long_description:
+            "Goa Beaches is a popular tourist attraction located in North Goa, Goa. It offers visitors a glimpse into the rich cultural and historical heritage of the region.",
+        image_carousel: [
+            "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=1000&auto=format&fit=crop",
+        ],
+        district: "",
+        linked_vr: [],
+        packages: [],
+        latitude: 0.0,
+        longitude: 0.0,
+        geohash: "",
+        timings: "9:00 AM - 6:00 PM",
+        days: "Monday to Sunday",
+        entry_pricing: {
+            adult: "Free",
+            child: "Free",
+        },
+        extra_details: "",
     },
 ];

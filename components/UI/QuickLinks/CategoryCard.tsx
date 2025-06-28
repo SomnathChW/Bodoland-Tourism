@@ -1,10 +1,4 @@
-import {
-    StyleSheet,
-    Text,
-    View,
-    Dimensions,
-    Pressable,
-} from "react-native";
+import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
 import FastImage from "react-native-fast-image";
@@ -25,8 +19,7 @@ const CategoryCard = ({ item }: Props) => {
             <Pressable
                 onPress={() =>
                     router.navigate({
-                        pathname: "/details",
-                        params: { identifier: item.identifier },
+                        pathname: item.route,
                     })
                 }
                 style={{ alignItems: "center" }}

@@ -9,6 +9,7 @@ const StackLayout = React.memo(() => {
         { name: "details", title: "Details" },
         { name: "festivals", title: "Festivals" },
         { name: "cuisine", title: "Cuisine" },
+        { name: "transport", title: "Transport" },
     ];
 
     return (

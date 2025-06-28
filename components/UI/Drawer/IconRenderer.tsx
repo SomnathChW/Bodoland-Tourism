@@ -70,6 +70,15 @@ export const useIconRenderer = () => {
                         style={styles.menuItemIcon}
                     />
                 );
+            case "transport":
+                return (
+                    <MaterialIcons
+                        name="directions-car"
+                        size={18}
+                        color="#fff"
+                        style={styles.menuItemIcon}
+                    />
+                );
             default:
                 return (
                     <Feather

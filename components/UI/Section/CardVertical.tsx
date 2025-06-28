@@ -1,10 +1,4 @@
-import {
-    StyleSheet,
-    Text,
-    View,
-    Dimensions,
-    Pressable,
-} from "react-native";
+import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
 import FastImage from "react-native-fast-image";
@@ -20,12 +14,16 @@ type Props = {
 const { width, height } = Dimensions.get("screen");
 const WIDTH_RATIO = 0.32;
 const HEIGHT_RATIO = 0.2;
-const NUM_CARDS_ON_SCREEN = 2.8;
+const NUM_CARDS_ON_SCREEN = 2.85;
+
+const CARD_WIDTH = Math.ceil(width * WIDTH_RATIO);
+const CARD_HEIGHT = Math.ceil(height * HEIGHT_RATIO);
+const TEXT_HEIGHT = Math.ceil(CARD_HEIGHT * 0.2);
 
 const CardVertical = ({ item }: Props) => {
     const router = useRouter();
     return (
-        <View style={[styles.card]}>
+        <View style={styles.card}>
             <Pressable
                 onPress={() =>
                     router.push({
@@ -33,13 +31,14 @@ const CardVertical = ({ item }: Props) => {
                         params: { identifier: item.identifier },
                     })
                 }
+                style={styles.pressable}
             >
                 <FastImage source={item.image} style={styles.image} />
                 {item.title && (
                     <View style={styles.textView}>
-                        <View style={styles.textView}>
-                            <Text style={styles.title}>{item.title}</Text>
-                        </View>
+                        <Text style={styles.title} numberOfLines={1}>
+                            {item.title}
+                        </Text>
                     </View>
                 )}
             </Pressable>
@@ -51,45 +50,37 @@ export default CardVertical;
 
 const styles = StyleSheet.create({
     card: {
-        alignItems: "center",
-        justifyContent: "center",
-        width: Math.ceil(width * WIDTH_RATIO),
+        width: CARD_WIDTH,
         marginHorizontal: Math.ceil(
             (width * (1 - WIDTH_RATIO * NUM_CARDS_ON_SCREEN)) /
                 (NUM_CARDS_ON_SCREEN * 2)
         ),
-        backgroundColor: "ergba(0, 0, 0, 0.5)",
         borderRadius: 10,
-        elevation: 5,
-        shadowOffset: { width: 10, height: 0 },
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        overflow: "hidden",
+    },
+    pressable: {
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
     },
     image: {
-        width: Math.ceil(width * WIDTH_RATIO),
-        height: Math.ceil(height * HEIGHT_RATIO),
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
         borderRadius: 10,
     },
     textView: {
         position: "absolute",
         bottom: 0,
-        width: Math.ceil(width * WIDTH_RATIO),
-        height: Math.ceil(height * HEIGHT_RATIO * 0.2),
-        padding: 7,
-        justifyContent: "flex-end",
-        borderBottomRightRadius: 9,
-        borderBottomLeftRadius: 9,
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        width: CARD_WIDTH,
+        height: TEXT_HEIGHT,
+        paddingHorizontal: 8,
+        justifyContent: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
     },
     title: {
         fontFamily: "SfProMedium",
         fontSize: 14,
-        fontWeight: "bold",
-        color: "#646f7e",
-        marginHorizontal: 5,
-    },
-    description: {
-        fontFamily: "SfProMedium",
-        fontSize: 12,
-        color: "white",
-        marginHorizontal: 5,
+        fontWeight: "600",
+        color: "#ffffff",
     },
 });
