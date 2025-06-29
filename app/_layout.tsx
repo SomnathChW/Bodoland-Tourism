@@ -49,6 +49,7 @@ const RootLayoutContent = React.memo(() => {
                     "(protected)",
                     "signin",
                     "password_recovery",
+                    "warn",
                     "+not-found",
                 ].map((name) => (
                     <Stack.Screen
