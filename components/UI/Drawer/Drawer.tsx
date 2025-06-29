@@ -121,10 +121,52 @@ function DrawerComponent(): JSX.Element {
     const handleHelpItemPress = useCallback(
         (key: string) => {
             console.log(`Selected help item: ${key}`);
-            // Add specific handling for help items
+
+            // Map help item keys to actual routes
+            const helpRouteMap: { [key: string]: string } = {
+                emergency: "/(protected)/emergency_contacts",
+                about: "/(protected)/about",
+                settings: "/(protected)/settings",
+                help: "/(protected)/help",
+                notifications: "/(protected)/notifications", // if you add this route later
+            };
+
+            const route = helpRouteMap[key];
+            if (!route) {
+                toggleDrawer();
+                return;
+            }
+
+            const isInSomeOtherTab = [
+                "attractions",
+                "stays",
+                "souvenirs",
+                "vrview",
+            ].some((path) => currentPath.includes(path));
+
+            if (route === currentPath) {
+                toggleDrawer();
+                return;
+            }
+
+            if (isInSomeOtherTab && route === "/(protected)/") {
+                toggleDrawer();
+                return;
+            }
+
+            if (router.canGoBack() && !isInSomeOtherTab) {
+                try {
+                    router.dismissTo(route as any);
+                } catch {
+                    router.push(route as any);
+                }
+            } else {
+                router.push(route as any);
+            }
+            drawerProgress.value = 0;
             toggleDrawer();
         },
-        [toggleDrawer]
+        [toggleDrawer, router, currentPath, drawerProgress]
     );
 
     const isMenuItemActive = useCallback(
@@ -134,15 +176,46 @@ function DrawerComponent(): JSX.Element {
             }
             if (itemKey === "/(protected)/") {
                 if (currentPath.startsWith("/(protected)/")) {
+                    // Check if current path matches any other main drawer item
                     const matchesOtherMenuItem = drawerItems.some(
                         (item) =>
                             item.key !== "/(protected)/" &&
                             currentPath.startsWith(item.key)
                     );
-                    return !matchesOtherMenuItem;
+
+                    // Check if current path matches any help item route
+                    const helpRoutes = [
+                        "/(protected)/emergency_contacts",
+                        "/(protected)/about",
+                        "/(protected)/settings",
+                        "/(protected)/help",
+                        "/(protected)/notifications",
+                    ];
+                    const matchesHelpItem = helpRoutes.some(
+                        (route) => currentPath === route
+                    );
+
+                    return !matchesOtherMenuItem && !matchesHelpItem;
                 }
             }
             return false;
+        },
+        [currentPath]
+    );
+
+    const isHelpItemActive = useCallback(
+        (itemKey: string) => {
+            // Map help item keys to actual routes for active state checking
+            const helpRouteMap: { [key: string]: string } = {
+                emergency: "/(protected)/emergency_contacts",
+                about: "/(protected)/about",
+                settings: "/(protected)/settings",
+                help: "/(protected)/help",
+                notifications: "/(protected)/notifications",
+            };
+
+            const route = helpRouteMap[itemKey];
+            return route ? currentPath === route : false;
         },
         [currentPath]
     );
@@ -203,7 +276,7 @@ function DrawerComponent(): JSX.Element {
                         <MenuItem
                             key={item.key}
                             item={item}
-                            isActive={false}
+                            isActive={isHelpItemActive(item.key)}
                             onPress={handleHelpItemPress}
                             renderIcon={renderIcon}
                         />

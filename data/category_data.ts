@@ -45,12 +45,12 @@ export const categoryData = [
         identifier: "category-emergency",
         title: "Emergency",
         image: require("@/assets/images/icons/emergency.png"),
-        route: "/attractions",
+        route: "/emergency_contacts",
     },
     {
         identifier: "category-about",
         title: "About",
         image: require("@/assets/images/icons/about.png"),
-        route: "/attractions",
+        route: "/about",
     },
 ];
