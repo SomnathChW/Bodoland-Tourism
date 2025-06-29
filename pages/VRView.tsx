@@ -5,6 +5,7 @@ import { VRData } from "@/data/vr_data";
 
 import { Ionicons } from "@expo/vector-icons";
 import VrCard from "@/components/VrCard";
+import MenuButton from "@/components/UI/MenuButton";
 import { FlashList } from "@shopify/flash-list";
 import { useDrawer } from "@/context/DrawerContext";
 
@@ -15,11 +16,10 @@ const VrView = () => {
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logo}>
-                        <Ionicons
-                            name="menu"
-                            size={30}
-                            style={styles.buttons}
+                        <MenuButton
                             onPress={toggleDrawer}
+                            size={30}
+                            color={styles.buttons.color}
                         />
                         <View>
                             <Text style={styles.headingText}>

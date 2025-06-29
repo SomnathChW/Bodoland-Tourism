@@ -4,6 +4,7 @@ import React from "react";
 import { souvenirData } from "@/data/souvenir_data";
 import ProductCard from "@/components/ProductCard";
 import DynamicSortFilterComponent from "@/components/UI/Header/DynamicSortFilterComponent";
+import MenuButton from "@/components/UI/MenuButton";
 
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
@@ -14,7 +15,7 @@ import { souvenirsSortAndFilter } from "@/utils/sortFilterConfigs";
 const Souvenirs = () => {
     const { toggleDrawer } = useDrawer();
 
-    const showSortFilter = true;
+    const showSortFilter = false;
 
     const {
         sortedAndFilteredData,
@@ -37,11 +38,10 @@ const Souvenirs = () => {
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logo}>
-                        <Ionicons
-                            name="menu"
-                            size={30}
-                            style={styles.buttons}
+                        <MenuButton
                             onPress={toggleDrawer}
+                            size={30}
+                            color={styles.buttons.color}
                         />
                         <View>
                             <Text style={styles.headingText}>Souvenirs</Text>

@@ -3,7 +3,6 @@ import {
     View,
     StyleSheet,
     StatusBar,
-    TouchableOpacity,
     Platform,
     FlatList,
 } from "react-native";
@@ -13,6 +12,7 @@ import { useRouter } from "expo-router";
 
 import Section from "@/components/UI/Section/Section";
 import QuickLinks from "@/components/UI/QuickLinks/QuickLinksSection";
+import MenuButton from "@/components/UI/MenuButton";
 import CardVertical from "@/components/UI/Section/CardVertical";
 import CardHorizontal from "@/components/UI/Section/CardHorizontal";
 import Carousel from "@/components/UI/Carousel/Carousel";
@@ -147,17 +147,11 @@ const Home = () => {
                 {/* Header remains the same */}
                 <View style={styles.header}>
                     <View style={styles.logo}>
-                        <TouchableOpacity
-                            activeOpacity={1}
+                        <MenuButton
                             onPress={toggleDrawer}
-                            hitSlop={20}
-                        >
-                            <Ionicons
-                                name="menu"
-                                size={30}
-                                style={styles.buttons}
-                            />
-                        </TouchableOpacity>
+                            size={30}
+                            color={styles.buttons.color}
+                        />
                         <View>
                             <Text style={styles.headingText}>
                                 Bodoland Tourism

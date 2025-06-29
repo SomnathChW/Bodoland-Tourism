@@ -5,13 +5,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import AttractionsCard from "@/components/AttractionsCard";
 import DynamicSortFilterComponent from "@/components/UI/Header/DynamicSortFilterComponent";
+import MenuButton from "@/components/UI/MenuButton";
 import { attractionsData } from "@/data/attractions_data";
 import { useSortFilter } from "@/hooks/useSortFilter";
 import { attractionsSortAndFilter } from "@/utils/sortFilterConfigs";
 
 const Attractions = () => {
     const { toggleDrawer } = useDrawer();
-    const showSortFilter = true; // Set to true if you want to show sort/filter options
+    const showSortFilter = false; // Set to true if you want to show sort/filter options
 
     const {
         sortedAndFilteredData,
@@ -35,11 +36,10 @@ const Attractions = () => {
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logo}>
-                        <Ionicons
-                            name="menu"
-                            size={30}
-                            style={styles.buttons}
+                        <MenuButton
                             onPress={toggleDrawer}
+                            size={30}
+                            color={styles.buttons.color}
                         />
                         <View>
                             <Text style={styles.headingText}>Attractions</Text>

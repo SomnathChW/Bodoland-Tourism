@@ -10,7 +10,7 @@ type Props = {
         image: any;
         title?: string;
         location?: string;
-        geohash?: string;
+        geohash?: string | null;
     };
     index: number;
 };

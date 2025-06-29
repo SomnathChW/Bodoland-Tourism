@@ -4,6 +4,7 @@ import { useDrawer } from "@/context/DrawerContext";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import CuisineCard from "@/components/CuisineCard";
+import MenuButton from "@/components/UI/MenuButton";
 import { cuisineData } from "@/data/cuisine_data";
 
 const Transport = () => {
@@ -14,11 +15,10 @@ const Transport = () => {
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logo}>
-                        <Ionicons
-                            name="menu"
-                            size={30}
-                            style={styles.buttons}
+                        <MenuButton
                             onPress={toggleDrawer}
+                            size={30}
+                            color={styles.buttons.color}
                         />
                         <View>
                             <Text style={styles.headingText}>Transport</Text>
