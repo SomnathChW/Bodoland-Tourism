@@ -36,6 +36,18 @@ export const categoryData = [
         route: "/attractions",
     },
     {
+        identifier: "category-vr",
+        title: "Virtual Tours",
+        image: require("@/assets/images/icons/vr.png"),
+        route: "/vrview",
+    },
+    {
+        identifier: "category-emergency",
+        title: "Emergency",
+        image: require("@/assets/images/icons/emergency.png"),
+        route: "/attractions",
+    },
+    {
         identifier: "category-about",
         title: "About",
         image: require("@/assets/images/icons/about.png"),

@@ -90,6 +90,26 @@ const QuickLinks = React.memo(
             return { firstRowItems: firstItems, remainingItems };
         }, [data, visibleItemsCount]);
 
+        const dynamicStyles = StyleSheet.create({
+            gridItem: {
+                flex: 1,
+                maxWidth: `${100 / itemsPerRow}%`,
+                marginBottom: 15,
+                alignItems: "center",
+            },
+            firstRowContainer: {
+                flexDirection: "row",
+                flexWrap: "nowrap", // Prevent wrapping for the first row
+                paddingHorizontal: 20,
+                justifyContent: "space-between",
+            },
+            remainingRowsContainer: {
+                flexDirection: "row",
+                flexWrap: "wrap",
+                paddingHorizontal: 20,
+            },
+        });
+
         const toggleExpanded = useCallback(() => {
             setExpanded((prev) => !prev);
         }, []);
@@ -103,21 +123,27 @@ const QuickLinks = React.memo(
         const firstRowItemsComponent = useMemo(
             () =>
                 firstRowItems.map((item, index) => (
-                    <View key={`visible-${index}`} style={styles.gridItem}>
-                        <CardComponent item={item} />
+                    <View
+                        key={`visible-${index}`}
+                        style={dynamicStyles.gridItem}
+                    >
+                        <CardComponent item={item} itemsPerRow={itemsPerRow} />
                     </View>
                 )),
-            [firstRowItems, CardComponent]
+            [firstRowItems, CardComponent, dynamicStyles.gridItem, itemsPerRow]
         );
 
         const remainingItemsComponent = useMemo(
             () =>
                 remainingItems.map((item, index) => (
-                    <View key={`hidden-${index}`} style={styles.gridItem}>
-                        <CardComponent item={item} />
+                    <View
+                        key={`hidden-${index}`}
+                        style={dynamicStyles.gridItem}
+                    >
+                        <CardComponent item={item} itemsPerRow={itemsPerRow} />
                     </View>
                 )),
-            [remainingItems, CardComponent]
+            [remainingItems, CardComponent, dynamicStyles.gridItem, itemsPerRow]
         );
 
         return (
@@ -138,21 +164,22 @@ const QuickLinks = React.memo(
                 </View>
 
                 {/* First row */}
-                <View style={styles.gridContainer}>
+                <View style={dynamicStyles.firstRowContainer}>
                     {firstRowItemsComponent}
 
                     {/* Show More button */}
-                    <View style={styles.gridItem}>
+                    <View style={dynamicStyles.gridItem}>
                         <ShowMoreCard
                             expanded={expanded}
                             toggleExpanded={toggleExpanded}
+                            itemsPerRow={itemsPerRow}
                         />
                     </View>
                 </View>
 
                 {/* Hidden content with CollapsableContainer */}
                 <CollapsableContainer expanded={expanded}>
-                    <View style={styles.gridContainer}>
+                    <View style={dynamicStyles.remainingRowsContainer}>
                         {remainingItemsComponent}
                     </View>
                 </CollapsableContainer>
@@ -187,11 +214,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         paddingHorizontal: 20,
-    },
-    gridItem: {
-        width: "25%",
-        marginBottom: 15,
-        alignItems: "center",
     },
 });
 

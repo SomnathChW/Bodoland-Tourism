@@ -74,7 +74,7 @@ const Home = () => {
             id: "quicklinks",
             data: categoryData,
             cardComponent: CategoryCard,
-            itemsPerRow: 4,
+            itemsPerRow: 5,
         },
         {
             type: "section",
