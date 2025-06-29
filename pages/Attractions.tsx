@@ -1,40 +1,34 @@
-import {
-    Text,
-    View,
-    StyleSheet,
-    StatusBar,
-} from "react-native";
-import React, { useState, useMemo } from "react";
+import { Text, View, StyleSheet, StatusBar } from "react-native";
+import React from "react";
 import { useDrawer } from "@/context/DrawerContext";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import AttractionsCard from "@/components/AttractionsCard";
-import SortFilterComponent from "@/components/UI/Header/SortFilterComponent";
+import DynamicSortFilterComponent from "@/components/UI/Header/DynamicSortFilterComponent";
 import { attractionsData } from "@/data/attractions_data";
+import { useSortFilter } from "@/hooks/useSortFilter";
+import { attractionsSortAndFilter } from "@/utils/sortFilterConfigs";
 
 const Attractions = () => {
     const { toggleDrawer } = useDrawer();
+    const showSortFilter = true; // Set to true if you want to show sort/filter options
 
-    // State for price sorting
-    const [priceSortOrder, setPriceSortOrder] = useState(0); // 0: none, 1: low-high, 2: high-low
-
-    // State for modals
-    const [sortModalVisible, setSortModalVisible] = useState(false);
-    const [filterModalVisible, setFilterModalVisible] = useState(false);
-
-    // Filter and sort data based on active filters
-    const filteredData = useMemo(() => {
-        let result = [...attractionsData];
-
-        // Apply price sorting if active
-        if (priceSortOrder === 1) {
-            result.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
-        } else if (priceSortOrder === 2) {
-            result.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
-        }
-
-        return result;
-    }, [priceSortOrder]);
+    const {
+        sortedAndFilteredData,
+        activeSortId,
+        setActiveSortId,
+        activeFilters,
+        setActiveFilters,
+        sortModalVisible,
+        setSortModalVisible,
+        filterModalVisible,
+        setFilterModalVisible,
+        resetFilters,
+    } = useSortFilter({
+        data: attractionsData,
+        sortOptions: attractionsSortAndFilter.sortOptions,
+        filterOptions: attractionsSortAndFilter.filterOptions,
+    });
 
     return (
         <View style={styles.container}>
@@ -58,17 +52,24 @@ const Attractions = () => {
                 </View>
 
                 {/* Sorting and Filtering Component */}
-                <SortFilterComponent
-                    priceSortOrder={priceSortOrder}
-                    setPriceSortOrder={setPriceSortOrder}
-                    sortModalVisible={sortModalVisible}
-                    setSortModalVisible={setSortModalVisible}
-                    filterModalVisible={filterModalVisible}
-                    setFilterModalVisible={setFilterModalVisible}
-                />
+                {showSortFilter && (
+                    <DynamicSortFilterComponent
+                        sortOptions={attractionsSortAndFilter.sortOptions}
+                        filterOptions={attractionsSortAndFilter.filterOptions}
+                        activeSortId={activeSortId}
+                        setActiveSortId={setActiveSortId}
+                        activeFilters={activeFilters}
+                        setActiveFilters={setActiveFilters}
+                        sortModalVisible={sortModalVisible}
+                        setSortModalVisible={setSortModalVisible}
+                        filterModalVisible={filterModalVisible}
+                        setFilterModalVisible={setFilterModalVisible}
+                        resetFilters={resetFilters}
+                    />
+                )}
 
                 <FlashList
-                    data={filteredData}
+                    data={sortedAndFilteredData}
                     renderItem={({ item, index }) => (
                         <AttractionsCard item={item} index={index} />
                     )}

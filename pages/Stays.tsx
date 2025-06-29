@@ -12,13 +12,35 @@ import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import StaysCard from "@/components/StaysCard";
 import CardLoader from "@/components/CardLoader";
+import DynamicSortFilterComponent from "@/components/UI/Header/DynamicSortFilterComponent";
 import { staysData } from "@/data/stays_data";
+import { useSortFilter } from "@/hooks/useSortFilter";
+import { staysSortAndFilter } from "@/utils/sortFilterConfigs";
 
 const { width, height } = Dimensions.get("window");
 
 const Stays = React.memo(() => {
     const { toggleDrawer } = useDrawer();
     const [loading, setLoading] = useState(true);
+
+    const showSortFilter = true;
+
+    const {
+        sortedAndFilteredData,
+        activeSortId,
+        setActiveSortId,
+        activeFilters,
+        setActiveFilters,
+        sortModalVisible,
+        setSortModalVisible,
+        filterModalVisible,
+        setFilterModalVisible,
+        resetFilters,
+    } = useSortFilter({
+        data: staysData,
+        sortOptions: staysSortAndFilter.sortOptions,
+        filterOptions: staysSortAndFilter.filterOptions,
+    });
 
     // Create array of 6 placeholder items
     const loaderItems = Array(10)
@@ -55,6 +77,23 @@ const Stays = React.memo(() => {
                     <Ionicons name="search" size={30} style={styles.buttons} />
                 </View>
 
+                {/* Sorting and Filtering Component */}
+                {!loading && showSortFilter && (
+                    <DynamicSortFilterComponent
+                        sortOptions={staysSortAndFilter.sortOptions}
+                        filterOptions={staysSortAndFilter.filterOptions}
+                        activeSortId={activeSortId}
+                        setActiveSortId={setActiveSortId}
+                        activeFilters={activeFilters}
+                        setActiveFilters={setActiveFilters}
+                        sortModalVisible={sortModalVisible}
+                        setSortModalVisible={setSortModalVisible}
+                        filterModalVisible={filterModalVisible}
+                        setFilterModalVisible={setFilterModalVisible}
+                        resetFilters={resetFilters}
+                    />
+                )}
+
                 {loading ? (
                     <FlatList
                         data={loaderItems}
@@ -72,7 +111,7 @@ const Stays = React.memo(() => {
                     />
                 ) : (
                     <FlashList
-                        data={staysData}
+                        data={sortedAndFilteredData}
                         renderItem={({ item, index }) => (
                             <StaysCard
                                 item={item}

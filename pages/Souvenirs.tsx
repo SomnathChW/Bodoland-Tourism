@@ -3,13 +3,35 @@ import React from "react";
 
 import { souvenirData } from "@/data/souvenir_data";
 import ProductCard from "@/components/ProductCard";
+import DynamicSortFilterComponent from "@/components/UI/Header/DynamicSortFilterComponent";
 
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { useDrawer } from "@/context/DrawerContext";
+import { useSortFilter } from "@/hooks/useSortFilter";
+import { souvenirsSortAndFilter } from "@/utils/sortFilterConfigs";
 
 const Souvenirs = () => {
     const { toggleDrawer } = useDrawer();
+
+    const showSortFilter = true;
+
+    const {
+        sortedAndFilteredData,
+        activeSortId,
+        setActiveSortId,
+        activeFilters,
+        setActiveFilters,
+        sortModalVisible,
+        setSortModalVisible,
+        filterModalVisible,
+        setFilterModalVisible,
+        resetFilters,
+    } = useSortFilter({
+        data: souvenirData,
+        sortOptions: souvenirsSortAndFilter.sortOptions,
+        filterOptions: souvenirsSortAndFilter.filterOptions,
+    });
     return (
         <View style={styles.container}>
             <View style={styles.content}>
@@ -30,8 +52,26 @@ const Souvenirs = () => {
                     </View>
                     <Ionicons name="search" size={30} style={styles.buttons} />
                 </View>
+
+                {/* Sorting and Filtering Component */}
+                {showSortFilter && (
+                    <DynamicSortFilterComponent
+                        sortOptions={souvenirsSortAndFilter.sortOptions}
+                        filterOptions={souvenirsSortAndFilter.filterOptions}
+                        activeSortId={activeSortId}
+                        setActiveSortId={setActiveSortId}
+                        activeFilters={activeFilters}
+                        setActiveFilters={setActiveFilters}
+                        sortModalVisible={sortModalVisible}
+                        setSortModalVisible={setSortModalVisible}
+                        filterModalVisible={filterModalVisible}
+                        setFilterModalVisible={setFilterModalVisible}
+                        resetFilters={resetFilters}
+                    />
+                )}
+
                 <FlashList
-                    data={souvenirData}
+                    data={sortedAndFilteredData}
                     renderItem={({ item, index }) => (
                         <ProductCard item={item} index={index} />
                     )}
