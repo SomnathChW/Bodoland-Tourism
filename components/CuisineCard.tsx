@@ -9,7 +9,7 @@ type Props = {
         identifier: string;
         name: string;
         image: any;
-        "short-desc": string;
+        short_description: string;
     };
     index: number;
 };
@@ -84,7 +84,7 @@ const CuisineCard = ({ item, index }: Props) => {
                         </Text>
 
                         <Text style={styles.desc} numberOfLines={1}>
-                            {item["short-desc"]}
+                            {item.short_description}
                         </Text>
                     </View>
                 </View>
