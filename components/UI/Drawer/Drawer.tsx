@@ -28,7 +28,7 @@ import {
     drawerItems,
     drawerFooterItems,
     helpItems,
-} from "@/constants/DrawerItems";
+} from "@/components/UI/Drawer/DrawerItems";
 import { useIconRenderer } from "./IconRenderer";
 
 const { width } = Dimensions.get("window");
@@ -128,7 +128,7 @@ function DrawerComponent(): JSX.Element {
                 about: "/(protected)/about",
                 settings: "/(protected)/settings",
                 help: "/(protected)/help",
-                notifications: "/(protected)/notifications", // if you add this route later
+                orders: "/(protected)/orders",
             };
 
             const route = helpRouteMap[key];
@@ -189,7 +189,7 @@ function DrawerComponent(): JSX.Element {
                         "/(protected)/about",
                         "/(protected)/settings",
                         "/(protected)/help",
-                        "/(protected)/notifications",
+                        "/(protected)/orders",
                     ];
                     const matchesHelpItem = helpRoutes.some(
                         (route) => currentPath === route
@@ -211,7 +211,7 @@ function DrawerComponent(): JSX.Element {
                 about: "/(protected)/about",
                 settings: "/(protected)/settings",
                 help: "/(protected)/help",
-                notifications: "/(protected)/notifications",
+                orders: "/(protected)/orders",
             };
 
             const route = helpRouteMap[itemKey];

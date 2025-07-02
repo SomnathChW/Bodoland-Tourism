@@ -100,13 +100,13 @@ const QuickLinks = React.memo(
             firstRowContainer: {
                 flexDirection: "row",
                 flexWrap: "nowrap", // Prevent wrapping for the first row
-                paddingHorizontal: 20,
-                justifyContent: "space-between",
+                paddingHorizontal: 10,
+                justifyContent: "space-evenly",
             },
             remainingRowsContainer: {
                 flexDirection: "row",
                 flexWrap: "wrap",
-                paddingHorizontal: 20,
+                paddingHorizontal: 10,
             },
         });
 

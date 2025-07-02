@@ -8,6 +8,7 @@ import React, {
     useCallback,
 } from "react";
 import { usePathname } from "expo-router";
+import { BackHandler } from "react-native";
 
 interface DrawerContextType {
     isDrawerOpen: boolean;
@@ -29,6 +30,22 @@ export function _DrawerProvider({
     const [currentPath, setCurrentPath] = useState<string>("/(protected)");
 
     const pathname = usePathname();
+
+    // Handle Android back button to close drawer
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            () => {
+                if (isDrawerOpen) {
+                    setIsDrawerOpen(false);
+                    return true; // Prevent default back behavior
+                }
+                return false; // Allow default back behavior
+            }
+        );
+
+        return () => backHandler.remove();
+    }, [isDrawerOpen]);
 
     useEffect(() => {
         const timeout = setTimeout(() => {

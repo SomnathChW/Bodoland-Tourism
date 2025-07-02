@@ -79,6 +79,15 @@ export const useIconRenderer = () => {
                         style={styles.menuItemIcon}
                     />
                 );
+            case "shopping-bag":
+                return (
+                    <MaterialIcons
+                        name="shopping-bag"
+                        size={18}
+                        color="#fff"
+                        style={styles.menuItemIcon}
+                    />
+                );
             default:
                 return (
                     <Feather

@@ -14,6 +14,7 @@ const StackLayout = React.memo(() => {
         { name: "emergency_contacts", title: "Emergency Contacts" },
         { name: "settings", title: "Settings" },
         { name: "help", title: "Help" },
+        { name: "orders", title: "Orders" }, // New screen for orders
     ];
 
     return (

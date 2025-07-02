@@ -68,7 +68,7 @@ const CategoryCard = ({ item, itemsPerRow = 4 }: Props) => {
             fontWeight: "bold",
             color: "#646f7e",
             textAlign: "center",
-            width: Math.min(width * DIMENSION_RATIO * 1.2, 100), // Slightly less overflow and cap width
+            width: Math.min(width * DIMENSION_RATIO * 1.3, 100), // Slightly less overflow and cap width
             paddingHorizontal: 2,
             paddingTop: 3,
             flexWrap: "wrap",
