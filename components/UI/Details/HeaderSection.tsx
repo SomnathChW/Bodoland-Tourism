@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
     StyleSheet,
     TouchableOpacity,
@@ -12,29 +12,37 @@ import Animated, {
     Extrapolation,
     useDerivedValue,
     SharedValue,
-    withTiming,
-    useSharedValue,
     FadeIn,
 } from "react-native-reanimated";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import FastImage from "react-native-fast-image";
 import { EdgeInsets } from "react-native-safe-area-context";
+import PagerView from "react-native-pager-view";
 
 interface HeaderSectionProps {
     scrollY: SharedValue<number>;
     isReady: SharedValue<number>;
     animationPhase: number;
     minimizedHeaderHeight: number;
+    hasModel: boolean;
     scrollDistance: number;
     identifier: string;
     onBack: () => void;
     insets: EdgeInsets;
 }
 
+const carouselImages = [
+    "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+    "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf0b5002895c5d022/view?project=bodoland-tourism",
+    "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+    // Add more image URLs as needed
+];
+
 const HeaderSection = ({
     scrollY,
     animationPhase,
     minimizedHeaderHeight,
+    hasModel,
     scrollDistance,
     identifier,
     onBack,
@@ -90,7 +98,6 @@ const HeaderSection = ({
         };
     }, [animationPhase, scrollDistance, minimizedHeaderHeight]);
 
-    // Create animated styles with worklets
     const headerAnimatedStyle = useAnimatedStyle(() => {
         "worklet";
         return {
@@ -135,6 +142,8 @@ const HeaderSection = ({
         [insets.top, minimizedHeaderHeight]
     );
 
+    const [currentPage, setCurrentPage] = useState(0);
+
     return (
         <Animated.View style={[styles.header, headerAnimatedStyle]}>
             {/* Header Image - Wrapper for layout animation */}
@@ -142,15 +151,73 @@ const HeaderSection = ({
                 <Animated.View
                     style={animationPhase >= 2 ? imageAnimatedStyle : {}}
                 >
-                    <FastImage
-                        source={{
-                            uri: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-                            priority: FastImage.priority.high,
-                            cache: FastImage.cacheControl.immutable,
-                        }}
-                        style={styles.headerImage}
-                        resizeMode={FastImage.resizeMode.cover}
-                    />
+                    <PagerView
+                        style={[
+                            styles.headerImage,
+                            { height: styles.headerImage.height },
+                        ]}
+                        initialPage={hasModel ? 1 : 0}
+                        onPageSelected={(e) =>
+                            setCurrentPage(e.nativeEvent.position)
+                        }
+                    >
+                        {hasModel && (
+                            <View style={styles.pageContainer}>
+                                <FastImage
+                                    source={{
+                                        uri: "https://example.com/3d-model-placeholder.jpg",
+                                        priority: FastImage.priority.high,
+                                        cache: FastImage.cacheControl.immutable,
+                                    }}
+                                    style={styles.carouselImage}
+                                    resizeMode={FastImage.resizeMode.cover}
+                                />
+                            </View>
+                        )}
+                        {carouselImages.map((imageUri, index) => (
+                            <View key={index} style={styles.pageContainer}>
+                                <FastImage
+                                    source={{
+                                        uri: imageUri,
+                                        priority: FastImage.priority.high,
+                                        cache: FastImage.cacheControl.immutable,
+                                    }}
+                                    style={styles.carouselImage}
+                                    resizeMode={FastImage.resizeMode.cover}
+                                />
+                            </View>
+                        ))}
+                    </PagerView>
+
+                    {/* Page indicators */}
+                    <View style={styles.indicatorContainer}>
+                        {Array.from({ length: carouselImages.length + (hasModel ? 1 : 0) }).map((_, index) => {
+                            const isModelPage = hasModel && index === 0;
+                            const isActive = currentPage === index;
+                            
+                            if (isModelPage) {
+                                return (
+                                    <MaterialCommunityIcons
+                                        key={index}
+                                        name="augmented-reality"
+                                        size={isActive ? 16 : 12}
+                                        color={isActive ? "white" : "rgba(255, 255, 255, 0.5)"}
+                                        style={{ marginHorizontal: 4 }}
+                                    />
+                                );
+                            }
+                            
+                            return (
+                                <View
+                                    key={index}
+                                    style={[
+                                        styles.indicator,
+                                        isActive && styles.activeIndicator,
+                                    ]}
+                                />
+                            );
+                        })}
+                    </View>
                 </Animated.View>
             </Animated.View>
 
@@ -249,6 +316,42 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(0, 0, 0, 0.3)",
         justifyContent: "center",
         alignItems: "center",
+    },
+
+    pageContainer: {
+        flex: 1,
+    },
+    modelContainer: {
+        flex: 1,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    carouselImage: {
+        width: "100%",
+        height: "100%",
+    },
+    indicatorContainer: {
+        position: "absolute",
+        bottom: 10,
+        left: 0,
+        right: 0,
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    indicator: {
+        width: 4,
+        height: 4,
+        borderRadius: 4,
+        backgroundColor: "rgba(255, 255, 255, 0.5)",
+        marginHorizontal: 4,
+    },
+    activeIndicator: {
+        backgroundColor: "white",
+        width: 12, // Wider selected indicator
+        height: 4,
+        borderRadius: 4,
     },
 });
 

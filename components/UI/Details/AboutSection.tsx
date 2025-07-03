@@ -9,7 +9,7 @@
 
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 interface AboutSectionProps {
     // Optional description text - if not provided, uses default lorem ipsum

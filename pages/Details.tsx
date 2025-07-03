@@ -62,7 +62,8 @@ const Details = () => {
             <HeaderSection
                 scrollY={scrollY}
                 isReady={isReady}
-                animationPhase={2} // Always set to full animation phase
+                animationPhase={2}
+                hasModel={true}
                 minimizedHeaderHeight={minimizedHeaderHeight}
                 scrollDistance={scrollDistance}
                 identifier={identifier as string}
