@@ -50,7 +50,7 @@ const StackLayout = React.memo(() => {
                     options={{
                         title: "3D View",
                         headerShown: false,
-                        navigationBarColor: "#000000",
+                        navigationBarHidden: true,
                     }}
                 />
                 <Stack.Screen
@@ -58,7 +58,7 @@ const StackLayout = React.memo(() => {
                     options={{
                         title: "AR View",
                         headerShown: false,
-                        navigationBarColor: "#000000",
+                        navigationBarHidden: true,
                     }}
                 />
             </Stack>
