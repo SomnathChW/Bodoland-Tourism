@@ -18,6 +18,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import FastImage from "react-native-fast-image";
 import { EdgeInsets } from "react-native-safe-area-context";
 import PagerView from "react-native-pager-view";
+import { ModelViewer } from "./ModelViewer/ModelViewer";
 
 interface HeaderSectionProps {
     scrollY: SharedValue<number>;
@@ -163,15 +164,7 @@ const HeaderSection = ({
                     >
                         {hasModel && (
                             <View style={styles.pageContainer}>
-                                <FastImage
-                                    source={{
-                                        uri: "https://example.com/3d-model-placeholder.jpg",
-                                        priority: FastImage.priority.high,
-                                        cache: FastImage.cacheControl.immutable,
-                                    }}
-                                    style={styles.carouselImage}
-                                    resizeMode={FastImage.resizeMode.cover}
-                                />
+                                <ModelViewer scale={3} />
                             </View>
                         )}
                         {carouselImages.map((imageUri, index) => (
@@ -191,22 +184,28 @@ const HeaderSection = ({
 
                     {/* Page indicators */}
                     <View style={styles.indicatorContainer}>
-                        {Array.from({ length: carouselImages.length + (hasModel ? 1 : 0) }).map((_, index) => {
+                        {Array.from({
+                            length: carouselImages.length + (hasModel ? 1 : 0),
+                        }).map((_, index) => {
                             const isModelPage = hasModel && index === 0;
                             const isActive = currentPage === index;
-                            
+
                             if (isModelPage) {
                                 return (
                                     <MaterialCommunityIcons
                                         key={index}
                                         name="augmented-reality"
                                         size={isActive ? 16 : 12}
-                                        color={isActive ? "white" : "rgba(255, 255, 255, 0.5)"}
+                                        color={
+                                            isActive
+                                                ? "white"
+                                                : "rgba(255, 255, 255, 0.5)"
+                                        }
                                         style={{ marginHorizontal: 4 }}
                                     />
                                 );
                             }
-                            
+
                             return (
                                 <View
                                     key={index}

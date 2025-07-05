@@ -66,6 +66,14 @@
                         "enableShrinkResourcesInReleaseBuilds": true
                     }
                 }
+            ],
+            [
+                "@reactvision/react-viro",
+                {
+                    "android": {
+                        "minSdkVersion": 24
+                    }
+                }
             ]
         ],
         "experiments": {

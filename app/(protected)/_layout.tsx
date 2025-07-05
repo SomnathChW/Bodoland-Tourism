@@ -45,6 +45,22 @@ const StackLayout = React.memo(() => {
                         }}
                     />
                 ))}
+                <Stack.Screen
+                    name="3d-view"
+                    options={{
+                        title: "3D View",
+                        headerShown: false,
+                        navigationBarColor: "#000000",
+                    }}
+                />
+                <Stack.Screen
+                    name="ar-view"
+                    options={{
+                        title: "AR View",
+                        headerShown: false,
+                        navigationBarColor: "#000000",
+                    }}
+                />
             </Stack>
             <Drawer />
         </>
