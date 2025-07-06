@@ -1,11 +1,32 @@
-import { StyleSheet, Text, View, StatusBar } from "react-native";
+import {
+    StyleSheet,
+    Text,
+    View,
+    StatusBar,
+    FlatList,
+    ScrollView,
+} from "react-native";
 import React from "react";
 import { useDrawer } from "@/context/DrawerContext";
-import { Ionicons } from "@expo/vector-icons";
 import MenuButton from "@/components/UI/MenuButton";
+import { EmergencyContact, emergencyData, universalEmergencyNumbers, UniversalEmergencyService } from "@/data/emergency_data";
+import EmergencyCard from "@/components/EmergencyCard";
+import UniversalEmergencyCard from "@/components/UniversalEmergencyCard";
 
 const Emergency = () => {
     const { toggleDrawer } = useDrawer();
+
+    const renderUniversalEmergencyCard = ({
+        item,
+    }: {
+        item: UniversalEmergencyService;
+    }) => <UniversalEmergencyCard item={item} />;
+
+    const renderDistrictEmergencyCard = ({
+        item,
+    }: {
+        item: EmergencyContact;
+    }) => <EmergencyCard item={item} />;
 
     return (
         <View style={styles.container}>
@@ -26,15 +47,42 @@ const Emergency = () => {
                             </Text>
                         </View>
                     </View>
-                    <Ionicons name="search" size={30} style={styles.buttons} />
                 </View>
 
-                <View style={styles.pageContent}>
-                    <Text style={styles.title}>Emergency Contacts</Text>
-                    <Text style={styles.description}>
-                        This is the emergency page of our application.
-                    </Text>
-                </View>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.scrollContainer}
+                >
+                    {/* Universal Emergency Numbers Section */}
+                    <View style={styles.sectionContainer}>
+                        <FlatList
+                            data={universalEmergencyNumbers}
+                            renderItem={renderUniversalEmergencyCard}
+                            keyExtractor={(item) => item.number}
+                            numColumns={2}
+                            scrollEnabled={false}
+                            contentContainerStyle={styles.universalGrid}
+                        />
+                    </View>
+
+                    {/* District-wise Emergency Contacts Section */}
+                    <View style={styles.sectionContainer}>
+                        <Text style={styles.sectionTitle}>
+                            District-wise Emergency Contacts
+                        </Text>
+                        <Text style={styles.sectionSubtitle}>
+                            Local emergency services in BTR districts
+                        </Text>
+                        <FlatList
+                            data={emergencyData}
+                            renderItem={renderDistrictEmergencyCard}
+                            keyExtractor={(item) => item.identifier}
+                            numColumns={2}
+                            scrollEnabled={false}
+                            contentContainerStyle={styles.districtGrid}
+                        />
+                    </View>
+                </ScrollView>
             </View>
         </View>
     );
@@ -54,47 +102,58 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: "row",
-        justifyContent: "space-between",
         alignItems: "center",
+        justifyContent: "space-between",
+        paddingVertical: 10,
         paddingHorizontal: 20,
-        paddingVertical: 16,
-        backgroundColor: "transparent",
     },
     logo: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 15,
+        justifyContent: "center",
+        gap: 20,
     },
     headingText: {
-        fontSize: 20,
-        fontWeight: "700",
-        color: "white",
-        fontFamily: "SF-Pro-Display-Medium",
+        fontSize: 24,
+        fontWeight: "bold",
+        fontFamily: "SfProMedium",
+        color: "#fff",
     },
     mainSubHeaddingText: {
         fontSize: 14,
-        color: "#8E8E93",
-        fontFamily: "SF-Pro-Display-Medium",
+        fontWeight: "bold",
+        color: "#646f7e",
     },
     buttons: {
-        color: "white",
+        color: "#fff",
     },
-    pageContent: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingHorizontal: 20,
+    scrollContainer: {
+        paddingHorizontal: 8,
+        paddingBottom: 20,
     },
-    title: {
-        fontSize: 24,
-        fontWeight: "bold",
-        color: "white",
-        marginBottom: 10,
+    sectionContainer: {
+        marginTop: 16,
+        marginBottom: 16,
     },
-    description: {
+    sectionTitle: {
         fontSize: 16,
-        color: "#8E8E93",
-        textAlign: "center",
-        lineHeight: 24,
+        fontWeight: "600",
+        color: "#fff",
+        fontFamily: "SfProMedium",
+        marginBottom: 4,
+        paddingHorizontal: 12,
+    },
+    sectionSubtitle: {
+        fontSize: 14,
+        color: "#646f7e",
+        fontFamily: "SfProMedium",
+        marginBottom: 16,
+        paddingHorizontal: 12,
+    },
+    universalGrid: {
+        paddingHorizontal: 4,
+    },
+    districtGrid: {
+        paddingHorizontal: 4,
     },
 });
