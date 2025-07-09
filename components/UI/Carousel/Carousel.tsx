@@ -8,6 +8,8 @@ import Animated, {
     useAnimatedStyle,
     withTiming,
     runOnJS,
+    useDerivedValue,
+    SharedValue,
 } from "react-native-reanimated";
 
 type Props = {
@@ -61,6 +63,13 @@ const Carousel = React.memo(({ itemList }: Props) => {
         }
     }, [sortedItemList.length, resetProgress, startProgressAnimation]);
 
+    const resetAutoScrollInterval = React.useCallback(() => {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+        intervalRef.current = setInterval(autoScroll, AUTO_SCROLL_INTERVAL);
+    }, [autoScroll]);
+
     const keyExtractor = React.useCallback(
         (item: CarouselTypes, index: number) => `${item.title}-${index}`,
         []
@@ -80,24 +89,24 @@ const Carousel = React.memo(({ itemList }: Props) => {
             const contentOffsetX = event.nativeEvent.contentOffset.x;
             const currentIndex = Math.round(contentOffsetX / width);
             scrollPosition.value = currentIndex;
-            // Reset progress when user manually scrolls
-            runOnJS(resetProgress)();
-            runOnJS(startProgressAnimation)();
+            // Reset progress and timer when user manually scrolls
+            resetProgress();
+            startProgressAnimation();
+            resetAutoScrollInterval();
         },
-        [resetProgress, startProgressAnimation]
+        [resetProgress, startProgressAnimation, resetAutoScrollInterval]
     );
 
     useEffect(() => {
         // Start initial progress animation
         startProgressAnimation();
-
-        intervalRef.current = setInterval(autoScroll, AUTO_SCROLL_INTERVAL);
+        resetAutoScrollInterval();
         return () => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
             }
         };
-    }, [autoScroll, startProgressAnimation]);
+    }, [autoScroll, startProgressAnimation, resetAutoScrollInterval]);
 
     const renderItem = React.useCallback(
         ({ item, index }: { item: CarouselTypes; index: number }) => (
@@ -125,20 +134,14 @@ const Carousel = React.memo(({ itemList }: Props) => {
 
             {/* Dot Indicators */}
             <View style={styles.indicatorContainer}>
-                {sortedItemList.map((_, index) => {
-                    const currentIndex = Math.floor(scrollPosition.value);
-                    const isActive = currentIndex === index;
-
-                    return (
-                        <DotIndicator
-                            key={index}
-                            index={index}
-                            isActive={isActive}
-                            progressValue={progressValue}
-                            scrollPosition={scrollPosition}
-                        />
-                    );
-                })}
+                {sortedItemList.map((_, index) => (
+                    <DotIndicator
+                        key={index}
+                        index={index}
+                        progressValue={progressValue}
+                        scrollPosition={scrollPosition}
+                    />
+                ))}
             </View>
         </View>
     );
@@ -148,20 +151,19 @@ const Carousel = React.memo(({ itemList }: Props) => {
 const DotIndicator = React.memo(
     ({
         index,
-        isActive,
         progressValue,
         scrollPosition,
     }: {
         index: number;
-        isActive: boolean;
-        progressValue: Animated.SharedValue<number>;
-        scrollPosition: Animated.SharedValue<number>;
+        progressValue: SharedValue<number>;
+        scrollPosition: SharedValue<number>;
     }) => {
-        const progressStyle = useAnimatedStyle(() => {
-            const currentIndex = Math.floor(scrollPosition.value);
-            const isCurrentActive = currentIndex === index;
+        const isCurrentActive = useDerivedValue(() => {
+            return Math.floor(scrollPosition.value) === index;
+        }, [index]);
 
-            if (isCurrentActive) {
+        const progressStyle = useAnimatedStyle(() => {
+            if (isCurrentActive.value) {
                 const progress = progressValue.value;
                 return {
                     width: `${progress * 100}%`,
@@ -174,12 +176,9 @@ const DotIndicator = React.memo(
         });
 
         const containerStyle = useAnimatedStyle(() => {
-            const currentIndex = Math.floor(scrollPosition.value);
-            const isCurrentActive = currentIndex === index;
-
             return {
-                width: isCurrentActive ? 20 : 4,
-                backgroundColor: isCurrentActive
+                width: isCurrentActive.value ? 20 : 4,
+                backgroundColor: isCurrentActive.value
                     ? "rgba(255, 255, 255, 0.3)"
                     : "rgba(255, 255, 255, 0.5)",
             };
