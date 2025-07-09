@@ -8,54 +8,6 @@ export interface EmergencyContact {
     extra_data: Record<string, any>;
 }
 
-export const emergencyData: EmergencyContact[] = [
-    {
-        identifier: "emergency-kokrajhar",
-        title: "Kokrajhar",
-        image: "https://picsum.photos/300/200?random=1",
-        police: "03861-270-222",
-        fire: "101",
-        ambulance: "108",
-        extra_data: {},
-    },
-    {
-        identifier: "emergency-chirang",
-        title: "Chirang",
-        image: "https://picsum.photos/300/200?random=2",
-        police: "03664-270-222",
-        fire: "101",
-        ambulance: "108",
-        extra_data: {},
-    },
-    {
-        identifier: "emergency-baksa",
-        title: "Baksa",
-        image: "https://picsum.photos/300/200?random=3",
-        police: "03661-270-222",
-        fire: "101",
-        ambulance: "108",
-        extra_data: {},
-    },
-    {
-        identifier: "emergency-udalguri",
-        title: "Udalguri",
-        image: "https://picsum.photos/300/200?random=4",
-        police: "03662-270-222",
-        fire: "101",
-        ambulance: "108",
-        extra_data: {},
-    },
-    {
-        identifier: "emergency-tamulpur",
-        title: "Tamulpur",
-        image: "https://picsum.photos/300/200?random=5",
-        police: "03861-270-222",
-        fire: "101",
-        ambulance: "108",
-        extra_data: {},
-    },
-];
-
 export interface UniversalEmergencyService {
     name: string;
     number: string;

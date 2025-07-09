@@ -18,7 +18,6 @@ import CardHorizontal from "@/components/UI/Section/CardHorizontal";
 import Carousel from "@/components/UI/Carousel/Carousel";
 import CategoryCard from "@/components/UI/QuickLinks/CategoryCard";
 
-import { carouselData } from "@/data/slider_data";
 import { districtData } from "@/data/district_data";
 import { categoryData } from "@/data/category_data";
 import { useAuth } from "@/context/AuthContext";
@@ -29,7 +28,6 @@ type ListItem =
     | {
           type: "carousel";
           id: string;
-          data: typeof carouselData;
       }
     | {
           type: "quicklinks";
@@ -67,7 +65,6 @@ const Home = () => {
         {
             type: "carousel",
             id: "carousel",
-            data: carouselData,
         },
         {
             type: "quicklinks",
@@ -115,7 +112,7 @@ const Home = () => {
             case "carousel":
                 return (
                     <View style={{ paddingBottom: 10 }}>
-                        <Carousel itemList={item.data} />
+                        <Carousel />
                     </View>
                 );
             case "quicklinks":

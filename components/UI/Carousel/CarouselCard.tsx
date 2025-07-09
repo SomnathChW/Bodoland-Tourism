@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions } from "react-native";
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
@@ -8,9 +8,12 @@ import Animated, {
     useAnimatedStyle,
 } from "react-native-reanimated";
 import FastImage from "react-native-fast-image";
+import { router } from "expo-router";
+import * as Linking from "expo-linking";
+import { CarouselTypes } from "./Carousel";
 
 type Props = {
-    item: any;
+    item: CarouselTypes;
     index: number;
     scrollX: SharedValue<number>;
 };
@@ -57,24 +60,42 @@ const CarouselCard = React.memo(({ item, index, scrollX }: Props) => {
         [item.description]
     );
 
+    const handlePress = () => {
+        if (item.type === "details") {
+            router.navigate({
+                pathname: "/details",
+                params: { identifier: item.identifier },
+            });
+        } else if (item.type === "browser" && item.promo_url) {
+            Linking.openURL(item.promo_url);
+        }
+        // If type is "none" or any other value, do nothing
+    };
+
     return (
-        <Animated.View style={[styles.card, animatedStyle]}>
-            <FastImage source={{ uri: item.image }} style={styles.image} />
-            <LinearGradient
-                colors={["transparent", " rgba(0, 0, 0, 0.6)"]}
-                style={styles.textView}
-            >
-                {item.tag && (
-                    <View style={styles.tagView}>
-                        <Text style={styles.tag}>{item.tag}</Text>
-                    </View>
-                )}
-                <Text style={styles.title}>{item.title}</Text>
-                <Text style={styles.description} numberOfLines={1}>
-                    {displayText}
-                </Text>
-            </LinearGradient>
-        </Animated.View>
+        <TouchableOpacity 
+            activeOpacity={1} 
+            onPress={handlePress}
+            disabled={item.type === "none"}
+        >
+            <Animated.View style={[styles.card, animatedStyle]}>
+                <FastImage source={{ uri: item.image }} style={styles.image} />
+                <LinearGradient
+                    colors={["transparent", " rgba(0, 0, 0, 0.6)"]}
+                    style={styles.textView}
+                >
+                    {item.tag && (
+                        <View style={styles.tagView}>
+                            <Text style={styles.tag}>{item.tag}</Text>
+                        </View>
+                    )}
+                    <Text style={styles.title}>{item.title}</Text>
+                    <Text style={styles.description} numberOfLines={1}>
+                        {displayText}
+                    </Text>
+                </LinearGradient>
+            </Animated.View>
+        </TouchableOpacity>
     );
 });
 

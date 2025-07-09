@@ -1,7 +1,7 @@
 import { StyleSheet, View, FlatList, Dimensions } from "react-native";
 import React, { useEffect, useRef } from "react";
-import { CarouselTypes } from "@/data/slider_data";
 import CarouselCard from "./CarouselCard";
+import CarouselLoader from "./CarouselLoader";
 import Animated, {
     useAnimatedScrollHandler,
     useSharedValue,
@@ -11,21 +11,38 @@ import Animated, {
     useDerivedValue,
     SharedValue,
 } from "react-native-reanimated";
-
-type Props = {
-    itemList: CarouselTypes[];
-};
+import { useAppwriteQuery } from "@/hooks/useAppwriteQuery";
 
 const AUTO_SCROLL_INTERVAL = 5000; // 5 seconds
 
 const { width } = Dimensions.get("screen");
 
-const Carousel = React.memo(({ itemList }: Props) => {
+export type CarouselItemType = "details" | "browser" | "none";
+export interface CarouselTypes {
+    identifier: string;
+    title: string;
+    image: any;
+    description: string;
+    tag?: string;
+    promo_url?: string;
+    type: CarouselItemType;
+}
+
+const Carousel = React.memo(() => {
     const scrollX = useSharedValue(0);
     const flatListRef = useRef<FlatList>(null);
     const scrollPosition = useSharedValue(0);
     const progressValue = useSharedValue(0);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    const { data, isLoading, error } = useAppwriteQuery<CarouselTypes>({
+        queryKey: ["featured"],
+        route: "featured",
+        limit: 20,
+        expectedFields: ["identifier", "title", "image", "description", "type"],
+    });
+
+    const itemList = data?.data || [];
 
     const onScrollHandler = useAnimatedScrollHandler({
         onScroll: (event) => {
@@ -50,7 +67,7 @@ const Carousel = React.memo(({ itemList }: Props) => {
     }, []);
 
     const autoScroll = React.useCallback(() => {
-        if (flatListRef.current) {
+        if (flatListRef.current && sortedItemList.length > 0) {
             const nextIndex =
                 (Math.floor(scrollPosition.value) + 1) % sortedItemList.length;
             flatListRef.current.scrollToIndex({
@@ -98,15 +115,22 @@ const Carousel = React.memo(({ itemList }: Props) => {
     );
 
     useEffect(() => {
-        // Start initial progress animation
-        startProgressAnimation();
-        resetAutoScrollInterval();
+        if (sortedItemList.length > 0) {
+            // Start initial progress animation
+            startProgressAnimation();
+            resetAutoScrollInterval();
+        }
         return () => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
             }
         };
-    }, [autoScroll, startProgressAnimation, resetAutoScrollInterval]);
+    }, [
+        sortedItemList,
+        autoScroll,
+        startProgressAnimation,
+        resetAutoScrollInterval,
+    ]);
 
     const renderItem = React.useCallback(
         ({ item, index }: { item: CarouselTypes; index: number }) => (
@@ -114,6 +138,14 @@ const Carousel = React.memo(({ itemList }: Props) => {
         ),
         [scrollX]
     );
+
+    if (isLoading) {
+        return <CarouselLoader />;
+    }
+
+    if (error || sortedItemList.length === 0) {
+        return <View style={styles.container} />;
+    }
 
     return (
         <View style={styles.container}>
