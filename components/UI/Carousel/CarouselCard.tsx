@@ -59,7 +59,7 @@ const CarouselCard = React.memo(({ item, index, scrollX }: Props) => {
 
     return (
         <Animated.View style={[styles.card, animatedStyle]}>
-            <FastImage source={item.image} style={styles.image} />
+            <FastImage source={{ uri: item.image }} style={styles.image} />
             <LinearGradient
                 colors={["transparent", " rgba(0, 0, 0, 0.6)"]}
                 style={styles.textView}
