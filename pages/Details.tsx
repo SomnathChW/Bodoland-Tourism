@@ -13,6 +13,10 @@ import TitleSection from "@/components/UI/Details/TitleSection";
 import AboutSection from "@/components/UI/Details/AboutSection";
 import FeaturesSection from "@/components/UI/Details/FeaturesSection";
 import SimilarPlacesSection from "@/components/UI/Details/SimilarPlacesSection";
+import EntryFeeSection from "@/components/UI/Details/EntryFeeSection";
+import LocationMapSection from "@/components/UI/Details/LocationMapSection";
+import PackagesSection from "@/components/UI/Details/PackagesSection";
+import VirtualToursSection from "@/components/UI/Details/VirtualToursSection";
 
 const { height } = Dimensions.get("screen");
 const HEADER_MAX_HEIGHT = height * 0.45;
@@ -57,6 +61,149 @@ const Details = () => {
         []
     );
 
+    // Function to return structure based on identifier
+    const getDetailsStructure = (identifier: string) => {
+        if (!identifier) {
+            return [
+                {
+                    key: "title",
+                    component: <TitleSection identifier={identifier} />,
+                },
+            ];
+        }
+
+        const detail_type = identifier.split(/[-_]/)[0].toLowerCase();
+        switch (detail_type) {
+            case "attraction":
+                return [
+                    {
+                        key: "title",
+                        component: (
+                            <TitleSection
+                                identifier={identifier}
+                                showRating={false}
+                                location={true}
+                            />
+                        ),
+                    },
+                    { key: "about", component: <AboutSection /> },
+
+                    {
+                        key: "location_map",
+                        component: (
+                            <LocationMapSection
+                                latitude={26.6583}
+                                longitude={91.0014}
+                                locationName="Manas National Park"
+                            />
+                        ),
+                    },
+                    {
+                        key: "virtualTours",
+                        component: (
+                            <VirtualToursSection
+                                tours={[
+                                    {
+                                        identifier: "vt-001",
+                                        name: "Main Temple View",
+                                        imageUrl:
+                                            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+                                    },
+                                    {
+                                        identifier: "vt-002",
+                                        name: "Scenic Lake Tour",
+                                        imageUrl:
+                                            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+                                    },
+                                    {
+                                        identifier: "vt-003",
+                                        name: "Mountain Vista",
+                                        imageUrl:
+                                            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+                                    },
+                                ]}
+                                onTourPress={(tour) =>
+                                    console.log(
+                                        "Virtual tour selected:",
+                                        tour.identifier
+                                    )
+                                }
+                            />
+                        ),
+                    },
+                    {
+                        key: "entry_fees",
+                        component: (
+                            <EntryFeeSection
+                                fees={{
+                                    adult: "1500",
+                                    child: "Free",
+                                }}
+                                timings={{
+                                    hours: "6:00 AM - 6:00 PM",
+                                    days: "Monday - Sunday",
+                                }}
+                            />
+                        ),
+                    },
+                    {
+                        key: "packages",
+                        component: (
+                            <PackagesSection
+                                packages={[
+                                    {
+                                        identifier: "pkg-001",
+                                        name: "Weekend Explorer",
+                                        fromPrice: "4,500",
+                                        imageUrl:
+                                            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+                                    },
+                                    {
+                                        identifier: "pkg-002",
+                                        name: "Wildlife Safari",
+                                        fromPrice: "6,800",
+                                        imageUrl:
+                                            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+                                    },
+                                    {
+                                        identifier: "pkg-003",
+                                        name: "Cultural Tour",
+                                        fromPrice: "3,200",
+                                        imageUrl:
+                                            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
+                                    },
+                                ]}
+                                onPackagePress={(pkg) =>
+                                    console.log(
+                                        "Package selected:",
+                                        pkg.identifier
+                                    )
+                                }
+                            />
+                        ),
+                    },
+                ];
+            case "placeB":
+                return [
+                    {
+                        key: "title",
+                        component: <TitleSection identifier={identifier} />,
+                    },
+                    { key: "features", component: <FeaturesSection /> },
+                ];
+            default:
+                return [
+                    {
+                        key: "title",
+                        component: <TitleSection identifier={identifier} />,
+                    },
+                    { key: "about", component: <AboutSection /> },
+                    { key: "features", component: <FeaturesSection /> },
+                    { key: "similar", component: <SimilarPlacesSection /> },
+                ];
+        }
+    };
+
     return (
         <View style={styles.container}>
             <HeaderSection
@@ -83,10 +230,12 @@ const Details = () => {
                 overScrollMode="never"
                 keyboardShouldPersistTaps="handled"
             >
-                <TitleSection identifier={identifier as string} />
-                <AboutSection />
-                <FeaturesSection />
-                <SimilarPlacesSection />
+                {/* Render sections based on structure */}
+                {getDetailsStructure(identifier as string).map((section) => (
+                    <React.Fragment key={section.key}>
+                        {section.component}
+                    </React.Fragment>
+                ))}
             </Animated.ScrollView>
         </View>
     );

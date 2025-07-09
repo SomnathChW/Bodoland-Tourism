@@ -13,16 +13,56 @@ import { Ionicons } from "@expo/vector-icons";
 
 interface TitleSectionProps {
     identifier: string;
+    showRating?: boolean;
+    location?: boolean;
 }
 
-const TitleSection: React.FC<TitleSectionProps> = ({ identifier }) => {
+const TitleSection = ({
+    identifier,
+    showRating,
+    location,
+}: TitleSectionProps) => {
     // Render rating stars
-    const renderRatingStars = () => {
-        return Array(5)
-            .fill(0)
-            .map((_, index) => (
-                <Ionicons key={index} name="star" size={16} color="#FFD700" />
-            ));
+    const renderRatingStars = ({ rating }: { rating: number }) => {
+        // Sanitize to increments of 0.5
+        const sanitizedRating = Math.round(rating * 2) / 2;
+        // Calculate the number of full stars
+        const fullStars = Math.floor(sanitizedRating);
+        // Calculate if there's a half star
+        const hasHalfStar = sanitizedRating % 1 !== 0;
+
+        // Create an array of stars
+        const stars = Array.from({ length: 5 }, (_, index) => {
+            if (index < fullStars) {
+                return (
+                    <Ionicons
+                        key={index}
+                        name="star"
+                        size={16}
+                        color="#FFD700"
+                    />
+                );
+            } else if (hasHalfStar && index === fullStars) {
+                return (
+                    <Ionicons
+                        key={index}
+                        name="star-half"
+                        size={16}
+                        color="#FFD700"
+                    />
+                );
+            } else {
+                return (
+                    <Ionicons
+                        key={index}
+                        name="star-outline"
+                        size={16}
+                        color="#FFD700"
+                    />
+                );
+            }
+        });
+        return stars;
     };
 
     return (
@@ -31,16 +71,19 @@ const TitleSection: React.FC<TitleSectionProps> = ({ identifier }) => {
             <Text style={styles.title}>{identifier}</Text>
 
             {/* Rating Container */}
-            <View style={styles.ratingContainer}>
-                {renderRatingStars()}
-                <Text style={styles.ratingText}>4.8 (240 reviews)</Text>
-            </View>
-
+            {showRating && (
+                <View style={styles.ratingContainer}>
+                    {renderRatingStars({ rating: 4.8 })}
+                    <Text style={styles.ratingText}>4.8 (240 reviews)</Text>
+                </View>
+            )}
             {/* Location Container */}
-            <View style={styles.locationContainer}>
-                <Ionicons name="location" size={16} color="#646f7e" />
-                <Text style={styles.locationText}>Assam, India</Text>
-            </View>
+            {location && (
+                <View style={styles.locationContainer}>
+                    <Ionicons name="location" size={16} color="#646f7e" />
+                    <Text style={styles.locationText}>Assam, India</Text>
+                </View>
+            )}
         </View>
     );
 };
