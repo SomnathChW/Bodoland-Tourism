@@ -16,8 +16,14 @@ const validPages = [
 ];
 
 const isValidRoute = (page: string | undefined) => {
-    if (page === undefined || page === null) return false;
-    return validPages.includes(page);
+    if (page === undefined || page === null || !page) {
+        return false;
+    }
+    // Remove query params and fragments
+    const cleanPage = page.split(/[?#]/)[0];
+    return validPages.some(
+        (valid) => cleanPage === valid || cleanPage.startsWith(valid + "/")
+    );
 };
 
 const _layout = React.memo(() => {
@@ -33,6 +39,7 @@ const _layout = React.memo(() => {
     const router = useRouter();
 
     const handleDeepLink = (url: string) => {
+        console.log("Handling deep link:", url);
         const route = url.split("/").pop();
         if (!isValidRoute(route)) {
             return;
