@@ -5,28 +5,94 @@ import {
     StatusBar,
     FlatList,
     ScrollView,
+    Dimensions,
+    ActivityIndicator,
+    TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import { useDrawer } from "@/context/DrawerContext";
 import MenuButton from "@/components/UI/MenuButton";
-import { EmergencyContact, emergencyData, universalEmergencyNumbers, UniversalEmergencyService } from "@/data/emergency_data";
+import {
+    EmergencyContact,
+    universalEmergencyNumbers,
+    UniversalEmergencyService,
+} from "@/data/emergency_data";
 import EmergencyCard from "@/components/EmergencyCard";
 import UniversalEmergencyCard from "@/components/UniversalEmergencyCard";
+import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
+import CardLoader from "@/components/CardLoader";
+
+const { width, height } = Dimensions.get("window");
 
 const Emergency = () => {
     const { toggleDrawer } = useDrawer();
 
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        error,
+        refetch,
+    } = useAppwriteInfiniteQuery({
+        queryKey: ["emergencyContacts"],
+        route: "emergency_contacts",
+        initialPageParam: 1,
+        staleTime: 30 * 60 * 1000,
+        limit: 10,
+        expectedFields: [
+            "identifier",
+            "title",
+            "image",
+            "police",
+            "fire",
+            "ambulance",
+            "extra_data",
+        ],
+    });
+
+    const emergencyContacts = useMemo(() => {
+        return (
+            (data?.pages.flatMap((page) => page.data) as EmergencyContact[]) ||
+            []
+        );
+    }, [data]);
+
     const renderUniversalEmergencyCard = ({
         item,
+        index,
     }: {
         item: UniversalEmergencyService;
-    }) => <UniversalEmergencyCard item={item} />;
+        index: number;
+    }) => <UniversalEmergencyCard item={item} index={index} />;
 
     const renderDistrictEmergencyCard = ({
         item,
+        index,
     }: {
         item: EmergencyContact;
-    }) => <EmergencyCard item={item} />;
+        index: number;
+    }) => <EmergencyCard item={item} index={index} />;
+
+    const renderCardLoader = ({ index }: { index: number }) => (
+        <CardLoader index={index} width={width} height={height} />
+    );
+
+    const handleLoadMore = () => {
+        if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+        }
+    };
+
+    const renderFooter = () => {
+        if (!isFetchingNextPage) return null;
+        return (
+            <View style={styles.loaderFooter}>
+                <ActivityIndicator size="small" color="#646f7e" />
+            </View>
+        );
+    };
 
     return (
         <View style={styles.container}>
@@ -62,6 +128,7 @@ const Emergency = () => {
                             numColumns={2}
                             scrollEnabled={false}
                             contentContainerStyle={styles.universalGrid}
+                            columnWrapperStyle={styles.columnWrapper}
                         />
                     </View>
 
@@ -73,14 +140,48 @@ const Emergency = () => {
                         <Text style={styles.sectionSubtitle}>
                             Local emergency services in BTR districts
                         </Text>
-                        <FlatList
-                            data={emergencyData}
-                            renderItem={renderDistrictEmergencyCard}
-                            keyExtractor={(item) => item.identifier}
-                            numColumns={2}
-                            scrollEnabled={false}
-                            contentContainerStyle={styles.districtGrid}
-                        />
+
+                        {isLoading ? (
+                            // Display loading skeleton while data is loading
+                            <FlatList
+                                data={Array(6).fill(0)}
+                                renderItem={renderCardLoader}
+                                keyExtractor={(_, index) => `loader-${index}`}
+                                numColumns={2}
+                                scrollEnabled={false}
+                                contentContainerStyle={styles.districtGrid}
+                                columnWrapperStyle={styles.columnWrapper}
+                            />
+                        ) : error ? (
+                            // Display error state
+                            <View style={styles.errorContainer}>
+                                <Text style={styles.errorText}>
+                                    Failed to load emergency contacts
+                                </Text>
+                                <TouchableOpacity
+                                    style={styles.retryButton}
+                                    onPress={() => refetch()}
+                                >
+                                    <Text style={styles.retryButtonText}>
+                                        Retry
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        ) : (
+                            // Display loaded data
+                            <FlatList
+                                data={emergencyContacts}
+                                renderItem={renderDistrictEmergencyCard}
+                                keyExtractor={(item) => item.identifier}
+                                numColumns={2}
+                                scrollEnabled={false}
+                                contentContainerStyle={styles.districtGrid}
+                                ListFooterComponent={renderFooter}
+                                onEndReached={handleLoadMore}
+                                onEndReachedThreshold={0.5}
+                                columnWrapperStyle={styles.columnWrapper}
+                            />
+                        )}
                     </View>
                 </ScrollView>
             </View>
@@ -128,7 +229,6 @@ const styles = StyleSheet.create({
         color: "#fff",
     },
     scrollContainer: {
-        paddingHorizontal: 8,
         paddingBottom: 20,
     },
     sectionContainer: {
@@ -141,19 +241,45 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontFamily: "SfProMedium",
         marginBottom: 4,
-        paddingHorizontal: 12,
+        paddingHorizontal: 15,
     },
     sectionSubtitle: {
         fontSize: 14,
         color: "#646f7e",
         fontFamily: "SfProMedium",
         marginBottom: 16,
-        paddingHorizontal: 12,
+        paddingHorizontal: 15,
     },
     universalGrid: {
-        paddingHorizontal: 4,
+        paddingHorizontal: 0,
     },
     districtGrid: {
-        paddingHorizontal: 4,
+        paddingHorizontal: 0,
+    },
+    columnWrapper: {
+        justifyContent: "space-between",
+    },
+    loaderFooter: {
+        paddingVertical: 20,
+        alignItems: "center",
+    },
+    errorContainer: {
+        padding: 20,
+        alignItems: "center",
+    },
+    errorText: {
+        color: "#ff6b6b",
+        marginBottom: 10,
+        textAlign: "center",
+    },
+    retryButton: {
+        backgroundColor: "rgba(255, 255, 255, 0.1)",
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        borderRadius: 5,
+    },
+    retryButtonText: {
+        color: "#fff",
+        fontWeight: "500",
     },
 });

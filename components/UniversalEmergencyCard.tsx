@@ -13,20 +13,38 @@ import { UniversalEmergencyService } from "@/data/emergency_data";
 
 interface UniversalEmergencyCardProps {
     item: UniversalEmergencyService;
+    index: number;
 }
 
 const { width } = Dimensions.get("window");
 
+// Calculate base dimensions
+const PADDING = 15;
+const GAP = 15;
+const NUM_CARDS_ON_SCREEN = 2;
+
 const UniversalEmergencyCard: React.FC<UniversalEmergencyCardProps> = ({
     item,
+    index,
 }) => {
     const handlePress = (number: string) => {
         Linking.openURL(`tel:${number}`);
     };
 
+    const CARD_WIDTH =
+        (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
+        NUM_CARDS_ON_SCREEN;
+
     return (
         <TouchableOpacity
-            style={styles.card}
+            style={{
+                width: CARD_WIDTH,
+                marginVertical: 6,
+                marginLeft: index % 2 === 0 ? PADDING : GAP / 2,
+                marginRight: index % 2 === 0 ? GAP / 2 : PADDING,
+                borderRadius: 12,
+                overflow: "hidden",
+            }}
             onPress={() => handlePress(item.number)}
             activeOpacity={0.8}
         >
@@ -62,11 +80,7 @@ export default UniversalEmergencyCard;
 
 const styles = StyleSheet.create({
     card: {
-        width: (width - 48) / 2, // 48 = 16 (container padding) + 32 (total margin between cards)
-        marginHorizontal: 8,
-        marginVertical: 6,
-        borderRadius: 12,
-        overflow: "hidden",
+        // Not used anymore - using inline styles
     },
     cardGradient: {
         padding: 16,

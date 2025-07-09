@@ -3,6 +3,16 @@ import { Redirect, Stack } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import Drawer from "@/components/UI/Drawer/Drawer";
 import { DrawerProvider } from "@/context/DrawerContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const client = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 30 * 60 * 1000,
+            gcTime: 60 * 60 * 1000,
+        },
+    },
+});
 
 const StackLayout = React.memo(() => {
     const screens = [
@@ -18,7 +28,7 @@ const StackLayout = React.memo(() => {
     ];
 
     return (
-        <>
+        <QueryClientProvider client={client}>
             <Stack
                 initialRouteName="(tabs)"
                 screenOptions={{
@@ -63,7 +73,7 @@ const StackLayout = React.memo(() => {
                 />
             </Stack>
             <Drawer />
-        </>
+        </QueryClientProvider>
     );
 });
 

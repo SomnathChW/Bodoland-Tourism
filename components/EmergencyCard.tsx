@@ -14,18 +14,49 @@ import { LinearGradient } from "expo-linear-gradient";
 
 interface EmergencyCardProps {
     item: EmergencyContact;
+    index: number;
 }
+
+// Define colors for emergency services
+const EMERGENCY_COLORS = {
+    police: "#7dd3fc",  // Sky blue
+    fire: "#fb923c",    // Orange
+    ambulance: "#4ade80" // Green
+};
 
 const { width } = Dimensions.get("window");
 
-const EmergencyCard: React.FC<EmergencyCardProps> = ({ item }) => {
+// Calculate base dimensions
+const PADDING = 15;
+const GAP = 15;
+const NUM_CARDS_ON_SCREEN = 2;
+
+const EmergencyCard: React.FC<EmergencyCardProps> = ({ item, index }) => {
     // Helper to open phone dialer
     const handlePress = (number: string) => {
         Linking.openURL(`tel:${number}`);
     };
 
+    const CARD_WIDTH =
+        (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
+        NUM_CARDS_ON_SCREEN;
+
     return (
-        <View style={styles.card}>
+        <View
+            style={{
+                width: CARD_WIDTH,
+                backgroundColor: "rgba(52, 52, 52, 0.35)",
+                borderRadius: 10,
+                overflow: "hidden",
+                shadowOffset: { width: 10, height: 0 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 3,
+                marginVertical: 8,
+                marginLeft: index % 2 === 0 ? PADDING : GAP / 2,
+                marginRight: index % 2 === 0 ? GAP / 2 : PADDING,
+            }}
+        >
             {/* Image section with text overlay */}
             <View style={styles.imageContainer}>
                 <FastImage
@@ -60,7 +91,7 @@ const EmergencyCard: React.FC<EmergencyCardProps> = ({ item }) => {
                             <Ionicons
                                 name="shield-checkmark"
                                 size={14}
-                                color="#666666"
+                                color={EMERGENCY_COLORS.police}
                             />
                             <Text style={styles.contactText}>Police</Text>
                         </LinearGradient>
@@ -78,7 +109,11 @@ const EmergencyCard: React.FC<EmergencyCardProps> = ({ item }) => {
                             ]}
                             style={styles.buttonGradient}
                         >
-                            <Ionicons name="flame" size={14} color="#666666" />
+                            <Ionicons 
+                                name="flame" 
+                                size={14} 
+                                color={EMERGENCY_COLORS.fire} 
+                            />
                             <Text style={styles.contactText}>Fire</Text>
                         </LinearGradient>
                     </TouchableOpacity>
@@ -98,7 +133,7 @@ const EmergencyCard: React.FC<EmergencyCardProps> = ({ item }) => {
                             <FontAwesome5
                                 name="ambulance"
                                 size={12}
-                                color="#666666"
+                                color={EMERGENCY_COLORS.ambulance}
                             />
                             <Text style={styles.contactText}>Ambulance</Text>
                         </LinearGradient>
@@ -111,20 +146,9 @@ const EmergencyCard: React.FC<EmergencyCardProps> = ({ item }) => {
 
 export default EmergencyCard;
 
-const PADDING = 8;
-
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: "rgba(52, 52, 52, 0.35)",
-        borderRadius: 10,
-        marginHorizontal: PADDING,
-        marginVertical: 8,
-        overflow: "hidden",
-        shadowOffset: { width: 10, height: 0 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-        width: (width - 48) / 2, // 48 = 16 (container padding) + 32 (total margin between cards)
+        // Not used anymore - using inline styles
     },
     imageContainer: {
         position: "relative",
