@@ -30,6 +30,8 @@ interface Package {
     name: string;
     fromPrice: string | number;
     imageUrl: string;
+    contact?: string;
+    website?: string;
 }
 
 interface PackagesSectionProps {

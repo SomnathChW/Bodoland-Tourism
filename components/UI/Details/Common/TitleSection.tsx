@@ -12,15 +12,15 @@ import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 interface TitleSectionProps {
-    identifier: string;
-    showRating?: boolean;
-    location?: boolean;
+    title: string;
+    rating?: number;
+    location?: string;
 }
 
 const TitleSection = ({
-    identifier,
-    showRating,
-    location,
+    title,
+    rating = 0,
+    location = "N/A",
 }: TitleSectionProps) => {
     // Render rating stars
     const renderRatingStars = ({ rating }: { rating: number }) => {
@@ -68,20 +68,20 @@ const TitleSection = ({
     return (
         <View style={styles.titleSection}>
             {/* Main Title */}
-            <Text style={styles.title}>{identifier}</Text>
+            <Text style={styles.title}>{title}</Text>
 
             {/* Rating Container */}
-            {showRating && (
+            {rating > 0 && (
                 <View style={styles.ratingContainer}>
-                    {renderRatingStars({ rating: 4.8 })}
-                    <Text style={styles.ratingText}>4.8 (240 reviews)</Text>
+                    {renderRatingStars({ rating })}
+                    <Text style={styles.ratingText}>{rating}</Text>
                 </View>
             )}
             {/* Location Container */}
             {location && (
                 <View style={styles.locationContainer}>
                     <Ionicons name="location" size={16} color="#646f7e" />
-                    <Text style={styles.locationText}>Assam, India</Text>
+                    <Text style={styles.locationText}>{location}</Text>
                 </View>
             )}
         </View>

@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const FestivalDetails = ({ identifier }: { identifier: string }) => {
+const TransportDetails = ({ identifier }: { identifier: string }) => {
     return (
         <View>
-            <Text>FestivalDetails for: {identifier}</Text>
+            <Text>TransportDetails for: {identifier}</Text>
         </View>
     );
 };
 
-export default FestivalDetails;
+export default TransportDetails;
 
 const styles = StyleSheet.create({});
