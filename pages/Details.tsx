@@ -8,15 +8,21 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import HeaderSection from "@/components/UI/Details/HeaderSection";
-import TitleSection from "@/components/UI/Details/TitleSection";
-import AboutSection from "@/components/UI/Details/AboutSection";
+import HeaderSection from "@/components/UI/Details/Common/HeaderSection";
+import TitleSection from "@/components/UI/Details/Common/TitleSection";
+import AboutSection from "@/components/UI/Details/Common/AboutSection";
 import FeaturesSection from "@/components/UI/Details/FeaturesSection";
 import SimilarPlacesSection from "@/components/UI/Details/SimilarPlacesSection";
-import EntryFeeSection from "@/components/UI/Details/EntryFeeSection";
-import LocationMapSection from "@/components/UI/Details/LocationMapSection";
-import PackagesSection from "@/components/UI/Details/PackagesSection";
-import VirtualToursSection from "@/components/UI/Details/VirtualToursSection";
+import EntryFeeSection from "@/components/UI/Details/AttractionDetails/EntryFeeSection";
+import LocationMapSection from "@/components/UI/Details/AttractionDetails/LocationMapSection";
+import PackagesSection from "@/components/UI/Details/AttractionDetails/PackagesSection";
+import VirtualToursSection from "@/components/UI/Details/AttractionDetails/VirtualToursSection";
+import PricingSection from "@/components/UI/Details/SouvenirDetails/PricingSection";
+import StickyPurchaseButtons from "@/components/UI/Details/SouvenirDetails/StickyPurchaseButtons";
+import DetailsSectionGroup from "@/components/UI/Details/SouvenirDetails/SouvenirDetailsSection";
+
+// Import data
+import { souvenirData } from "@/data/souvenir_data";
 
 const { height } = Dimensions.get("screen");
 const HEADER_MAX_HEIGHT = height * 0.45;
@@ -27,6 +33,14 @@ const Details = () => {
     const identifier = params?.identifier || "Sample Place";
     const router = useRouter();
     const insets = useSafeAreaInsets();
+
+    // Check if the current page is a souvenir page
+    const isSouvenirPage = identifier?.toString().startsWith("souvenir-");
+
+    // Get souvenir data if it's a souvenir page
+    const souvenirItem = isSouvenirPage
+        ? souvenirData.find((item) => item.identifier === identifier)
+        : null;
 
     const minimizedHeaderHeight = HEADER_MIN_HEIGHT + insets.top;
     const scrollDistance = HEADER_MAX_HEIGHT - minimizedHeaderHeight;
@@ -183,13 +197,69 @@ const Details = () => {
                         ),
                     },
                 ];
-            case "placeB":
+            case "souvenir":
+                // Find the souvenir item by identifier
+                const souvenirItem = souvenirData.find(
+                    (item) => item.identifier === identifier
+                );
+
+                if (!souvenirItem) {
+                    return [
+                        {
+                            key: "title",
+                            component: <TitleSection identifier={identifier} />,
+                        },
+                    ];
+                }
+
                 return [
                     {
                         key: "title",
-                        component: <TitleSection identifier={identifier} />,
+                        component: (
+                            <TitleSection
+                                identifier={souvenirItem.title}
+                                showRating={true}
+                            />
+                        ),
                     },
-                    { key: "features", component: <FeaturesSection /> },
+                    {
+                        key: "about",
+                        component: (
+                            <AboutSection
+                                description={souvenirItem.long_description}
+                            />
+                        ),
+                    },
+                    {
+                        key: "pricing",
+                        component: (
+                            <PricingSection
+                                originalPrice={souvenirItem.original_price}
+                                price={souvenirItem.price}
+                                discountPercentage={
+                                    souvenirItem.discount_percentage
+                                }
+                                inStock={souvenirItem.in_stock}
+                            />
+                        ),
+                    },
+                    {
+                        key: "details",
+                        component: (
+                            <DetailsSectionGroup
+                                weight={souvenirItem.weight}
+                                dimensions={souvenirItem.dimensions}
+                                shipping_time_estimate={
+                                    souvenirItem.shipping_time_estimate
+                                }
+                                in_stock={souvenirItem.in_stock}
+                                categories={souvenirItem.categories}
+                                is_vegan={souvenirItem.is_vegan}
+                                is_vegetarian={souvenirItem.is_vegetarian}
+                                expiration_date={souvenirItem.expiration_date}
+                            />
+                        ),
+                    },
                 ];
             default:
                 return [
@@ -222,6 +292,8 @@ const Details = () => {
                 contentContainerStyle={[
                     styles.scrollViewContent,
                     staticStyles.scrollContentContainer,
+                    // Add bottom padding to ensure content isn't hidden behind sticky buttons
+                    isSouvenirPage && { paddingBottom: 80 },
                 ]}
                 showsVerticalScrollIndicator={false}
                 onScroll={scrollHandler}
@@ -237,6 +309,11 @@ const Details = () => {
                     </React.Fragment>
                 ))}
             </Animated.ScrollView>
+
+            {/* Render sticky purchase buttons for souvenirs */}
+            {isSouvenirPage && souvenirItem && (
+                <StickyPurchaseButtons inStock={souvenirItem.in_stock} />
+            )}
         </View>
     );
 };

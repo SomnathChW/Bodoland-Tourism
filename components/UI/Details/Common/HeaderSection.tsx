@@ -18,7 +18,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import FastImage from "react-native-fast-image";
 import { EdgeInsets } from "react-native-safe-area-context";
 import PagerView from "react-native-pager-view";
-import { ModelViewer } from "./ModelViewer/ModelViewer";
+import { ModelViewer } from "../ModelViewer/ModelViewer";
 
 interface HeaderSectionProps {
     scrollY: SharedValue<number>;
