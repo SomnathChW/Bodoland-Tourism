@@ -16,20 +16,19 @@ import {
     TouchableOpacity,
     Dimensions,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import FastImage from "react-native-fast-image";
 import Animated, { FadeIn } from "react-native-reanimated";
-import colors from "@/constants/colors";
 
 // Get screen dimensions
 const { width } = Dimensions.get("screen");
 
 // Define the structure of a package item
-interface Package {
+export interface Package {
     identifier: string;
     name: string;
-    fromPrice: string | number;
-    imageUrl: string;
+    from_price: string | number;
+    image: string;
     contact?: string;
     website?: string;
 }
@@ -70,7 +69,7 @@ const PackageCard = React.memo(
                 <View style={styles.packageCardImageContainer}>
                     <FastImage
                         source={{
-                            uri: packageItem.imageUrl,
+                            uri: packageItem.image,
                             priority: FastImage.priority.normal,
                             cache: FastImage.cacheControl.immutable,
                         }}
@@ -88,7 +87,7 @@ const PackageCard = React.memo(
                         <Text style={styles.fromText}>From</Text>
                         <Text style={styles.priceText}>
                             {currency}
-                            {packageItem.fromPrice}
+                            {packageItem.from_price}
                         </Text>
                     </View>
                 </View>
@@ -96,6 +95,41 @@ const PackageCard = React.memo(
         );
     }
 );
+
+/**
+ * End of data card component
+ */
+const EndDataCard = React.memo(({ cardWidth }: { cardWidth: number }) => {
+    return (
+        <View style={[styles.endCard, { width: cardWidth }]}>
+            <View style={styles.endCardContent}>
+                <Ionicons
+                    name="checkmark-circle-outline"
+                    size={24}
+                    color="#646f7e"
+                />
+                <Text style={styles.endCardText}>That's all we have now</Text>
+            </View>
+        </View>
+    );
+});
+
+/**
+ * Empty state component when no packages are available
+ */
+const EmptyPackagesState = () => {
+    return (
+        <View style={styles.emptyStateContainer}>
+            <MaterialIcons name="luggage" size={24} color="#646f7e" />
+            <Text style={styles.emptyStateText}>
+                Currently no offcial packages available for this attraction.
+            </Text>
+            <Text style={styles.emptyStateSubText}>
+                Please visit the attraction and enquire!
+            </Text>
+        </View>
+    );
+};
 
 /**
  * PackagesSection renders a horizontal scrollable list of tour packages
@@ -130,37 +164,47 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
             {/* Separator Line */}
             <View style={styles.separator} />
 
-            {/* Horizontal ScrollView for Cards */}
-            <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.packagesCardsContainer}
-                removeClippedSubviews={true}
-                decelerationRate="fast"
-            >
-                {packages.map((packageItem) => (
-                    <PackageCard
-                        key={packageItem.identifier}
-                        packageItem={packageItem}
-                        currency={currency}
-                        onPress={() => handlePackagePress(packageItem)}
-                        cardWidth={cardWidth}
-                    />
-                ))}
-            </ScrollView>
+            {packages.length === 0 ? (
+                <EmptyPackagesState />
+            ) : (
+                <>
+                    {/* Horizontal ScrollView for Cards */}
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.packagesCardsContainer}
+                        removeClippedSubviews={true}
+                        decelerationRate="fast"
+                    >
+                        {packages.map((packageItem) => (
+                            <PackageCard
+                                key={packageItem.identifier}
+                                packageItem={packageItem}
+                                currency={currency}
+                                onPress={() => handlePackagePress(packageItem)}
+                                cardWidth={cardWidth}
+                            />
+                        ))}
+                        {/* End of data card */}
+                        {packages.length > 0 && (
+                            <EndDataCard cardWidth={cardWidth} />
+                        )}
+                    </ScrollView>
 
-            {/* Disclaimer Note */}
-            <View style={styles.disclaimerContainer}>
-                <Ionicons
-                    name="information-circle-outline"
-                    size={12}
-                    color="#646f7e"
-                />
-                <Text style={styles.disclaimerText}>
-                    Please confirm prices and availability with respective
-                    providers
-                </Text>
-            </View>
+                    {/* Disclaimer Note */}
+                    <View style={styles.disclaimerContainer}>
+                        <Ionicons
+                            name="information-circle-outline"
+                            size={12}
+                            color="#646f7e"
+                        />
+                        <Text style={styles.disclaimerText}>
+                            Please confirm prices and availability with
+                            respective providers
+                        </Text>
+                    </View>
+                </>
+            )}
         </Animated.View>
     );
 };
@@ -207,6 +251,8 @@ const styles = StyleSheet.create({
     },
     packageCardContent: {
         padding: 8,
+        height: 50,
+        justifyContent: "center",
     },
     packageCardTitle: {
         color: "#fff",
@@ -246,6 +292,57 @@ const styles = StyleSheet.create({
         fontFamily: "SfProMedium",
         fontSize: 12,
         marginLeft: 5,
+    },
+    // Empty state styles
+    emptyStateContainer: {
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#1a2029",
+        borderRadius: 10,
+        padding: 20,
+        marginVertical: 15,
+        marginHorizontal: 2,
+    },
+    emptyStateText: {
+        color: "#fff",
+        fontFamily: "SfProMedium",
+        fontSize: 14,
+        textAlign: "center",
+        marginTop: 12,
+        marginBottom: 6,
+    },
+    emptyStateSubText: {
+        color: "#646f7e",
+        fontFamily: "SfProMedium",
+        fontSize: 12,
+        textAlign: "center",
+    },
+    // End card styles
+    endCard: {
+        height: 160,
+        marginRight: 12,
+        borderRadius: 10,
+        overflow: "hidden",
+        backgroundColor: "#1a2029",
+        borderWidth: 1,
+        borderColor: "#2c3440",
+        borderStyle: "dashed",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    endCardContent: {
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+        height: "100%",
+        flex: 1,
+    },
+    endCardText: {
+        color: "#646f7e",
+        fontFamily: "SfProMedium",
+        fontSize: 12,
+        marginTop: 12,
+        textAlign: "center",
     },
 });
 

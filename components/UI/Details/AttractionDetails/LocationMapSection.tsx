@@ -22,17 +22,28 @@ interface LocationMapProps {
     latitude: number;
     longitude: number;
     locationName?: string;
+    mapUrl?: string; // Optional URL for the map location
 }
 
 const LocationMapSection: React.FC<LocationMapProps> = ({
     latitude,
     longitude,
     locationName = "Location",
+    mapUrl,
 }) => {
     // Function to open location in maps app
     const openInMaps = () => {
         const label = encodeURIComponent(locationName);
 
+        //check if mapUrl is provided
+        if (mapUrl) {
+            Linking.openURL(mapUrl).catch((err) =>
+                console.error("An error occurred opening the map URL:", err)
+            );
+            return;
+        }
+
+        //If no mapUrl is provided, use coordinates to open in maps
         // Different URL schemes for iOS and Android
         const url = Platform.select({
             ios: `maps:0,0?q=${label}@${latitude},${longitude}`,

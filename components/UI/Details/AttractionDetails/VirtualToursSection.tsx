@@ -28,7 +28,8 @@ const { width } = Dimensions.get("screen");
 interface VirtualTour {
     identifier: string;
     name: string;
-    imageUrl: string;
+    image: string;
+    tour_resource: string; // URL or identifier for the tour resourceS
 }
 
 interface VirtualToursSectionProps {
@@ -64,7 +65,7 @@ const VirtualTourCard = React.memo(
                 <View style={styles.tourCardImageContainer}>
                     <FastImage
                         source={{
-                            uri: tour.imageUrl,
+                            uri: tour.image,
                             priority: FastImage.priority.normal,
                             cache: FastImage.cacheControl.immutable,
                         }}
@@ -91,6 +92,41 @@ const VirtualTourCard = React.memo(
         );
     }
 );
+
+/**
+ * End of data card component
+ */
+const EndDataCard = React.memo(({ cardWidth }: { cardWidth: number }) => {
+    return (
+        <View style={[styles.endCard, { width: cardWidth }]}>
+            <View style={styles.endCardContent}>
+                <Ionicons
+                    name="checkmark-circle-outline"
+                    size={24}
+                    color="#646f7e"
+                />
+                <Text style={styles.endCardText}>That's all we have now</Text>
+            </View>
+        </View>
+    );
+});
+
+/**
+ * Empty state component when no virtual tours are available
+ */
+const EmptyToursState = () => {
+    return (
+        <View style={styles.emptyStateContainer}>
+            <FontAwesome5 name="vr-cardboard" size={24} color="#646f7e" />
+            <Text style={styles.emptyStateText}>
+                We're working on bringing virtual tours to this attraction soon.
+            </Text>
+            <Text style={styles.emptyStateSubText}>
+                Check back later for immersive experiences!
+            </Text>
+        </View>
+    );
+};
 
 /**
  * VirtualToursSection renders a horizontal scrollable list of virtual tours
@@ -124,35 +160,45 @@ const VirtualToursSection: React.FC<VirtualToursSectionProps> = ({
             {/* Separator Line */}
             <View style={styles.separator} />
 
-            {/* Horizontal ScrollView for Cards */}
-            <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.toursCardsContainer}
-                removeClippedSubviews={true}
-                decelerationRate="fast"
-            >
-                {tours.map((tour) => (
-                    <VirtualTourCard
-                        key={tour.identifier}
-                        tour={tour}
-                        onPress={() => handleTourPress(tour)}
-                        cardWidth={cardWidth}
-                    />
-                ))}
-            </ScrollView>
+            {tours.length === 0 ? (
+                <EmptyToursState />
+            ) : (
+                <>
+                    {/* Horizontal ScrollView for Cards */}
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.toursCardsContainer}
+                        removeClippedSubviews={true}
+                        decelerationRate="fast"
+                    >
+                        {tours.map((tour) => (
+                            <VirtualTourCard
+                                key={tour.identifier}
+                                tour={tour}
+                                onPress={() => handleTourPress(tour)}
+                                cardWidth={cardWidth}
+                            />
+                        ))}
+                        {/* End of data card */}
+                        {tours.length > 0 && (
+                            <EndDataCard cardWidth={cardWidth} />
+                        )}
+                    </ScrollView>
 
-            {/* Disclaimer Note */}
-            <View style={styles.disclaimerContainer}>
-                <Ionicons
-                    name="information-circle-outline"
-                    size={12}
-                    color="#646f7e"
-                />
-                <Text style={styles.disclaimerText}>
-                    Virtual tours require high-speed internet connection
-                </Text>
-            </View>
+                    {/* Disclaimer Note */}
+                    <View style={styles.disclaimerContainer}>
+                        <Ionicons
+                            name="information-circle-outline"
+                            size={12}
+                            color="#646f7e"
+                        />
+                        <Text style={styles.disclaimerText}>
+                            Virtual tours require high-speed internet connection
+                        </Text>
+                    </View>
+                </>
+            )}
         </Animated.View>
     );
 };
@@ -210,7 +256,11 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     tourCardContent: {
+        flexDirection: "column",
         padding: 8,
+        flex: 1,
+        justifyContent: "center",
+        display: "flex",
     },
     tourCardTitle: {
         color: "#fff",
@@ -232,6 +282,58 @@ const styles = StyleSheet.create({
         fontFamily: "SfProMedium",
         fontSize: 12,
         marginLeft: 5,
+    },
+    // Empty state styles
+    emptyStateContainer: {
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#1a2029",
+        borderRadius: 10,
+        padding: 20,
+        marginVertical: 15,
+        marginHorizontal: 2,
+    },
+    emptyStateText: {
+        color: "#fff",
+        fontFamily: "SfProMedium",
+        fontSize: 14,
+        textAlign: "center",
+        marginTop: 12,
+        marginBottom: 6,
+        lineHeight: 21,
+    },
+    emptyStateSubText: {
+        color: "#646f7e",
+        fontFamily: "SfProMedium",
+        fontSize: 12,
+        textAlign: "center",
+    },
+    // End card styles
+    endCard: {
+        height: 150,
+        marginRight: 12,
+        borderRadius: 10,
+        overflow: "hidden",
+        backgroundColor: "#1a2029",
+        borderWidth: 1,
+        borderColor: "#2c3440",
+        borderStyle: "dashed",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    endCardContent: {
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+        height: "100%",
+        flex: 1,
+    },
+    endCardText: {
+        color: "#646f7e",
+        fontFamily: "SfProMedium",
+        fontSize: 12,
+        marginTop: 12,
+        textAlign: "center",
     },
 });
 

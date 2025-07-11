@@ -1,5 +1,5 @@
-import { StyleSheet, View } from "react-native";
-import React, { useState } from "react";
+import { StyleSheet, View, Text } from "react-native";
+import React, { useState, useEffect } from "react";
 import TitleSection from "../Common/TitleSection";
 import AboutSection from "../Common/AboutSection";
 import LocationMapSection from "./LocationMapSection";
@@ -8,17 +8,8 @@ import EntryFeeSection from "./EntryFeeSection";
 import PackagesSection from "./PackagesSection";
 import { Linking } from "react-native";
 import CustomAlertDialog from "../../CustomAlertDialog";
-
-// Define the structure of a package item for the alert dialog
-interface Package {
-    identifier: string;
-    name: string;
-    fromPrice: string | number;
-    imageUrl: string;
-    contact?: string;
-    website?: string;
-}
-
+import { useDataStore } from "@/store/useDataStore";
+import { Package } from "./PackagesSection"; // Import the Package type
 const AttractionDetails = ({ identifier }: { identifier: string }) => {
     // State for alert dialog
     const [dialogVisible, setDialogVisible] = useState(false);
@@ -42,84 +33,60 @@ const AttractionDetails = ({ identifier }: { identifier: string }) => {
 
         Linking.openURL(selectedPackage.website);
         setDialogVisible(false);
-    };
+    }; // Try to get the attraction details based on the identifier from store
+    const attractionDetails = useDataStore
+        .getState()
+        .attractions.find((attraction) => attraction.identifier === identifier);
+
+    if (!attractionDetails) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <Text style={{ color: "#ff6b6b", fontSize: 16 }}>
+                    Attraction not found
+                </Text>
+            </View>
+        );
+    }
 
     return (
         <View style={{ flex: 1 }}>
-            <TitleSection title={identifier} location="City Park" />
+            <TitleSection
+                title={attractionDetails.name}
+                location={attractionDetails.location}
+            />
             <AboutSection
                 description={
-                    "Located in the heart of the city, this attraction offers stunning views and a rich history."
+                    attractionDetails.long_description ||
+                    "No description available for this attraction."
                 }
             />
             <LocationMapSection
-                locationName="City Park"
-                latitude={26.2006}
-                longitude={92.9376}
+                locationName={attractionDetails.location}
+                latitude={attractionDetails.latitude}
+                longitude={attractionDetails.longitude}
+                mapUrl={attractionDetails.map_url}
             />
             <VirtualToursSection
-                tours={[
-                    {
-                        identifier: "vt-001",
-                        name: "Main Temple View",
-                        imageUrl:
-                            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-                    },
-                    {
-                        identifier: "vt-002",
-                        name: "Scenic Lake Tour",
-                        imageUrl:
-                            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-                    },
-                    {
-                        identifier: "vt-003",
-                        name: "Mountain Vista",
-                        imageUrl:
-                            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-                    },
-                ]}
+                tours={attractionDetails.virtual_tours || []}
                 onTourPress={(tour) =>
-                    console.log("Virtual tour selected:", tour.identifier)
+                    console.log("Virtual tour selected:", tour.tour_resource)
                 }
             />
             <EntryFeeSection
-                fees={{
-                    adult: "500",
-                    child: "300",
-                }}
+                fees={attractionDetails.entry_pricing || []}
                 timings={{
-                    hours: "10:00 AM - 6:00 PM",
-                    days: "Monday to Sunday",
+                    hours: attractionDetails.timings,
+                    days: attractionDetails.days,
                 }}
             />
             <PackagesSection
-                packages={[
-                    {
-                        identifier: "pkg-001",
-                        name: "Weekend Explorer",
-                        fromPrice: "4,500",
-                        imageUrl:
-                            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-                        website: "https://example.com/weekend-explorer",
-                    },
-                    {
-                        identifier: "pkg-002",
-                        name: "Wildlife Safari",
-                        fromPrice: "6,800",
-                        imageUrl:
-                            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-                        contact: "+91 12345 67890",
-                        website: "https://example.com/wildlife-safari",
-                    },
-                    {
-                        identifier: "pkg-003",
-                        name: "Cultural Tour",
-                        fromPrice: "3,200",
-                        imageUrl:
-                            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-                        contact: "+91 12345 67890",
-                    },
-                ]}
+                packages={attractionDetails.packages || []}
                 onPackagePress={(pkg) => {
                     // Set the selected package and show dialog
                     setSelectedPackage(pkg);
@@ -192,5 +159,3 @@ const AttractionDetails = ({ identifier }: { identifier: string }) => {
 };
 
 export default AttractionDetails;
-
-const styles = StyleSheet.create({});
