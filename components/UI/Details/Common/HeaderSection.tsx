@@ -71,18 +71,6 @@ const HeaderSection = ({
     // Optimized derived animations with worklet
     const animations = useDerivedValue(() => {
         "worklet";
-
-        // During initial load, use simplified animation values
-        if (animationPhase < 2) {
-            return {
-                headerHeight: HEADER_MAX_HEIGHT,
-                imageOpacity: 1,
-                imageScale: 1,
-                minimizedHeaderOpacity: 0,
-                backButtonOpacity: 1,
-            };
-        }
-
         // Full animations for phase 2+
         return {
             headerHeight: interpolate(
@@ -264,34 +252,32 @@ const HeaderSection = ({
             </Animated.View>
 
             {/* Minimized Header (appears when scrolling) */}
-            {animationPhase >= 2 && (
-                <Animated.View
-                    style={[
-                        styles.minimizedHeader,
-                        staticStyles.minimizedHeaderContainer,
-                        minimizedHeaderStyle,
-                    ]}
+            <Animated.View
+                style={[
+                    styles.minimizedHeader,
+                    staticStyles.minimizedHeaderContainer,
+                    minimizedHeaderStyle,
+                ]}
+            >
+                <TouchableOpacity
+                    style={styles.headerBackButton}
+                    onPress={onBack}
+                    activeOpacity={0.8}
                 >
-                    <TouchableOpacity
-                        style={styles.headerBackButton}
-                        onPress={onBack}
-                        activeOpacity={0.8}
-                    >
-                        <Ionicons name="arrow-back" size={24} color="#fff" />
-                    </TouchableOpacity>
-                    <Text style={styles.minimizedTitle} numberOfLines={1}>
-                        {data?.name || ""}
-                    </Text>
-                    <View style={styles.headerRightPlaceholder} />
-                </Animated.View>
-            )}
+                    <Ionicons name="arrow-back" size={24} color="#fff" />
+                </TouchableOpacity>
+                <Text style={styles.minimizedTitle} numberOfLines={1}>
+                    {data?.name || ""}
+                </Text>
+                <View style={styles.headerRightPlaceholder} />
+            </Animated.View>
 
             {/* Floating Back Button */}
             <Animated.View
                 style={[
                     styles.floatingBackButton,
                     staticStyles.floatingBackButtonContainer,
-                    animationPhase >= 2 ? floatingBackButtonStyle : {},
+                    floatingBackButtonStyle,
                 ]}
             >
                 <TouchableOpacity onPress={onBack} activeOpacity={0.8}>
@@ -397,4 +383,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default React.memo(HeaderSection);
+export default HeaderSection;

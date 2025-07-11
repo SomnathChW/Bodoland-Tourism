@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 interface LocationMapProps {
     latitude: number;
@@ -93,14 +94,19 @@ const LocationMapSection: React.FC<LocationMapProps> = ({
                 </View>
 
                 {/* Open In Maps Button */}
-                <TouchableOpacity
-                    style={styles.mapButton}
-                    onPress={openInMaps}
-                    activeOpacity={0.7}
-                >
-                    <Ionicons name="map-outline" size={18} color="#0d1116" />
-                    <Text style={styles.mapButtonText}>Open in Maps</Text>
-                </TouchableOpacity>
+                <TouchableWithoutFeedback onPress={openInMaps}>
+                    <TouchableOpacity
+                        style={styles.mapButton}
+                        activeOpacity={0.7}
+                    >
+                        <Ionicons
+                            name="map-outline"
+                            size={18}
+                            color="#0d1116"
+                        />
+                        <Text style={styles.mapButtonText}>Open in Maps</Text>
+                    </TouchableOpacity>
+                </TouchableWithoutFeedback>
             </View>
         </Animated.View>
     );

@@ -1,10 +1,10 @@
 /**
  * PackagesSection Component
- * Author: GitHub Copilot
- * Created: 2025-07-09
+ * Author: SomnathChW
+ * Updated: 2025-07-11
  *
  * This component renders a horizontal scrollable list of tour packages
- * with image, name, and price information.
+ * with image, name, and price information, styled like VirtualToursSection.
  */
 
 import React from "react";
@@ -19,6 +19,7 @@ import {
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import FastImage from "react-native-fast-image";
 import Animated, { FadeIn } from "react-native-reanimated";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 // Get screen dimensions
 const { width } = Dimensions.get("screen");
@@ -41,8 +42,8 @@ interface PackagesSectionProps {
 }
 
 // Constants for card dimensions calculation
-const DEFAULT_NUM_CARDS = 2.5; // Default number of cards to show
-const WIDTH_RATIO = 0.36; // Width ratio relative to screen width
+const DEFAULT_NUM_CARDS = 2.5;
+const WIDTH_RATIO = 0.36;
 
 /**
  * Individual package card component
@@ -60,38 +61,40 @@ const PackageCard = React.memo(
         cardWidth: number;
     }) => {
         return (
-            <TouchableOpacity
-                style={[styles.packageCard, { width: cardWidth }]}
-                activeOpacity={0.8}
-                onPress={onPress}
-            >
-                {/* Card Image */}
-                <View style={styles.packageCardImageContainer}>
-                    <FastImage
-                        source={{
-                            uri: packageItem.image,
-                            priority: FastImage.priority.normal,
-                            cache: FastImage.cacheControl.immutable,
-                        }}
-                        style={styles.packageCardImage}
-                        resizeMode={FastImage.resizeMode.cover}
-                    />
-                </View>
-
-                {/* Card Content */}
-                <View style={styles.packageCardContent}>
-                    <Text style={styles.packageCardTitle} numberOfLines={1}>
-                        {packageItem.name}
-                    </Text>
-                    <View style={styles.priceContainer}>
-                        <Text style={styles.fromText}>From</Text>
-                        <Text style={styles.priceText}>
-                            {currency}
-                            {packageItem.from_price}
-                        </Text>
+            <TouchableWithoutFeedback onPress={onPress}>
+                <TouchableOpacity
+                    style={[{ width: cardWidth }, styles.packageCard]}
+                    activeOpacity={0.8}
+                    onPress={onPress}
+                >
+                    {/* Card Image */}
+                    <View style={styles.packageCardImageContainer}>
+                        <FastImage
+                            source={{
+                                uri: packageItem.image,
+                                priority: FastImage.priority.normal,
+                                cache: FastImage.cacheControl.immutable,
+                            }}
+                            style={styles.packageCardImage}
+                            resizeMode={FastImage.resizeMode.cover}
+                        />
                     </View>
-                </View>
-            </TouchableOpacity>
+
+                    {/* Card Content */}
+                    <View style={styles.packageCardContent}>
+                        <Text style={styles.packageCardTitle} numberOfLines={1}>
+                            {packageItem.name}
+                        </Text>
+                        <View style={styles.priceContainer}>
+                            <Text style={styles.fromText}>From</Text>
+                            <Text style={styles.priceText}>
+                                {currency}
+                                {packageItem.from_price}
+                            </Text>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            </TouchableWithoutFeedback>
         );
     }
 );
@@ -102,10 +105,27 @@ const PackageCard = React.memo(
 const EndDataCard = React.memo(({ cardWidth }: { cardWidth: number }) => {
     return (
         <View style={[styles.endCard, { width: cardWidth }]}>
-            <View style={styles.endCardContent}>
+            {/* Dummy image and text for height matching, hidden from view */}
+            <View style={styles.packageCardImageContainer}>
+                <FastImage
+                    source={{
+                        uri: "https://dummyimage.com/300x100/1a2432/fff.png&text=Dummy",
+                        priority: FastImage.priority.low,
+                    }}
+                    style={[styles.packageCardImage, { opacity: 0 }]}
+                    resizeMode={FastImage.resizeMode.cover}
+                />
+            </View>
+            <View style={styles.packageCardContent}>
+                <Text style={[styles.packageCardTitle, { opacity: 0 }]}>
+                    Dummy Package
+                </Text>
+            </View>
+            {/* Actual end card content, absolutely centered */}
+            <View style={styles.endCardAbsoluteContent}>
                 <Ionicons
                     name="checkmark-circle-outline"
-                    size={24}
+                    size={32}
                     color="#646f7e"
                 />
                 <Text style={styles.endCardText}>That's all we have now</Text>
@@ -122,7 +142,7 @@ const EmptyPackagesState = () => {
         <View style={styles.emptyStateContainer}>
             <MaterialIcons name="luggage" size={24} color="#646f7e" />
             <Text style={styles.emptyStateText}>
-                Currently no offcial packages available for this attraction.
+                Currently no official packages available for this attraction.
             </Text>
             <Text style={styles.emptyStateSubText}>
                 Please visit the attraction and enquire!
@@ -142,9 +162,6 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
 }) => {
     // Calculate card width and spacing based on number of cards to show
     const cardWidth = Math.ceil(width * WIDTH_RATIO);
-    const cardSpacing = Math.ceil(
-        (width * (1 - WIDTH_RATIO * numCardsToShow)) / (numCardsToShow * 2)
-    );
 
     // Handler for package card press
     const handlePackagePress = (packageItem: Package) => {
@@ -243,23 +260,25 @@ const styles = StyleSheet.create({
     packageCardImageContainer: {
         width: "100%",
         height: 100,
-        backgroundColor: "#1a2432", // Placeholder color while image loads
+        position: "relative",
     },
     packageCardImage: {
         width: "100%",
         height: "100%",
     },
     packageCardContent: {
-        padding: 8,
-        height: 50,
+        flexDirection: "column",
+        paddingVertical: 16,
+        paddingHorizontal: 12,
+        flex: 1,
         justifyContent: "center",
+        display: "flex",
     },
     packageCardTitle: {
         color: "#fff",
         fontFamily: "SfProMedium",
         fontSize: 13,
         fontWeight: "bold",
-        marginBottom: 4,
     },
     priceContainer: {
         flexDirection: "row",
@@ -310,6 +329,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginTop: 12,
         marginBottom: 6,
+        lineHeight: 21,
     },
     emptyStateSubText: {
         color: "#646f7e",
@@ -319,7 +339,6 @@ const styles = StyleSheet.create({
     },
     // End card styles
     endCard: {
-        height: 160,
         marginRight: 12,
         borderRadius: 10,
         overflow: "hidden",
@@ -329,13 +348,17 @@ const styles = StyleSheet.create({
         borderStyle: "dashed",
         justifyContent: "center",
         alignItems: "center",
+        position: "relative",
     },
-    endCardContent: {
-        alignItems: "center",
+    endCardAbsoluteContent: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         justifyContent: "center",
-        padding: 16,
-        height: "100%",
-        flex: 1,
+        alignItems: "center",
+        zIndex: 2,
     },
     endCardText: {
         color: "#646f7e",
@@ -343,6 +366,8 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 12,
         textAlign: "center",
+        wordWrap: "break-word",
+        maxWidth: "80%",
     },
 });
 

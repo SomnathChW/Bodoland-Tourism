@@ -19,7 +19,7 @@ import {
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import FastImage from "react-native-fast-image";
 import Animated, { FadeIn } from "react-native-reanimated";
-import colors from "@/constants/colors";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 // Get screen dimensions
 const { width } = Dimensions.get("screen");
@@ -56,39 +56,41 @@ const VirtualTourCard = React.memo(
         cardWidth: number;
     }) => {
         return (
-            <TouchableOpacity
-                style={[styles.tourCard, { width: cardWidth }]}
-                activeOpacity={0.8}
-                onPress={onPress}
-            >
-                {/* Card Image */}
-                <View style={styles.tourCardImageContainer}>
-                    <FastImage
-                        source={{
-                            uri: tour.image,
-                            priority: FastImage.priority.normal,
-                            cache: FastImage.cacheControl.immutable,
-                        }}
-                        style={styles.tourCardImage}
-                        resizeMode={FastImage.resizeMode.cover}
-                    />
-                    {/* VR Icon Overlay */}
-                    <View style={styles.vrIconContainer}>
-                        <FontAwesome5
-                            name="vr-cardboard"
-                            size={12}
-                            color="#fff"
+            <TouchableWithoutFeedback onPress={onPress}>
+                <TouchableOpacity
+                    style={[{ width: cardWidth }, styles.tourCard]}
+                    activeOpacity={0.8}
+                    onPress={onPress}
+                >
+                    {/* Card Image */}
+                    <View style={styles.tourCardImageContainer}>
+                        <FastImage
+                            source={{
+                                uri: tour.image,
+                                priority: FastImage.priority.normal,
+                                cache: FastImage.cacheControl.immutable,
+                            }}
+                            style={styles.tourCardImage}
+                            resizeMode={FastImage.resizeMode.cover}
                         />
+                        {/* VR Icon Overlay */}
+                        <View style={styles.vrIconContainer}>
+                            <FontAwesome5
+                                name="vr-cardboard"
+                                size={12}
+                                color="#fff"
+                            />
+                        </View>
                     </View>
-                </View>
 
-                {/* Card Content */}
-                <View style={styles.tourCardContent}>
-                    <Text style={styles.tourCardTitle} numberOfLines={1}>
-                        {tour.name}
-                    </Text>
-                </View>
-            </TouchableOpacity>
+                    {/* Card Content */}
+                    <View style={styles.tourCardContent}>
+                        <Text style={styles.tourCardTitle} numberOfLines={1}>
+                            {tour.name}
+                        </Text>
+                    </View>
+                </TouchableOpacity>
+            </TouchableWithoutFeedback>
         );
     }
 );
@@ -99,10 +101,30 @@ const VirtualTourCard = React.memo(
 const EndDataCard = React.memo(({ cardWidth }: { cardWidth: number }) => {
     return (
         <View style={[styles.endCard, { width: cardWidth }]}>
-            <View style={styles.endCardContent}>
+            {/* Dummy image and text for height matching, hidden from view */}
+            <View style={styles.tourCardImageContainer}>
+                <FastImage
+                    source={{
+                        uri: "https://dummyimage.com/300x100/1a2432/fff.png&text=Dummy",
+                        priority: FastImage.priority.low,
+                    }}
+                    style={[styles.tourCardImage, { opacity: 0 }]}
+                    resizeMode={FastImage.resizeMode.cover}
+                />
+                <View style={[styles.vrIconContainer, { opacity: 0 }]}>
+                    <FontAwesome5 name="vr-cardboard" size={12} color="#fff" />
+                </View>
+            </View>
+            <View style={styles.tourCardContent}>
+                <Text style={[styles.tourCardTitle, { opacity: 0 }]}>
+                    Dummy Tour
+                </Text>
+            </View>
+            {/* Actual end card content, absolutely centered */}
+            <View style={styles.endCardAbsoluteContent}>
                 <Ionicons
                     name="checkmark-circle-outline"
-                    size={24}
+                    size={32}
                     color="#646f7e"
                 />
                 <Text style={styles.endCardText}>That's all we have now</Text>
@@ -237,7 +259,6 @@ const styles = StyleSheet.create({
     tourCardImageContainer: {
         width: "100%",
         height: 100,
-        backgroundColor: "#1a2432", // Placeholder color while image loads
         position: "relative",
     },
     tourCardImage: {
@@ -257,7 +278,8 @@ const styles = StyleSheet.create({
     },
     tourCardContent: {
         flexDirection: "column",
-        padding: 8,
+        paddingVertical: 16,
+        paddingHorizontal: 12,
         flex: 1,
         justifyContent: "center",
         display: "flex",
@@ -310,7 +332,6 @@ const styles = StyleSheet.create({
     },
     // End card styles
     endCard: {
-        height: 150,
         marginRight: 12,
         borderRadius: 10,
         overflow: "hidden",
@@ -320,13 +341,17 @@ const styles = StyleSheet.create({
         borderStyle: "dashed",
         justifyContent: "center",
         alignItems: "center",
+        position: "relative", // for absolute centering
     },
-    endCardContent: {
-        alignItems: "center",
+    endCardAbsoluteContent: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         justifyContent: "center",
-        padding: 16,
-        height: "100%",
-        flex: 1,
+        alignItems: "center",
+        zIndex: 2,
     },
     endCardText: {
         color: "#646f7e",
@@ -334,6 +359,8 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 12,
         textAlign: "center",
+        wordWrap: "break-word",
+        maxWidth: "80%",
     },
 });
 
