@@ -16,6 +16,7 @@ import FastImage from "react-native-fast-image";
 
 const modelPath =
     "https://fra.cloud.appwrite.io/v1/storage/buckets/model_placeholders/files/khopari/view?project=bodoland-tourism";
+const modelImagePath = "https://picsum.photos/300/300?random=1564";
 
 // interface SceneProps {
 //     model?: string;
@@ -86,12 +87,7 @@ export function ModelViewer({
     const [isARSupported, setIsARSupported] = React.useState(false);
     const router = useRouter();
 
-    console.log("ModelViewer props:", {
-        scale,
-        model,
-        bgColor,
-        model_image_url,
-    });
+    const imageUrl = model_image_url === "" ? modelImagePath : model_image_url;
 
     useEffect(() => {
         const checkAR = async () => {
@@ -118,7 +114,7 @@ export function ModelViewer({
     return (
         <View style={styles.container}>
             <FastImage
-                source={{ uri: model_image_url }}
+                source={{ uri: imageUrl }}
                 style={{
                     width: "100%",
                     height: "100%",
