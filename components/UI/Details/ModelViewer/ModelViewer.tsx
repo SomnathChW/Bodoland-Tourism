@@ -12,12 +12,10 @@ import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { isARSupportedOnDevice } from "@reactvision/react-viro";
-import { useVideoPlayer, VideoView } from "expo-video";
+import FastImage from "react-native-fast-image";
 
 const modelPath =
     "https://fra.cloud.appwrite.io/v1/storage/buckets/model_placeholders/files/khopari/view?project=bodoland-tourism";
-const VIDEO_URL =
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
 // interface SceneProps {
 //     model?: string;
@@ -66,7 +64,7 @@ interface ModelViewerProps {
     bgColor?: string;
     scale?: number;
     model: string;
-    videoUrl: string;
+    model_image_url: string;
 }
 
 const checkARSupport = async () => {
@@ -82,7 +80,7 @@ export function ModelViewer({
     scale,
     model,
     bgColor,
-    videoUrl,
+    model_image_url,
 }: ModelViewerProps) {
     const backgroundColor = bgColor ?? "#222222";
     const [isARSupported, setIsARSupported] = React.useState(false);
@@ -92,7 +90,7 @@ export function ModelViewer({
         scale,
         model,
         bgColor,
-        videoUrl,
+        model_image_url,
     });
 
     useEffect(() => {
@@ -117,24 +115,16 @@ export function ModelViewer({
         });
     };
 
-    const player = useVideoPlayer(
-        videoUrl === "" ? VIDEO_URL : videoUrl,
-        (player) => {
-            player.loop = true;
-            player.muted = true;
-            player.play();
-        }
-    );
-
     return (
         <View style={styles.container}>
-            <VideoView
-                style={{ width: "100%", height: "100%" }}
-                player={player}
-                nativeControls={false}
-                allowsFullscreen={false}
-                allowsPictureInPicture={false}
-                contentFit="contain"
+            <FastImage
+                source={{ uri: model_image_url }}
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor,
+                }}
+                resizeMode={FastImage.resizeMode.contain}
             />
 
             {/* Action Buttons */}

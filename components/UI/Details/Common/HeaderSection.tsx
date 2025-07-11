@@ -48,7 +48,7 @@ const HeaderSection = ({
     // State for dynamic images from data
     const [displayImages, setDisplayImages] = useState(carouselImages);
     const [model, setModel] = useState<string | null>(null);
-    const [videoUrl, setVideoUrl] = useState<string | null>(null);
+    const [modelImageUrl, setModelImageUrl] = useState<string | null>(null);
     const [hasModel, setHasModel] = useState(false);
 
     // Update images when data is received
@@ -56,8 +56,8 @@ const HeaderSection = ({
         if (data?.image_carousel && data.image_carousel.length > 0) {
             setDisplayImages(data.image_carousel);
         }
-        if (data?.model_data && typeof data.video_url === "string") {
-            setVideoUrl(data.video_url);
+        if (data?.model_data && typeof data.model_image_url === "string") {
+            setModelImageUrl(data.model_image_url);
             setModel(data.model_data);
             setHasModel(true);
         }
@@ -165,7 +165,11 @@ const HeaderSection = ({
     const [currentPage, setCurrentPage] = useState(hasModel ? 1 : 0);
 
     // Define types for pages
-    type ModelPage = { type: "model"; model_url: string; video_url: string };
+    type ModelPage = {
+        type: "model";
+        model_url: string;
+        model_image_url: string;
+    };
     type ImagePage = { type: "image"; uri: string };
     type Page = ModelPage | ImagePage;
 
@@ -174,7 +178,7 @@ const HeaderSection = ({
               {
                   type: "model",
                   model_url: model || "",
-                  video_url: videoUrl || "",
+                  model_image_url: modelImageUrl || "",
               } as ModelPage,
               ...displayImages.map(
                   (uri): ImagePage => ({ type: "image", uri })
@@ -206,7 +210,7 @@ const HeaderSection = ({
                                     <ModelViewer
                                         scale={3}
                                         model={page.model_url}
-                                        videoUrl={page.video_url}
+                                        model_image_url={page.model_image_url}
                                     />
                                 ) : page.type === "image" ? (
                                     <FastImage
