@@ -1,66 +1,72 @@
 import React, { useEffect } from "react";
-import {
-    Camera,
-    DefaultLight,
-    FilamentScene,
-    FilamentView,
-    Model,
-    Skybox,
-    useCameraManipulator,
-} from "react-native-filament";
+// import {
+//     Camera,
+//     DefaultLight,
+//     FilamentScene,
+//     FilamentView,
+//     Model,
+//     Skybox,
+//     useCameraManipulator,
+// } from "react-native-filament";
 import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { isARSupportedOnDevice } from "@reactvision/react-viro";
+import { useVideoPlayer, VideoView } from "expo-video";
 
 const modelPath =
     "https://fra.cloud.appwrite.io/v1/storage/buckets/model_placeholders/files/khopari/view?project=bodoland-tourism";
+const VIDEO_URL =
+    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
-interface SceneProps {
-    model?: string;
-    scale?: number;
-    skyBox: string;
-}
+// interface SceneProps {
+//     model?: string;
+//     scale?: number;
+//     skyBox: string;
+// }
 
-function Scene({ model, scale = 8, skyBox }: SceneProps) {
-    const cameraManipulator = useCameraManipulator({
-        orbitHomePosition: [0, 2, -scale], // Camera positioned slightly above (Y=2) and at distance=scale
-        targetPosition: [0, -0.2, 0], // Looking slightly down at the model
-        orbitSpeed: [0.003, 0.003],
-    });
+// ! This component is currently not used in the app, but it can be used to render a 3D model scene with auto-rotation and camera manipulation. This causes a slight flicker on Android devices, so it is not recommended to use it in production without further optimization.
 
-    // Auto-rotation effect
-    useEffect(() => {
-        if (!cameraManipulator) return;
+// function Scene({ model, scale = 8, skyBox }: SceneProps) {
+//     const cameraManipulator = useCameraManipulator({
+//         orbitHomePosition: [0, 2, -scale], // Camera positioned slightly above (Y=2) and at distance=scale
+//         targetPosition: [0, -0.2, 0], // Looking slightly down at the model
+//         orbitSpeed: [0.003, 0.003],
+//     });
 
-        const rotationInterval = setInterval(() => {
-            // Slow auto-rotation around Y-axis
-            cameraManipulator.grabBegin(0, 0, false);
-            cameraManipulator.grabUpdate(1, 0); // Small rotation increment
-            cameraManipulator.grabEnd();
-        }, 50); // Adjust timing for rotation speed
+//     // Auto-rotation effect
+//     useEffect(() => {
+//         if (!cameraManipulator) return;
 
-        return () => clearInterval(rotationInterval);
-    }, [cameraManipulator]);
+//         const rotationInterval = setInterval(() => {
+//             // Slow auto-rotation around Y-axis
+//             cameraManipulator.grabBegin(0, 0, false);
+//             cameraManipulator.grabUpdate(1, 0); // Small rotation increment
+//             cameraManipulator.grabEnd();
+//         }, 50); // Adjust timing for rotation speed
 
-    return (
-        <FilamentView style={styles.container}>
-            <Skybox colorInHex={skyBox} />
-            <Camera cameraManipulator={cameraManipulator} />
-            <DefaultLight />
-            <Model
-                source={{ uri: model ?? modelPath }}
-                transformToUnitCube
-                castShadow
-            />
-        </FilamentView>
-    );
-}
+//         return () => clearInterval(rotationInterval);
+//     }, [cameraManipulator]);
+
+//     return (
+//         <FilamentView style={styles.container}>
+//             <Skybox colorInHex={skyBox} />
+//             <Camera cameraManipulator={cameraManipulator} />
+//             <DefaultLight />
+//             <Model
+//                 source={{ uri: model ?? modelPath }}
+//                 transformToUnitCube
+//                 castShadow
+//             />
+//         </FilamentView>
+//     );
+// }
 
 interface ModelViewerProps {
     bgColor?: string;
     scale?: number;
-    model?: string;
+    model: string;
+    videoUrl: string;
 }
 
 const checkARSupport = async () => {
@@ -72,10 +78,22 @@ const checkARSupport = async () => {
     }
 };
 
-export function ModelViewer({ scale, model, bgColor }: ModelViewerProps) {
+export function ModelViewer({
+    scale,
+    model,
+    bgColor,
+    videoUrl,
+}: ModelViewerProps) {
     const backgroundColor = bgColor ?? "#222222";
     const [isARSupported, setIsARSupported] = React.useState(false);
     const router = useRouter();
+
+    console.log("ModelViewer props:", {
+        scale,
+        model,
+        bgColor,
+        videoUrl,
+    });
 
     useEffect(() => {
         const checkAR = async () => {
@@ -99,11 +117,25 @@ export function ModelViewer({ scale, model, bgColor }: ModelViewerProps) {
         });
     };
 
+    const player = useVideoPlayer(
+        videoUrl === "" ? VIDEO_URL : videoUrl,
+        (player) => {
+            player.loop = true;
+            player.muted = true;
+            player.play();
+        }
+    );
+
     return (
         <View style={styles.container}>
-            <FilamentScene>
-                <Scene model={model} scale={scale} skyBox={backgroundColor} />
-            </FilamentScene>
+            <VideoView
+                style={{ width: "100%", height: "100%" }}
+                player={player}
+                nativeControls={false}
+                allowsFullscreen={false}
+                allowsPictureInPicture={false}
+                contentFit="contain"
+            />
 
             {/* Action Buttons */}
             <View style={styles.buttonContainer}>

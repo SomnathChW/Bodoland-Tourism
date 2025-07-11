@@ -1,5 +1,5 @@
 import { useDataStore } from "@/store/useDataStore";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import TitleSection from "../Common/TitleSection";
 import PricingSection from "./PricingSection";
@@ -13,9 +13,13 @@ const SouvenirDetails = ({
     identifier: string;
     onDataFetched: (data: any) => void;
 }) => {
-    const souvenirDetails = useDataStore
-        .getState()
-        .souvenirs.find((souvenir) => souvenir.identifier === identifier);
+    // Use zustand hook properly to subscribe to state changes
+    const souvenirs = useDataStore((state) => state.souvenirs);
+    
+    // Memoize the souvenir details to prevent unnecessary re-computations
+    const souvenirDetails = useMemo(() => {
+        return souvenirs.find((souvenir) => souvenir.identifier === identifier);
+    }, [souvenirs, identifier]);
 
     // Send data back to parent component when souvenir details are found
     useEffect(() => {
