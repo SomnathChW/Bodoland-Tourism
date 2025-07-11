@@ -176,8 +176,6 @@ const HeaderSection = ({
           ]
         : displayImages.map((uri): ImagePage => ({ type: "image", uri }));
 
-    console.log("HeaderSection pages:", pages);
-
     return (
         <Animated.View style={[styles.header, headerAnimatedStyle]}>
             {/* Header Image - Wrapper for layout animation */}

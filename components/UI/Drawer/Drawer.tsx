@@ -72,7 +72,6 @@ function DrawerComponent(): JSX.Element {
     const handleMenuItemPress = useCallback(
         (key: string) => {
             if (!key.startsWith("/")) {
-                console.log(`Selected item: ${key}`);
                 toggleDrawer();
                 return;
             }
@@ -120,8 +119,6 @@ function DrawerComponent(): JSX.Element {
 
     const handleHelpItemPress = useCallback(
         (key: string) => {
-            console.log(`Selected help item: ${key}`);
-
             // Map help item keys to actual routes
             const helpRouteMap: { [key: string]: string } = {
                 emergency: "/(protected)/emergency_contacts",

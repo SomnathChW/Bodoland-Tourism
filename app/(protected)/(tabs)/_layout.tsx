@@ -39,7 +39,7 @@ const _layout = React.memo(() => {
     const router = useRouter();
 
     const handleDeepLink = (url: string) => {
-        console.log("Handling deep link:", url);
+        // console.log("Handling deep link:", url);
         const route = url.split("/").pop();
         if (!isValidRoute(route)) {
             return;

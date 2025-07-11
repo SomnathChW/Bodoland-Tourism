@@ -90,7 +90,6 @@ const _3DView = () => {
 
     const params = useLocalSearchParams<_3DViewProps>();
     const modelPath = params.modelPath;
-    console.log("Model Path:", modelPath);
 
     const fallbackModelPath =
         "https://raw.githubusercontent.com/google/filament/main/third_party/models/DamagedHelmet/DamagedHelmet.glb";

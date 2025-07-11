@@ -33,9 +33,10 @@ export const useDataStore = create<State & Actions>((set) => ({
         set((state) => {
             // Handle if an array is accidentally passed to addToData
             if (Array.isArray(item)) {
-                console.warn(
-                    "Array passed to addToData. Use appendToData for arrays."
-                );
+                // TODO: Handle Warning or error for missing identifier
+                // console.warn(
+                //     "Array passed to addToData. Use appendToData for arrays."
+                // );
                 // Extract item from array if it's a single-item array
                 if (item.length === 1) {
                     item = item[0];
@@ -47,9 +48,10 @@ export const useDataStore = create<State & Actions>((set) => ({
 
             // Check if the item has an identifier
             if (!item.identifier) {
-                console.warn(
-                    "Item has no identifier property, duplicate check skipped."
-                );
+                // TODO: Handle Warning or error for missing identifier
+                // console.warn(
+                //     "Item has no identifier property, duplicate check skipped."
+                // );
                 return {
                     [key]: [...state[key], item],
                 };
@@ -75,9 +77,10 @@ export const useDataStore = create<State & Actions>((set) => ({
         set((state) => {
             // Handle if a non-array is accidentally passed to appendToData
             if (!Array.isArray(items)) {
-                console.warn(
-                    "Non-array passed to appendToData. Use addToData for single items."
-                );
+                // TODO: Handle Warning or error for missing identifier
+                // console.warn(
+                //     "Non-array passed to appendToData. Use addToData for single items."
+                // );
                 // Treat it as a single item array
                 items = [items];
             }
@@ -86,9 +89,10 @@ export const useDataStore = create<State & Actions>((set) => ({
             const uniqueItems = items.filter((item) => {
                 // Skip duplicate check if item has no identifier
                 if (!item.identifier) {
-                    console.warn(
-                        "Item has no identifier property, duplicate check skipped."
-                    );
+                    // TODO: Handle Warning or error for missing identifier
+                    // console.warn(
+                    //     "Item has no identifier property, duplicate check skipped."
+                    // );
                     return true;
                 }
 
