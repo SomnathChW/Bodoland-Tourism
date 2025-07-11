@@ -1,21 +1,62 @@
-import { StyleSheet, StatusBar, View, Text, ScrollView } from "react-native";
-import React from "react";
-
-import { souvenirData } from "@/data/souvenir_data";
+import {
+    Text,
+    View,
+    StyleSheet,
+    StatusBar,
+    ActivityIndicator,
+    TouchableOpacity,
+    Dimensions,
+} from "react-native";
+import React, { useMemo } from "react";
+import { useDrawer } from "@/context/DrawerContext";
+import { Ionicons } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
 import ProductCard from "@/components/ProductCard";
 import DynamicSortFilterComponent from "@/components/UI/Header/DynamicSortFilterComponent";
 import MenuButton from "@/components/UI/MenuButton";
-
-import { Ionicons } from "@expo/vector-icons";
-import { FlashList } from "@shopify/flash-list";
-import { useDrawer } from "@/context/DrawerContext";
 import { useSortFilter } from "@/hooks/useSortFilter";
 import { souvenirsSortAndFilter } from "@/utils/sortFilterConfigs";
+import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
+import CardLoader from "@/components/CardLoader";
+
+const { width, height } = Dimensions.get("window");
 
 const Souvenirs = () => {
     const { toggleDrawer } = useDrawer();
+    const showSortFilter = false; // Set to true if you want to show sort/filter options
 
-    const showSortFilter = false;
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        error,
+        refetch,
+    } = useAppwriteInfiniteQuery({
+        queryKey: ["souvenirs"],
+        route: "souvenirs",
+        initialPageParam: 1,
+        staleTime: 30 * 60 * 1000,
+        limit: 10,
+        expectedFields: [
+            "identifier",
+            "name",
+            "image",
+            "short_description",
+            "price",
+            "original_price",
+            "discount_percentage",
+            "rating",
+            "in_stock",
+            "categories",
+        ],
+        storeToUpdate: "souvenirs",
+    });
+
+    const souvenirData = useMemo(() => {
+        return data?.pages.flatMap((page) => page.data) || [];
+    }, [data]);
 
     const {
         sortedAndFilteredData,
@@ -33,6 +74,21 @@ const Souvenirs = () => {
         sortOptions: souvenirsSortAndFilter.sortOptions,
         filterOptions: souvenirsSortAndFilter.filterOptions,
     });
+
+    const renderFooter = () => {
+        if (!isFetchingNextPage) return null;
+        return (
+            <View style={styles.loaderFooter}>
+                <ActivityIndicator size="small" color="#646f7e" />
+            </View>
+        );
+    };
+
+    const handleLoadMore = () => {
+        if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+        }
+    };
     return (
         <View style={styles.container}>
             <View style={styles.content}>
@@ -70,18 +126,52 @@ const Souvenirs = () => {
                     />
                 )}
 
-                <FlashList
-                    data={sortedAndFilteredData}
-                    renderItem={({ item, index }) => (
-                        <ProductCard item={item} index={index} />
-                    )}
-                    horizontal={false}
-                    showsVerticalScrollIndicator={false}
-                    numColumns={2}
-                    estimatedItemSize={300}
-                    keyExtractor={(item) => item.identifier}
-                    contentContainerStyle={{}}
-                />
+                {isLoading ? (
+                    // Display loading skeleton while data is loading
+                    <FlashList
+                        data={Array(6).fill(0)}
+                        renderItem={({ index }) => (
+                            <CardLoader
+                                index={index}
+                                width={width}
+                                height={height}
+                            />
+                        )}
+                        keyExtractor={(_, index: number) => `loader-${index}`}
+                        numColumns={2}
+                        estimatedItemSize={300}
+                    />
+                ) : error ? (
+                    // Display error state
+                    <View style={styles.errorContainer}>
+                        <Text style={styles.errorText}>
+                            Failed to load souvenirs
+                        </Text>
+                        <TouchableOpacity
+                            style={styles.retryButton}
+                            onPress={() => refetch()}
+                        >
+                            <Text style={styles.retryButtonText}>Retry</Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    // Display loaded data
+                    <FlashList
+                        data={sortedAndFilteredData}
+                        renderItem={({ item, index }) => (
+                            <ProductCard item={item} index={index} />
+                        )}
+                        horizontal={false}
+                        showsVerticalScrollIndicator={false}
+                        numColumns={2}
+                        estimatedItemSize={300}
+                        keyExtractor={(item) => item.identifier}
+                        contentContainerStyle={{}}
+                        onEndReached={handleLoadMore}
+                        onEndReachedThreshold={0.7}
+                        ListFooterComponent={renderFooter}
+                    />
+                )}
             </View>
         </View>
     );
@@ -125,5 +215,35 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: "bold",
         color: "#646f7e",
+    },
+    errorContainer: {
+        padding: 20,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "rgba(255, 0, 0, 0.1)",
+        borderRadius: 10,
+        margin: 20,
+        flex: 1,
+    },
+    errorText: {
+        color: "#ff6b6b",
+        fontSize: 16,
+        marginBottom: 10,
+        textAlign: "center",
+    },
+    retryButton: {
+        backgroundColor: "#4b88a2",
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 5,
+    },
+    retryButtonText: {
+        color: "#fff",
+        fontSize: 14,
+        fontWeight: "bold",
+    },
+    loaderFooter: {
+        paddingVertical: 20,
+        alignItems: "center",
     },
 });

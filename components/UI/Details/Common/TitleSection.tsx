@@ -17,11 +17,7 @@ interface TitleSectionProps {
     location?: string;
 }
 
-const TitleSection = ({
-    title,
-    rating = 0,
-    location = "N/A",
-}: TitleSectionProps) => {
+const TitleSection = ({ title, rating, location }: TitleSectionProps) => {
     // Render rating stars
     const renderRatingStars = ({ rating }: { rating: number }) => {
         // Sanitize to increments of 0.5
@@ -69,19 +65,24 @@ const TitleSection = ({
         <View style={styles.titleSection}>
             {/* Main Title */}
             <Text style={styles.title}>{title}</Text>
-
             {/* Rating Container */}
-            {rating > 0 && (
+            {rating !== undefined && (
                 <View style={styles.ratingContainer}>
-                    {renderRatingStars({ rating })}
-                    <Text style={styles.ratingText}>{rating}</Text>
+                    {rating > 0 ? (
+                        <>
+                            {renderRatingStars({ rating })}
+                            <Text style={styles.ratingText}>{rating}</Text>
+                        </>
+                    ) : (
+                        <Text style={styles.ratingText}>No ratings yet</Text>
+                    )}
                 </View>
             )}
             {/* Location Container */}
-            {location && (
+            {location !== undefined && (
                 <View style={styles.locationContainer}>
                     <Ionicons name="location" size={16} color="#646f7e" />
-                    <Text style={styles.locationText}>{location}</Text>
+                    <Text style={styles.locationText}>{location || "N/A"}</Text>
                 </View>
             )}
         </View>

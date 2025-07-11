@@ -88,14 +88,14 @@ export function ModelViewer({ scale, model, bgColor }: ModelViewerProps) {
     const handleViewInRoom = () => {
         router.push({
             pathname: "/ar-view",
-            params: { modelPath: modelPath },
+            params: { modelPath: model ?? modelPath },
         });
     };
 
     const handleView3D = () => {
         router.push({
             pathname: "/3d-view",
-            params: { modelPath: modelPath },
+            params: { modelPath: model ?? modelPath },
         });
     };
 

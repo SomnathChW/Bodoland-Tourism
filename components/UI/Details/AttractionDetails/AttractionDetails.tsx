@@ -10,7 +10,16 @@ import { Linking } from "react-native";
 import CustomAlertDialog from "../../CustomAlertDialog";
 import { useDataStore } from "@/store/useDataStore";
 import { Package } from "./PackagesSection"; // Import the Package type
-const AttractionDetails = ({ identifier }: { identifier: string }) => {
+
+interface AttractionDetailsProps {
+    identifier: string;
+    onDataFetched?: (data: any) => void;
+}
+
+const AttractionDetails = ({
+    identifier,
+    onDataFetched,
+}: AttractionDetailsProps) => {
     // State for alert dialog
     const [dialogVisible, setDialogVisible] = useState(false);
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(
@@ -38,6 +47,13 @@ const AttractionDetails = ({ identifier }: { identifier: string }) => {
         .getState()
         .attractions.find((attraction) => attraction.identifier === identifier);
 
+    // Send data back to parent component when attraction details are found
+    useEffect(() => {
+        if (attractionDetails && onDataFetched) {
+            onDataFetched(attractionDetails);
+        }
+    }, [attractionDetails, onDataFetched]);
+
     if (!attractionDetails) {
         return (
             <View
@@ -59,6 +75,7 @@ const AttractionDetails = ({ identifier }: { identifier: string }) => {
             <TitleSection
                 title={attractionDetails.name}
                 location={attractionDetails.location}
+                rating={undefined}
             />
             <AboutSection
                 description={

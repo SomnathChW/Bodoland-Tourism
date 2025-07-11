@@ -1,7 +1,7 @@
 export const souvenirData = [
     {
         identifier: "souvenir-jaapi",
-        title: "Japi",
+        name: "Japi",
         short_description:
             "Traditional Assamese conical hat made from bamboo and cane.",
         long_description:
@@ -29,14 +29,15 @@ export const souvenirData = [
     },
     {
         identifier: "souvenir-gamusa",
-        title: "Gamusa",
+        name: "Gamusa",
         short_description:
             "Handwoven traditional Assamese cloth, symbol of respect and pride.",
         long_description:
             "Gamusa is a handwoven rectangular cotton cloth with red borders and motifs, essential to Assamese culture. Used during Bihu and ceremonial events, it symbolizes honor and hospitality.",
-        image: "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf0b5002895c5d022/view?project=bodoland-tourism",
+        image: "https://picsum.photos/300/300?random=124",
         image_carousel: [
-            "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf0b5002895c5d022/view?project=bodoland-tourism",
+            "https://picsum.photos/300/300?random=124",
+            "https://picsum.photos/300/300?random=145",
         ],
         model_data: "",
         vendor_ids: ["vendor002"],
@@ -57,7 +58,7 @@ export const souvenirData = [
     },
     {
         identifier: "souvenir-xorai",
-        title: "Xorai",
+        name: "Xorai",
         short_description:
             "Brass offering tray with a stand, symbol of Assamese hospitality.",
         long_description:
@@ -85,7 +86,7 @@ export const souvenirData = [
     },
     {
         identifier: "souvenir-assam-tea",
-        title: "Assam Tea (1kg)",
+        name: "Assam Tea (1kg)",
         short_description:
             "Premium loose-leaf Assam tea with bold flavor and rich aroma.",
         long_description:
@@ -113,7 +114,7 @@ export const souvenirData = [
     },
     {
         identifier: "souvenir-silk-scarf",
-        title: "Muga Silk Scarf",
+        name: "Muga Silk Scarf",
         short_description:
             "Elegant scarf made from luxurious Muga silk of Assam.",
         long_description:
@@ -141,7 +142,7 @@ export const souvenirData = [
     },
     {
         identifier: "souvenir-bamboo-craft",
-        title: "Bamboo Handicraft",
+        name: "Bamboo Handicraft",
         short_description:
             "Handcrafted bamboo item showcasing Assamese rural artistry.",
         long_description:
@@ -172,7 +173,7 @@ export const souvenirData = [
 export const souvenirItemsNew = [
     {
         identifier: "souvenir-assam-tea",
-        title: "Assam Tea (1kg)",
+        name: "Assam Tea (1kg)",
         short_description:
             "Premium loose-leaf Assam tea with bold flavor and rich aroma.",
         long_description:

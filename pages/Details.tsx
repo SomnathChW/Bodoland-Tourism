@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Dimensions } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import Animated, {
@@ -17,6 +17,7 @@ import StayDetails from "@/components/UI/Details/StayDetails/StayDetails";
 import FestivalDetails from "@/components/UI/Details/FestivalDetails/FestivalDetails";
 import CuisineDetails from "@/components/UI/Details/CuisineDetails/CuisineDetails";
 import TransportDetails from "@/components/UI/Details/TransportDetails/TransportDetails";
+import StickyPurchaseButtons from "@/components/UI/Details/SouvenirDetails/StickyPurchaseButtons";
 
 const { height } = Dimensions.get("screen");
 const HEADER_MAX_HEIGHT = height * 0.45;
@@ -27,6 +28,9 @@ const Details = () => {
     const identifier = params?.identifier || "Sample Place";
     const router = useRouter();
     const insets = useSafeAreaInsets();
+
+    // State to hold fetched data
+    const [fetchedData, setFetchedData] = useState<any>(null);
 
     const minimizedHeaderHeight = HEADER_MIN_HEIGHT + insets.top;
     const scrollDistance = HEADER_MAX_HEIGHT - minimizedHeaderHeight;
@@ -66,9 +70,19 @@ const Details = () => {
         const detail_type = identifier.split(/[-_]/)[0].toLowerCase();
         switch (detail_type) {
             case "attraction":
-                return <AttractionDetails identifier={identifier} />;
+                return (
+                    <AttractionDetails
+                        identifier={identifier}
+                        onDataFetched={setFetchedData}
+                    />
+                );
             case "souvenir":
-                return <SouvenirDetails identifier={identifier} />;
+                return (
+                    <SouvenirDetails
+                        identifier={identifier}
+                        onDataFetched={setFetchedData}
+                    />
+                );
             case "stay":
                 return <StayDetails identifier={identifier} />;
             case "festival":
@@ -82,24 +96,28 @@ const Details = () => {
         }
     };
 
+    // Check if current page is for souvenirs
+    const isSouvenirDetail =
+        (identifier as string).split(/[-_]/)[0].toLowerCase() === "souvenir";
+
     return (
         <View style={styles.container}>
             <HeaderSection
                 scrollY={scrollY}
                 isReady={isReady}
                 animationPhase={2}
-                hasModel={true}
                 minimizedHeaderHeight={minimizedHeaderHeight}
                 scrollDistance={scrollDistance}
-                identifier={identifier as string}
                 onBack={() => router.back()}
                 insets={insets}
+                data={fetchedData}
             />
 
             <Animated.ScrollView
                 contentContainerStyle={[
                     styles.scrollViewContent,
                     staticStyles.scrollContentContainer,
+                    isSouvenirDetail && { paddingBottom: 80 }, // Add padding for sticky buttons
                 ]}
                 showsVerticalScrollIndicator={false}
                 onScroll={scrollHandler}
@@ -111,6 +129,11 @@ const Details = () => {
                 {/* Render sections based on structure */}
                 {getDetailsStructure(identifier as string)}
             </Animated.ScrollView>
+
+            {/* Sticky Purchase Buttons - Only for souvenirs */}
+            {isSouvenirDetail && fetchedData && (
+                <StickyPurchaseButtons inStock={fetchedData.in_stock} />
+            )}
         </View>
     );
 };

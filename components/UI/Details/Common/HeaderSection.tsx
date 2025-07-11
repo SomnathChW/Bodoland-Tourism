@@ -25,16 +25,13 @@ interface HeaderSectionProps {
     isReady: SharedValue<number>;
     animationPhase: number;
     minimizedHeaderHeight: number;
-    hasModel: boolean;
     scrollDistance: number;
-    identifier: string;
     onBack: () => void;
     insets: EdgeInsets;
+    data?: any;
 }
 
 const carouselImages = [
-    "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-    "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf0b5002895c5d022/view?project=bodoland-tourism",
     "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
     // Add more image URLs as needed
 ];
@@ -43,12 +40,32 @@ const HeaderSection = ({
     scrollY,
     animationPhase,
     minimizedHeaderHeight,
-    hasModel,
     scrollDistance,
-    identifier,
     onBack,
     insets,
+    data,
 }: HeaderSectionProps) => {
+    // State for dynamic images from attraction data
+    const [displayImages, setDisplayImages] = useState(carouselImages);
+    const [model, setModel] = useState<string | null>(null);
+    const [hasModel, setHasModel] = useState(false);
+
+    // Update images when attraction data is received
+    useEffect(() => {
+        if (data?.image_carousel && data.image_carousel.length > 0) {
+            setDisplayImages(data.image_carousel);
+        }
+        if (data?.model_data) {
+            setModel(data.model_data);
+            setHasModel(true);
+        }
+    }, [data]);
+
+    // Update current page when model availability changes
+    useEffect(() => {
+        setCurrentPage(hasModel ? 1 : 0);
+    }, [hasModel]);
+
     // Optimized derived animations with worklet
     const animations = useDerivedValue(() => {
         "worklet";
@@ -143,7 +160,23 @@ const HeaderSection = ({
         [insets.top, minimizedHeaderHeight]
     );
 
-    const [currentPage, setCurrentPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(hasModel ? 1 : 0);
+
+    // Define types for pages
+    type ModelPage = { type: "model"; model_url: string };
+    type ImagePage = { type: "image"; uri: string };
+    type Page = ModelPage | ImagePage;
+
+    const pages: Page[] = hasModel
+        ? [
+              { type: "model", model_url: model || "" } as ModelPage,
+              ...displayImages.map(
+                  (uri): ImagePage => ({ type: "image", uri })
+              ),
+          ]
+        : displayImages.map((uri): ImagePage => ({ type: "image", uri }));
+
+    console.log("HeaderSection pages:", pages);
 
     return (
         <Animated.View style={[styles.header, headerAnimatedStyle]}>
@@ -153,6 +186,7 @@ const HeaderSection = ({
                     style={animationPhase >= 2 ? imageAnimatedStyle : {}}
                 >
                     <PagerView
+                        key={`pager-${hasModel}`}
                         style={[
                             styles.headerImage,
                             { height: styles.headerImage.height },
@@ -162,35 +196,35 @@ const HeaderSection = ({
                             setCurrentPage(e.nativeEvent.position)
                         }
                     >
-                        {hasModel && (
-                            <View style={styles.pageContainer}>
-                                <ModelViewer scale={3} />
-                            </View>
-                        )}
-                        {carouselImages.map((imageUri, index) => (
+                        {pages.map((page, index) => (
                             <View key={index} style={styles.pageContainer}>
-                                <FastImage
-                                    source={{
-                                        uri: imageUri,
-                                        priority: FastImage.priority.high,
-                                        cache: FastImage.cacheControl.immutable,
-                                    }}
-                                    style={styles.carouselImage}
-                                    resizeMode={FastImage.resizeMode.cover}
-                                />
+                                {page.type === "model" ? (
+                                    <ModelViewer
+                                        scale={3}
+                                        model={page.model_url}
+                                    />
+                                ) : page.type === "image" ? (
+                                    <FastImage
+                                        source={{
+                                            uri: page.uri,
+                                            priority: FastImage.priority.high,
+                                            cache: FastImage.cacheControl
+                                                .immutable,
+                                        }}
+                                        style={styles.carouselImage}
+                                        resizeMode={FastImage.resizeMode.cover}
+                                    />
+                                ) : null}
                             </View>
                         ))}
                     </PagerView>
 
                     {/* Page indicators */}
                     <View style={styles.indicatorContainer}>
-                        {Array.from({
-                            length: carouselImages.length + (hasModel ? 1 : 0),
-                        }).map((_, index) => {
-                            const isModelPage = hasModel && index === 0;
+                        {pages.map((page, index) => {
                             const isActive = currentPage === index;
 
-                            if (isModelPage) {
+                            if (page.type === "model") {
                                 return (
                                     <MaterialCommunityIcons
                                         key={index}
@@ -237,7 +271,7 @@ const HeaderSection = ({
                         <Ionicons name="arrow-back" size={24} color="#fff" />
                     </TouchableOpacity>
                     <Text style={styles.minimizedTitle} numberOfLines={1}>
-                        {identifier}
+                        {data?.name || ""}
                     </Text>
                     <View style={styles.headerRightPlaceholder} />
                 </Animated.View>

@@ -7,7 +7,7 @@ import FastImage from "react-native-fast-image";
 type Props = {
     item: {
         identifier: string;
-        title: string;
+        name: string;
         image: any;
         discount_percentage?: string;
         original_price?: string;
@@ -87,7 +87,7 @@ const ProductCard = ({ item, index }: Props) => {
                     resizeMode="cover"
                 />
 
-                {item.title && (
+                {item.name && (
                     <View
                         style={{
                             width: CARD_WIDTH,
@@ -100,7 +100,7 @@ const ProductCard = ({ item, index }: Props) => {
                     >
                         <View style={styles.textView}>
                             <Text style={styles.title} numberOfLines={1}>
-                                {item.title}
+                                {item.name}
                             </Text>
 
                             {item.rating ? (
