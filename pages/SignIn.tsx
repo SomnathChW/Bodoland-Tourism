@@ -15,7 +15,7 @@ import Animated, {
     useAnimatedStyle,
     withTiming,
 } from "react-native-reanimated";
-import { validateAuthInputs } from "@/lib/formValidator";
+import { validateAuthInputs } from "@/utils/formValidator";
 
 const SignInPage = () => {
     const { session, signIn, signUp } = useAuth();

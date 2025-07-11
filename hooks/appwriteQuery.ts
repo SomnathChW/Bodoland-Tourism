@@ -1,16 +1,19 @@
 import { functions } from "@/lib/appwrite";
 import { ExecutionMethod } from "react-native-appwrite";
+import { useDataStore } from "@/store/useDataStore";
 
 export const fetchPaginatedData = async <T extends Record<string, any>>({
     pageParam = 1,
     limit,
     route,
     expectedFields = [] as string[],
+    storeToUpdate,
 }: {
     pageParam: number;
     limit: number;
     route: string;
     expectedFields?: string[];
+    storeToUpdate?: string;
 }): Promise<{
     data: T[];
     nextPage?: number | null;
@@ -54,6 +57,15 @@ export const fetchPaginatedData = async <T extends Record<string, any>>({
             }
         }
 
+        // If storeToUpdate is provided, append data to the store
+        if (storeToUpdate) {
+            const store = useDataStore.getState();
+            store.appendToData(
+                storeToUpdate as keyof ReturnType<typeof useDataStore>,
+                data
+            );
+        }
+
         return {
             data: data as T[],
             nextPage: parsedBody.nextPage ?? null,
@@ -68,10 +80,12 @@ export const fetchData = async <T extends Record<string, any>>({
     route,
     expectedFields = [] as string[],
     limit = 20,
+    storeToUpdate,
 }: {
     route: string;
     expectedFields?: string[];
     limit?: number;
+    storeToUpdate?: string;
 }): Promise<{
     data: T[];
 }> => {
@@ -114,11 +128,98 @@ export const fetchData = async <T extends Record<string, any>>({
             }
         }
 
+        // If storeToUpdate is provided, append data to the store (instead of replacing it)
+        if (storeToUpdate) {
+            const store = useDataStore.getState();
+            store.appendToData(
+                storeToUpdate as keyof ReturnType<typeof useDataStore>,
+                data
+            );
+            console.log(`[Store Updated] appendToData: ${storeToUpdate}`, {
+                count: data.length,
+                firstItem: data.length > 0 ? data[0] : null,
+            });
+        }
+
         return {
             data: data as T[],
         };
     } catch (error) {
         console.error("Error fetching data:", error);
+        throw error;
+    }
+};
+
+export const fetchDetails = async <T extends Record<string, any>>({
+    route,
+    identifier,
+    expectedFields = [] as string[],
+    storeToUpdate,
+}: {
+    route: string;
+    identifier: string;
+    expectedFields?: string[];
+    storeToUpdate?: string;
+}): Promise<{
+    data: T;
+}> => {
+    try {
+        const response = await functions.createExecution(
+            process.env.EXPO_PUBLIC_FUNCTION_DATA as string,
+            JSON.stringify({}),
+            false,
+            `/v1/${route}/${identifier}`,
+            ExecutionMethod.GET,
+            {}
+        );
+
+        const statusCode = response.responseStatusCode;
+
+        if (statusCode !== 200) {
+            throw new Error(
+                `Error fetching details: ${response.responseBody} (Status Code: ${statusCode})`
+            );
+        }
+
+        // Parse the responseBody JSON string
+        const parsedBody = JSON.parse(response.responseBody);
+
+        const data = parsedBody.data || {};
+
+        // Validate expected fields if specified
+        if (expectedFields.length > 0) {
+            // Check if item has all expected fields
+            const missingFields = expectedFields.filter(
+                (field) => data[field] === undefined
+            );
+
+            if (missingFields.length > 0) {
+                throw new Error(
+                    `Response missing expected fields: ${missingFields.join(
+                        ", "
+                    )}`
+                );
+            }
+        }
+
+        // If storeToUpdate is provided, add data to the store
+        if (storeToUpdate) {
+            const store = useDataStore.getState();
+            store.addToData(
+                storeToUpdate as keyof ReturnType<typeof useDataStore>,
+                data
+            );
+            console.log(`[Store Updated] addToData: ${storeToUpdate}`, {
+                itemIdentifier: identifier,
+                item: data,
+            });
+        }
+
+        return {
+            data: data as T,
+        };
+    } catch (error) {
+        console.error("Error fetching details:", error);
         throw error;
     }
 };

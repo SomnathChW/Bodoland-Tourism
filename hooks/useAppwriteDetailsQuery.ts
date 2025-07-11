@@ -1,36 +1,37 @@
 import { useQuery, QueryKey } from "@tanstack/react-query";
-import { fetchData } from "./appwriteQuery";
+import { fetchDetails } from "./appwriteQuery";
 
-interface FetchDataResponse<T> {
-    data: T[];
+interface FetchDetailsResponse<T> {
+    data: T;
 }
 
-interface UseAppwriteQueryParams<TQueryKey extends QueryKey = QueryKey> {
+interface UseAppwriteDetailsQueryParams<TQueryKey extends QueryKey = QueryKey> {
     queryKey: TQueryKey;
     route: string;
-    limit?: number;
+    identifier: string;
     expectedFields?: string[];
     staleTime?: number;
     storeToUpdate?: string;
 }
 
-export const useAppwriteQuery = <
+export const useAppwriteDetailsQuery = <
     T extends Record<string, any> = Record<string, any>,
     TQueryKey extends QueryKey = QueryKey
 >({
     queryKey,
     route,
-    limit = 20,
+    identifier,
     expectedFields = [],
     staleTime = 30 * 60 * 1000, // 30 minutes
     storeToUpdate,
-}: UseAppwriteQueryParams<TQueryKey>) => {
-    const QueryKey = [...queryKey, route];
+}: UseAppwriteDetailsQueryParams<TQueryKey>) => {
+    // Include identifier in the query key to ensure unique caching
+    const QueryKey = [...queryKey, route, identifier];
 
-    return useQuery<FetchDataResponse<T>>({
+    return useQuery<FetchDetailsResponse<T>>({
         queryKey: QueryKey,
         queryFn: () =>
-            fetchData<T>({ route, expectedFields, limit, storeToUpdate }),
+            fetchDetails<T>({ route, identifier, expectedFields, storeToUpdate }),
         staleTime,
         retry: (failureCount) => failureCount < 1,
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),

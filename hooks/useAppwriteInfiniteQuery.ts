@@ -20,6 +20,7 @@ interface UseAppwriteInfiniteQueryParams<
     initialPageParam?: number;
     staleTime?: number;
     getNextPageParam?: (lastPage: FetchDataResponse<T>) => number | undefined;
+    storeToUpdate?: string;
 }
 
 export const useAppwriteInfiniteQuery = <
@@ -34,6 +35,7 @@ export const useAppwriteInfiniteQuery = <
     staleTime = 30 * 60 * 1000, // 30 minutes
     getNextPageParam = (lastPage: FetchDataResponse<T>) =>
         lastPage.nextPage ?? undefined,
+    storeToUpdate,
 }: UseAppwriteInfiniteQueryParams<T, TQueryKey>) => {
     //const { signOut } = useAuth();
 
@@ -47,6 +49,7 @@ export const useAppwriteInfiniteQuery = <
                 route,
                 limit,
                 expectedFields,
+                storeToUpdate,
             }),
         initialPageParam,
         getNextPageParam,

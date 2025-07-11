@@ -50,6 +50,7 @@ const Emergency = () => {
             "ambulance",
             "extra_data",
         ],
+        storeToUpdate: "emergency_contacts",
     });
 
     const emergencyContacts = useMemo(() => {
