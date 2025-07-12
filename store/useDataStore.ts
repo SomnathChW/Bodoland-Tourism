@@ -7,6 +7,7 @@ type State = {
     virtual_tours: any[];
     emergency_contacts: any[];
     souvenirs: any[];
+    extras: any[];
 };
 
 type Actions = {
@@ -26,6 +27,7 @@ export const useDataStore = create<State & Actions>((set) => ({
     virtual_tours: [],
     emergency_contacts: [],
     souvenirs: [],
+    extras: [],
 
     setData: (data) => set((state) => ({ ...state, ...data })),
 

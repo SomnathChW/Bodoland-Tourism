@@ -151,12 +151,12 @@ export const fetchData = async <T extends Record<string, any>>({
 };
 
 export const fetchDetails = async <T extends Record<string, any>>({
-    route,
+    type,
     identifier,
     expectedFields = [] as string[],
     storeToUpdate,
 }: {
-    route: string;
+    type: string;
     identifier: string;
     expectedFields?: string[];
     storeToUpdate?: string;
@@ -168,7 +168,7 @@ export const fetchDetails = async <T extends Record<string, any>>({
             process.env.EXPO_PUBLIC_FUNCTION_DATA as string,
             JSON.stringify({}),
             false,
-            `/v1/${route}/${identifier}`,
+            `/v1/details?type=${type}&identifier=${identifier}`,
             ExecutionMethod.GET,
             {}
         );

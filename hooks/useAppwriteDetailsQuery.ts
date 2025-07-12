@@ -7,7 +7,7 @@ interface FetchDetailsResponse<T> {
 
 interface UseAppwriteDetailsQueryParams<TQueryKey extends QueryKey = QueryKey> {
     queryKey: TQueryKey;
-    route: string;
+    type: string;
     identifier: string;
     expectedFields?: string[];
     staleTime?: number;
@@ -19,19 +19,19 @@ export const useAppwriteDetailsQuery = <
     TQueryKey extends QueryKey = QueryKey
 >({
     queryKey,
-    route,
+    type,
     identifier,
     expectedFields = [],
     staleTime = 30 * 60 * 1000, // 30 minutes
     storeToUpdate,
 }: UseAppwriteDetailsQueryParams<TQueryKey>) => {
     // Include identifier in the query key to ensure unique caching
-    const QueryKey = [...queryKey, route, identifier];
+    const QueryKey = [...queryKey,type, identifier];
 
     return useQuery<FetchDetailsResponse<T>>({
         queryKey: QueryKey,
         queryFn: () =>
-            fetchDetails<T>({ route, identifier, expectedFields, storeToUpdate }),
+            fetchDetails<T>({ type, identifier, expectedFields, storeToUpdate }),
         staleTime,
         retry: (failureCount) => failureCount < 1,
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),

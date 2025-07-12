@@ -42,7 +42,9 @@ const AttractionDetails = ({
 
         Linking.openURL(selectedPackage.website);
         setDialogVisible(false);
-    }; // Try to get the attraction details based on the identifier from store
+    };
+    
+    // Try to get the attraction details based on the identifier from store
     const attractionDetails = useDataStore
         .getState()
         .attractions.find((attraction) => attraction.identifier === identifier);
