@@ -2,7 +2,7 @@ type State = {
     attractions: any[];
     districts: any[];
     cuisine: any[];
-    festivale: any[];
+    festivals: any[];
     hotels: any[];
     virtual_tours: any[];
     emergency_contacts: any[];
@@ -21,7 +21,7 @@ export const useDataStore = create<State & Actions>((set) => ({
     attractions: [],
     districts: [],
     cuisine: [],
-    festivale: [],
+    festivals: [],
     hotels: [],
     virtual_tours: [],
     emergency_contacts: [],
@@ -65,7 +65,6 @@ export const useDataStore = create<State & Actions>((set) => ({
 
     appendToData: (key, items) =>
         set((state) => {
-
             // Handle if a non-array is accidentally passed to appendToData
             if (!Array.isArray(items)) {
                 items = [items];

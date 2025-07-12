@@ -9,7 +9,7 @@ type Props = {
         identifier: string;
         name: string;
         image: any;
-        "short-desc": string;
+        short_description: string;
     };
     index: number;
 };
@@ -28,7 +28,7 @@ const MIN_CARD_HEIGHT = height * 0.25;
 // Set minimum image height to 75% of minimum card height
 const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
 
-const AttractionsCard = ({ item, index }: Props) => {
+const FestivalsCard = ({ item, index }: Props) => {
     const router = useRouter();
     const [isFavorite, setIsFavorite] = React.useState(false);
 
@@ -84,7 +84,7 @@ const AttractionsCard = ({ item, index }: Props) => {
                         </Text>
 
                         <Text style={styles.desc} numberOfLines={1}>
-                            {item["short-desc"]}
+                            {item.short_description}
                         </Text>
                     </View>
                 </View>
@@ -120,7 +120,7 @@ const AttractionsCard = ({ item, index }: Props) => {
     );
 };
 
-export default AttractionsCard;
+export default FestivalsCard;
 
 const styles = StyleSheet.create({
     topSection: {

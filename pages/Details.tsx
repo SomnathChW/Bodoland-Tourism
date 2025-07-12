@@ -86,7 +86,12 @@ const Details = () => {
             case "stay":
                 return <StayDetails identifier={identifier} />;
             case "festival":
-                return <FestivalDetails identifier={identifier} />;
+                return (
+                    <FestivalDetails
+                        identifier={identifier}
+                        onDataFetched={setFetchedData}
+                    />
+                );
             case "cuisine":
                 return (
                     <CuisineDetails
