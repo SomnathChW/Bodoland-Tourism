@@ -23,7 +23,6 @@ export const cuisineData = [
         nutritional_info: {},
         cultural_significance:
             "The Assamese thali is a reflection of the region's agricultural abundance and culinary traditions.",
-        associated_festivals: ["Bihu", "Magh Bihu", "Rongali Bihu"],
     },
     {
         identifier: "cuisine2",
@@ -48,7 +47,6 @@ export const cuisineData = [
         nutritional_info: {},
         cultural_significance:
             "Masor Tenga is a classic summer dish in Assam, prized for its cooling properties and delicate flavors.",
-        associated_festivals: ["Bihu"],
     },
     {
         identifier: "cuisine3",
@@ -67,7 +65,6 @@ export const cuisineData = [
         nutritional_info: {},
         cultural_significance:
             "Pitha is deeply associated with Bihu festivities and Assamese hospitality.",
-        associated_festivals: ["Magh Bihu", "Rongali Bihu"],
     },
     {
         identifier: "cuisine4",
@@ -92,7 +89,6 @@ export const cuisineData = [
         nutritional_info: {},
         cultural_significance:
             "This curry reflects the rich meat-based dishes enjoyed during Assamese celebrations.",
-        associated_festivals: ["Bihu"],
     },
     {
         identifier: "cuisine5",
@@ -117,7 +113,6 @@ export const cuisineData = [
         nutritional_info: {},
         cultural_significance:
             "A staple side dish showcasing Assamese simplicity and love for fresh flavors.",
-        associated_festivals: ["Bihu"],
     },
     {
         identifier: "cuisine6",
@@ -136,7 +131,6 @@ export const cuisineData = [
         nutritional_info: {},
         cultural_significance:
             "Khar embodies Assamese culinary identity, being unique to the region.",
-        associated_festivals: ["Rongali Bihu"],
     },
     {
         identifier: "cuisine7",
@@ -160,7 +154,6 @@ export const cuisineData = [
         nutritional_info: {},
         cultural_significance:
             "Xaak Bhaji showcases the use of fresh greens in Assamese daily meals.",
-        associated_festivals: [],
     },
     {
         identifier: "cuisine8",
@@ -179,7 +172,6 @@ export const cuisineData = [
         nutritional_info: {},
         cultural_significance:
             "Laru are synonymous with Magh Bihu celebrations in Assam.",
-        associated_festivals: ["Magh Bihu"],
     },
     {
         identifier: "cuisine9",
@@ -198,7 +190,6 @@ export const cuisineData = [
         nutritional_info: {},
         cultural_significance:
             "This dish represents the agrarian roots of Assamese food culture.",
-        associated_festivals: ["Magh Bihu"],
     },
     {
         identifier: "cuisine10",
@@ -217,7 +208,6 @@ export const cuisineData = [
         nutritional_info: {},
         cultural_significance:
             "This dish is a delicacy enjoyed during gatherings and special meals.",
-        associated_festivals: [],
     },
     {
         identifier: "cuisine11",
@@ -236,7 +226,6 @@ export const cuisineData = [
         nutritional_info: {},
         cultural_significance:
             "A cherished comfort food in Assamese households.",
-        associated_festivals: [],
     },
     {
         identifier: "cuisine12",
@@ -255,6 +244,5 @@ export const cuisineData = [
         nutritional_info: {},
         cultural_significance:
             "An iconic festive sweet marking the harvest festival Magh Bihu.",
-        associated_festivals: ["Magh Bihu"],
     },
 ];

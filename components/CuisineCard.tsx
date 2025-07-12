@@ -4,12 +4,13 @@ import { useRouter } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import FastImage from "react-native-fast-image";
 
-type Props = {
+export type CuisineProps = {
     item: {
         identifier: string;
         name: string;
         image: any;
         short_description: string;
+        [key: string]: any; // Allow additional properties
     };
     index: number;
 };
@@ -28,7 +29,7 @@ const MIN_CARD_HEIGHT = height * 0.25;
 // Set minimum image height to 75% of minimum card height
 const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
 
-const CuisineCard = ({ item, index }: Props) => {
+const CuisineCard = ({ item, index }: CuisineProps) => {
     const router = useRouter();
     const [isFavorite, setIsFavorite] = React.useState(false);
 

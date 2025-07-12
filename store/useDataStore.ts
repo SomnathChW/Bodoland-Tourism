@@ -33,25 +33,15 @@ export const useDataStore = create<State & Actions>((set) => ({
         set((state) => {
             // Handle if an array is accidentally passed to addToData
             if (Array.isArray(item)) {
-                // TODO: Handle Warning or error for missing identifier
-                // console.warn(
-                //     "Array passed to addToData. Use appendToData for arrays."
-                // );
-                // Extract item from array if it's a single-item array
                 if (item.length === 1) {
                     item = item[0];
                 } else {
-                    // Return unchanged state if it's not a single-item array
                     return state;
                 }
             }
 
             // Check if the item has an identifier
             if (!item.identifier) {
-                // TODO: Handle Warning or error for missing identifier
-                // console.warn(
-                //     "Item has no identifier property, duplicate check skipped."
-                // );
                 return {
                     [key]: [...state[key], item],
                 };
@@ -75,13 +65,9 @@ export const useDataStore = create<State & Actions>((set) => ({
 
     appendToData: (key, items) =>
         set((state) => {
+
             // Handle if a non-array is accidentally passed to appendToData
             if (!Array.isArray(items)) {
-                // TODO: Handle Warning or error for missing identifier
-                // console.warn(
-                //     "Non-array passed to appendToData. Use addToData for single items."
-                // );
-                // Treat it as a single item array
                 items = [items];
             }
 
@@ -89,13 +75,8 @@ export const useDataStore = create<State & Actions>((set) => ({
             const uniqueItems = items.filter((item) => {
                 // Skip duplicate check if item has no identifier
                 if (!item.identifier) {
-                    // TODO: Handle Warning or error for missing identifier
-                    // console.warn(
-                    //     "Item has no identifier property, duplicate check skipped."
-                    // );
                     return true;
                 }
-
                 return !state[key].some(
                     (existingItem) =>
                         existingItem.identifier === item.identifier
