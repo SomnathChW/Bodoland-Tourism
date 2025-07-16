@@ -9,6 +9,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HeaderSection from "@/components/UI/Details/Common/HeaderSection";
+import HeaderLoader from "@/components/HeaderLoader";
 
 // Import data
 import AttractionDetails from "@/components/UI/Details/AttractionDetails/AttractionDetails";
@@ -31,6 +32,8 @@ const Details = () => {
 
     // State to hold fetched data
     const [fetchedData, setFetchedData] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isError, setIsError] = useState(false);
 
     const minimizedHeaderHeight = HEADER_MIN_HEIGHT + insets.top;
     const scrollDistance = HEADER_MAX_HEIGHT - minimizedHeaderHeight;
@@ -55,6 +58,18 @@ const Details = () => {
         };
     }, []);
 
+    // Handler for when data is fetched
+    const handleDataFetched = (data: any) => {
+        setFetchedData(data);
+        setIsLoading(false);
+    };
+
+    // Handler for error cases
+    const handleFetchError = () => {
+        setIsLoading(false);
+        setIsError(true);
+    };
+
     // Static styles calculated once
     const staticStyles = React.useMemo(
         () => ({
@@ -73,14 +88,15 @@ const Details = () => {
                 return (
                     <AttractionDetails
                         identifier={identifier}
-                        onDataFetched={setFetchedData}
+                        onDataFetched={handleDataFetched}
+                        onError={handleFetchError}
                     />
                 );
             case "souvenir":
                 return (
                     <SouvenirDetails
                         identifier={identifier}
-                        onDataFetched={setFetchedData}
+                        onDataFetched={handleDataFetched}
                     />
                 );
             case "stay":
@@ -89,20 +105,26 @@ const Details = () => {
                 return (
                     <FestivalDetails
                         identifier={identifier}
-                        onDataFetched={setFetchedData}
+                        onDataFetched={handleDataFetched}
                     />
                 );
             case "cuisine":
                 return (
                     <CuisineDetails
                         identifier={identifier}
-                        onDataFetched={setFetchedData}
+                        onDataFetched={handleDataFetched}
                     />
                 );
             case "transport":
                 return <TransportDetails identifier={identifier} />;
             default:
-                return null;
+                return (
+                    <AttractionDetails
+                        identifier={identifier}
+                        onDataFetched={handleDataFetched}
+                        onError={handleFetchError}
+                    />
+                );
         }
     };
 
@@ -112,16 +134,22 @@ const Details = () => {
 
     return (
         <View style={styles.container}>
-            <HeaderSection
-                scrollY={scrollY}
-                isReady={isReady}
-                animationPhase={2}
-                minimizedHeaderHeight={minimizedHeaderHeight}
-                scrollDistance={scrollDistance}
-                onBack={() => router.back()}
-                insets={insets}
-                data={fetchedData}
-            />
+            {/* Loading header */}
+            {isLoading && !isError && <HeaderLoader />}
+
+            {/* Dynamic header that shows when data is loaded */}
+            {!isLoading && !isError && (
+                <HeaderSection
+                    scrollY={scrollY}
+                    isReady={isReady}
+                    animationPhase={1}
+                    minimizedHeaderHeight={minimizedHeaderHeight}
+                    scrollDistance={scrollDistance}
+                    onBack={() => router.back()}
+                    insets={insets}
+                    data={fetchedData}
+                />
+            )}
 
             <Animated.ScrollView
                 contentContainerStyle={[
@@ -135,6 +163,7 @@ const Details = () => {
                 removeClippedSubviews={true}
                 overScrollMode="never"
                 keyboardShouldPersistTaps="handled"
+                scrollEnabled={!isLoading && !isError}
             >
                 {/* Render sections based on structure */}
                 {getDetailsStructure(identifier as string)}

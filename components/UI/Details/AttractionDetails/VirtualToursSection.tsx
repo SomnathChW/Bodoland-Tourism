@@ -56,40 +56,37 @@ const VirtualTourCard = React.memo(
         cardWidth: number;
     }) => {
         return (
-            <TouchableWithoutFeedback onPress={onPress}>
-                <TouchableOpacity
-                    style={[{ width: cardWidth }, styles.tourCard]}
-                    activeOpacity={0.8}
-                    onPress={onPress}
-                >
-                    {/* Card Image */}
-                    <View style={styles.tourCardImageContainer}>
-                        <FastImage
-                            source={{
-                                uri: tour.image,
-                                priority: FastImage.priority.normal,
-                                cache: FastImage.cacheControl.immutable,
-                            }}
-                            style={styles.tourCardImage}
-                            resizeMode={FastImage.resizeMode.cover}
+            <TouchableWithoutFeedback
+                style={[{ width: cardWidth }, styles.tourCard]}
+                onPress={onPress}
+            >
+                {/* Card Image */}
+                <View style={styles.tourCardImageContainer}>
+                    <FastImage
+                        source={{
+                            uri: tour.image,
+                            priority: FastImage.priority.normal,
+                            cache: FastImage.cacheControl.immutable,
+                        }}
+                        style={styles.tourCardImage}
+                        resizeMode={FastImage.resizeMode.cover}
+                    />
+                    {/* VR Icon Overlay */}
+                    <View style={styles.vrIconContainer}>
+                        <FontAwesome5
+                            name="vr-cardboard"
+                            size={12}
+                            color="#fff"
                         />
-                        {/* VR Icon Overlay */}
-                        <View style={styles.vrIconContainer}>
-                            <FontAwesome5
-                                name="vr-cardboard"
-                                size={12}
-                                color="#fff"
-                            />
-                        </View>
                     </View>
+                </View>
 
-                    {/* Card Content */}
-                    <View style={styles.tourCardContent}>
-                        <Text style={styles.tourCardTitle} numberOfLines={1}>
-                            {tour.name}
-                        </Text>
-                    </View>
-                </TouchableOpacity>
+                {/* Card Content */}
+                <View style={styles.tourCardContent}>
+                    <Text style={styles.tourCardTitle} numberOfLines={1}>
+                        {tour.name}
+                    </Text>
+                </View>
             </TouchableWithoutFeedback>
         );
     }

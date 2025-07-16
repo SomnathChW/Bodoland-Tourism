@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Linking } from "react-native";
 import React, { useState, useEffect } from "react";
 import TitleSection from "../Common/TitleSection";
 import AboutSection from "../Common/AboutSection";
@@ -6,19 +6,23 @@ import LocationMapSection from "./LocationMapSection";
 import VirtualToursSection from "./VirtualToursSection";
 import EntryFeeSection from "./EntryFeeSection";
 import PackagesSection from "./PackagesSection";
-import { Linking } from "react-native";
 import CustomAlertDialog from "../../CustomAlertDialog";
 import { useDataStore } from "@/store/useDataStore";
 import { Package } from "./PackagesSection"; // Import the Package type
+import { useAppwriteDetailsQuery } from "@/hooks/useAppwriteDetailsQuery";
+import { Ionicons } from "@expo/vector-icons";
+import DetailsLoader from "@/components/DetailsLoader";
 
 interface AttractionDetailsProps {
     identifier: string;
     onDataFetched?: (data: any) => void;
+    onError?: () => void;
 }
 
 const AttractionDetails = ({
     identifier,
     onDataFetched,
+    onError,
 }: AttractionDetailsProps) => {
     // State for alert dialog
     const [dialogVisible, setDialogVisible] = useState(false);
@@ -43,11 +47,20 @@ const AttractionDetails = ({
         Linking.openURL(selectedPackage.website);
         setDialogVisible(false);
     };
-    
+
     // Try to get the attraction details based on the identifier from store
-    const attractionDetails = useDataStore
+    const attractionDetailsStore = useDataStore
         .getState()
         .attractions.find((attraction) => attraction.identifier === identifier);
+
+    const { data, isLoading, error } = useAppwriteDetailsQuery({
+        queryKey: ["attractions", identifier],
+        type: "attractions",
+        identifier: identifier,
+        isEnabled: !attractionDetailsStore, // Only fetch if not in store
+    });
+
+    const attractionDetails = attractionDetailsStore || data?.data;
 
     // Send data back to parent component when attraction details are found
     useEffect(() => {
@@ -56,18 +69,23 @@ const AttractionDetails = ({
         }
     }, [attractionDetails, onDataFetched]);
 
-    if (!attractionDetails) {
+    // Show loading state with skeleton loader
+    if (isLoading) {
+        return <DetailsLoader />;
+    }
+
+    // Show error state and notify parent
+    if (error) {
+        // Call onError if provided to hide the header loader
+        if (onError) {
+            onError();
+        }
+
         return (
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
-            >
-                <Text style={{ color: "#ff6b6b", fontSize: 16 }}>
-                    Attraction not found
-                </Text>
+            <View style={styles.errorContainer}>
+                {/* Warning Icon */}
+                <Ionicons name="warning-outline" size={24} color="#ff6b6b" />
+                <Text style={styles.errorText}>Attraction Not Found</Text>
             </View>
         );
     }
@@ -178,3 +196,28 @@ const AttractionDetails = ({
 };
 
 export default AttractionDetails;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#0d1116",
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    errorText: {
+        color: "#ff6b6b",
+        fontSize: 16,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    loadingText: {
+        fontSize: 16,
+        color: "#666",
+    },
+});

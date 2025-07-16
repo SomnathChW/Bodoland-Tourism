@@ -61,39 +61,36 @@ const PackageCard = React.memo(
         cardWidth: number;
     }) => {
         return (
-            <TouchableWithoutFeedback onPress={onPress}>
-                <TouchableOpacity
-                    style={[{ width: cardWidth }, styles.packageCard]}
-                    activeOpacity={0.8}
-                    onPress={onPress}
-                >
-                    {/* Card Image */}
-                    <View style={styles.packageCardImageContainer}>
-                        <FastImage
-                            source={{
-                                uri: packageItem.image,
-                                priority: FastImage.priority.normal,
-                                cache: FastImage.cacheControl.immutable,
-                            }}
-                            style={styles.packageCardImage}
-                            resizeMode={FastImage.resizeMode.cover}
-                        />
-                    </View>
+            <TouchableWithoutFeedback
+                onPress={onPress}
+                style={[{ width: cardWidth }, styles.packageCard]}
+            >
+                {/* Card Image */}
+                <View style={styles.packageCardImageContainer}>
+                    <FastImage
+                        source={{
+                            uri: packageItem.image,
+                            priority: FastImage.priority.normal,
+                            cache: FastImage.cacheControl.immutable,
+                        }}
+                        style={styles.packageCardImage}
+                        resizeMode={FastImage.resizeMode.cover}
+                    />
+                </View>
 
-                    {/* Card Content */}
-                    <View style={styles.packageCardContent}>
-                        <Text style={styles.packageCardTitle} numberOfLines={1}>
-                            {packageItem.name}
+                {/* Card Content */}
+                <View style={styles.packageCardContent}>
+                    <Text style={styles.packageCardTitle} numberOfLines={1}>
+                        {packageItem.name}
+                    </Text>
+                    <View style={styles.priceContainer}>
+                        <Text style={styles.fromText}>From</Text>
+                        <Text style={styles.priceText}>
+                            {currency}
+                            {packageItem.from_price}
                         </Text>
-                        <View style={styles.priceContainer}>
-                            <Text style={styles.fromText}>From</Text>
-                            <Text style={styles.priceText}>
-                                {currency}
-                                {packageItem.from_price}
-                            </Text>
-                        </View>
                     </View>
-                </TouchableOpacity>
+                </View>
             </TouchableWithoutFeedback>
         );
     }

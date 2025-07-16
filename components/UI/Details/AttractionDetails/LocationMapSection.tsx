@@ -94,18 +94,12 @@ const LocationMapSection: React.FC<LocationMapProps> = ({
                 </View>
 
                 {/* Open In Maps Button */}
-                <TouchableWithoutFeedback onPress={openInMaps}>
-                    <TouchableOpacity
-                        style={styles.mapButton}
-                        activeOpacity={0.7}
-                    >
-                        <Ionicons
-                            name="map-outline"
-                            size={18}
-                            color="#0d1116"
-                        />
-                        <Text style={styles.mapButtonText}>Open in Maps</Text>
-                    </TouchableOpacity>
+                <TouchableWithoutFeedback
+                    style={styles.mapButton}
+                    onPress={openInMaps}
+                >
+                    <Ionicons name="map-outline" size={18} color="#0d1116" />
+                    <Text style={styles.mapButtonText}>Open in Maps</Text>
                 </TouchableWithoutFeedback>
             </View>
         </Animated.View>
@@ -160,6 +154,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         paddingVertical: 8,
         paddingHorizontal: 12,
+        flex: 1,
     },
     mapButtonText: {
         color: "#0d1116",
