@@ -12,6 +12,8 @@ import {
     ViroMaterials,
     ViroARPlane,
     Viro3DObject,
+    ViroText,
+    ViroNode,
 } from "@reactvision/react-viro";
 import { Viro3DPoint } from "@reactvision/react-viro/dist/components/Types/ViroUtils";
 import LottieView from "lottie-react-native";
@@ -28,11 +30,19 @@ ViroMaterials.createMaterials({
 function ARScene({
     modelPath,
     onModelPlaced,
+    onModelLoadStart,
+    onModelLoadEnd,
+    onModelError,
 }: {
     modelPath?: string;
     onModelPlaced?: () => void;
+    onModelLoadStart?: () => void;
+    onModelLoadEnd?: () => void;
+    onModelError?: (error: string) => void;
 }) {
     const [position, setPosition] = useState<Viro3DPoint | null>(null);
+    const [isModelLoading, setIsModelLoading] = useState<boolean>(false);
+    const [modelError, setModelError] = useState<string | null>(null);
 
     return (
         <ViroARScene>
@@ -49,14 +59,68 @@ function ARScene({
                     }, 1000);
                 }}
             >
+                {position && (
+                    <ViroNode position={[0, 0.5, 0]}>
+                        {isModelLoading && (
+                            <ViroText
+                                text="Loading 3D model..."
+                                scale={[0.5, 0.5, 0.5]}
+                                position={[0, 0, 0]}
+                                style={{
+                                    fontSize: 20,
+                                    color: "white",
+                                    fontWeight: "bold",
+                                    textAlignVertical: "center",
+                                    textAlign: "center",
+                                }}
+                            />
+                        )}
+                        {modelError && (
+                            <ViroText
+                                text={`Error loading model: ${modelError}\nPlease go back and try again.`}
+                                scale={[0.5, 0.5, 0.5]}
+                                position={[0, 0, 0]}
+                                style={{
+                                    fontSize: 20,
+                                    color: "red",
+                                    fontWeight: "bold",
+                                    textAlignVertical: "center",
+                                    textAlign: "center",
+                                }}
+                            />
+                        )}
+                    </ViroNode>
+                )}
+
                 <Viro3DObject
-                    visible={!!position}
+                    visible={!!position && !modelError}
                     source={{ uri: modelPath }}
                     position={[0, 0, 0]}
                     scale={[0.3, 0.3, 0.3]}
                     type="GLB"
                     dragType="FixedToWorld"
                     onDrag={() => {}}
+                    onLoadStart={() => {
+                        setIsModelLoading(true);
+                        if (onModelLoadStart) {
+                            onModelLoadStart();
+                        }
+                    }}
+                    onLoadEnd={() => {
+                        setIsModelLoading(false);
+                        if (onModelLoadEnd) {
+                            onModelLoadEnd();
+                        }
+                    }}
+                    onError={(event) => {
+                        const errorMsg = event.nativeEvent.error ? 
+                            String(event.nativeEvent.error) : "Unknown error";
+                        setIsModelLoading(false);
+                        setModelError(errorMsg);
+                        if (onModelError) {
+                            onModelError(errorMsg);
+                        }
+                    }}
                 />
                 <ViroQuad
                     visible={!position}
@@ -79,9 +143,24 @@ const ARView = () => {
     const modelPath = params.modelPath;
 
     const [shouldShowLottie, setShouldShowLottie] = useState(true);
+    const [isModelLoading, setIsModelLoading] = useState(false);
+    const [modelError, setModelError] = useState<string | null>(null);
 
     const handleModelPlaced = () => {
         setShouldShowLottie(false);
+    };
+
+    const handleModelLoadStart = () => {
+        setIsModelLoading(true);
+    };
+
+    const handleModelLoadEnd = () => {
+        setIsModelLoading(false);
+    };
+
+    const handleModelError = (error: string) => {
+        setModelError(error);
+        setIsModelLoading(false);
     };
 
     const fallbackModelPath =
@@ -97,6 +176,9 @@ const ARView = () => {
                             modelPath:
                                 (modelPath as string) || fallbackModelPath,
                             onModelPlaced: handleModelPlaced,
+                            onModelLoadStart: handleModelLoadStart,
+                            onModelLoadEnd: handleModelLoadEnd,
+                            onModelError: handleModelError,
                         }),
                 }}
             />
@@ -123,6 +205,28 @@ const ARView = () => {
                     <Text style={styles.instructionText}>
                         The model will appear once a plane is detected
                     </Text>
+                </View>
+            )}
+
+            {/* Loading State Overlay */}
+            {isModelLoading && !shouldShowLottie && (
+                <View style={styles.loadingOverlay}>
+                    <Text style={styles.loadingText}>Loading 3D model...</Text>
+                </View>
+            )}
+
+            {/* Error State Overlay */}
+            {modelError && !shouldShowLottie && (
+                <View style={styles.errorOverlay}>
+                    <Text style={styles.errorText}>
+                        Error loading model: {modelError}
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.backButton}
+                        onPress={() => router.back()}
+                    >
+                        <Text style={styles.backButtonText}>Go Back</Text>
+                    </TouchableOpacity>
                 </View>
             )}
 
@@ -200,5 +304,53 @@ const styles = StyleSheet.create({
         backgroundColor: "transparent",
         zIndex: 5,
         pointerEvents: "none", // This allows touches to pass through
+    },
+    loadingOverlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 20,
+    },
+    loadingText: {
+        color: "#ffffff",
+        fontSize: 18,
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+    errorOverlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 20,
+        padding: 20,
+    },
+    errorText: {
+        color: "#ff5252",
+        fontSize: 18,
+        fontWeight: "bold",
+        textAlign: "center",
+        marginBottom: 20,
+    },
+    backButton: {
+        backgroundColor: "#1e88e5",
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 8,
+        marginTop: 20,
+    },
+    backButtonText: {
+        color: "#ffffff",
+        fontSize: 16,
+        fontWeight: "bold",
     },
 });
