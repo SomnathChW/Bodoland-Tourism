@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, Linking } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import TitleSection from "../Common/TitleSection";
 import AboutSection from "../Common/AboutSection";
 import LocationMapSection from "./LocationMapSection";
@@ -7,9 +7,8 @@ import VirtualToursSection from "./VirtualToursSection";
 import EntryFeeSection from "./EntryFeeSection";
 import PackagesSection from "./PackagesSection";
 import CustomAlertDialog from "../../CustomAlertDialog";
-import { useDataStore } from "@/store/useDataStore";
 import { Package } from "./PackagesSection"; // Import the Package type
-import { useAppwriteDetailsQuery } from "@/hooks/useAppwriteDetailsQuery";
+import { useAttractionDetails } from "@/hooks/useEntityDetails";
 import { Ionicons } from "@expo/vector-icons";
 import DetailsLoader from "@/components/DetailsLoader";
 
@@ -48,26 +47,47 @@ const AttractionDetails = ({
         setDialogVisible(false);
     };
 
-    // Try to get the attraction details based on the identifier from store
-    const attractionDetailsStore = useDataStore
-        .getState()
-        .attractions.find((attraction) => attraction.identifier === identifier);
+    const handlePackagePress = (pkg: any) => {
+        // Set the selected package and show dialog
+        setSelectedPackage(pkg);
 
-    const { data, isLoading, error } = useAppwriteDetailsQuery({
-        queryKey: ["attractions", identifier],
-        type: "attractions",
-        identifier: identifier,
-        isEnabled: !attractionDetailsStore, // Only fetch if not in store
-    });
-
-    const attractionDetails = attractionDetailsStore || data?.data;
-
-    // Send data back to parent component when attraction details are found
-    useEffect(() => {
-        if (attractionDetails && onDataFetched) {
-            onDataFetched(attractionDetails);
+        // If only website is available, open it directly
+        if (pkg.website && !pkg.contact) {
+            Linking.openURL(pkg.website);
+            return;
         }
-    }, [attractionDetails, onDataFetched]);
+
+        // If only contact is available, call directly
+        if (pkg.contact && !pkg.website) {
+            const phoneNumber = pkg.contact.replace(/\s+/g, "");
+            Linking.openURL(`tel:${phoneNumber}`);
+            return;
+        }
+
+        // If both are available, show dialog
+        if ((pkg.contact || pkg.website) && !(pkg.contact && pkg.website)) {
+            // If only one option is available, open it directly
+            if (pkg.contact) {
+                const phoneNumber = pkg.contact.replace(/\s+/g, "");
+                Linking.openURL(`tel:${phoneNumber}`);
+            } else if (pkg.website) {
+                Linking.openURL(pkg.website);
+            }
+            return;
+        }
+
+        // Show dialog if both options are available
+        if (pkg.contact && pkg.website) {
+            setDialogVisible(true);
+        }
+    };
+
+    // Use the attraction details hook to fetch attraction data
+    const { attractionDetails, isLoading, error } = useAttractionDetails({
+        identifier,
+        onDataFetched,
+        onError,
+    });
 
     // Show loading state with skeleton loader
     if (isLoading) {
@@ -76,11 +96,6 @@ const AttractionDetails = ({
 
     // Show error state and notify parent
     if (error) {
-        // Call onError if provided to hide the header loader
-        if (onError) {
-            onError();
-        }
-
         return (
             <View style={styles.errorContainer}>
                 {/* Warning Icon */}
@@ -124,43 +139,7 @@ const AttractionDetails = ({
             />
             <PackagesSection
                 packages={attractionDetails.packages || []}
-                onPackagePress={(pkg) => {
-                    // Set the selected package and show dialog
-                    setSelectedPackage(pkg);
-
-                    // If only website is available, open it directly
-                    if (pkg.website && !pkg.contact) {
-                        Linking.openURL(pkg.website);
-                        return;
-                    }
-
-                    // If only contact is available, call directly
-                    if (pkg.contact && !pkg.website) {
-                        const phoneNumber = pkg.contact.replace(/\s+/g, "");
-                        Linking.openURL(`tel:${phoneNumber}`);
-                        return;
-                    }
-
-                    // If both are available, show dialog
-                    if (
-                        (pkg.contact || pkg.website) &&
-                        !(pkg.contact && pkg.website)
-                    ) {
-                        // If only one option is available, open it directly
-                        if (pkg.contact) {
-                            const phoneNumber = pkg.contact.replace(/\s+/g, "");
-                            Linking.openURL(`tel:${phoneNumber}`);
-                        } else if (pkg.website) {
-                            Linking.openURL(pkg.website);
-                        }
-                        return;
-                    }
-
-                    // Show dialog if both options are available
-                    if (pkg.contact && pkg.website) {
-                        setDialogVisible(true);
-                    }
-                }}
+                onPackagePress={handlePackagePress}
             />
 
             {/* Custom Alert Dialog */}

@@ -1,7 +1,9 @@
-type State = {
+import { create } from "zustand";
+
+export type State = {
     attractions: any[];
     districts: any[];
-    cuisine: any[];
+    cuisines: any[];
     festivals: any[];
     hotels: any[];
     virtual_tours: any[];
@@ -10,18 +12,16 @@ type State = {
     extras: any[];
 };
 
-type Actions = {
+export type Actions = {
     setData: (data: Partial<State>) => void;
     addToData: (key: keyof State, item: any) => void;
     appendToData: (key: keyof State, items: any[]) => void;
 };
 
-import { create } from "zustand";
-
 export const useDataStore = create<State & Actions>((set) => ({
     attractions: [],
     districts: [],
-    cuisine: [],
+    cuisines: [],
     festivals: [],
     hotels: [],
     virtual_tours: [],

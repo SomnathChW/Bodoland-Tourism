@@ -43,7 +43,7 @@ const Cuisine = () => {
             "short_description",
             "long_description",
         ],
-        storeToUpdate: "cuisine",
+        storeToUpdate: "cuisines",
     });
 
     const cuisineData = useMemo(() => {
