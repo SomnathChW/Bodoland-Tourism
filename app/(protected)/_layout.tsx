@@ -56,7 +56,7 @@ const StackLayout = React.memo(() => {
                     />
                 ))}
                 <Stack.Screen
-                    name="3d-view"
+                    name="3d_view"
                     options={{
                         title: "3D View",
                         headerShown: false,
@@ -64,7 +64,7 @@ const StackLayout = React.memo(() => {
                     }}
                 />
                 <Stack.Screen
-                    name="ar-view"
+                    name="ar_view"
                     options={{
                         title: "AR View",
                         headerShown: false,

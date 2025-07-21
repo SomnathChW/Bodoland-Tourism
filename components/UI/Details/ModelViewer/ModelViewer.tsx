@@ -99,14 +99,14 @@ export function ModelViewer({
 
     const handleViewInRoom = () => {
         router.push({
-            pathname: "/ar-view",
+            pathname: "/ar_view",
             params: { modelPath: model ?? modelPath },
         });
     };
 
     const handleView3D = () => {
         router.push({
-            pathname: "/3d-view",
+            pathname: "/3d_view",
             params: { modelPath: model ?? modelPath },
         });
     };
