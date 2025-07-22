@@ -31,7 +31,7 @@ const _layout = React.memo(() => {
         { name: "attractions", title: "Attractions" },
         { name: "stays", title: "Stays" },
         { name: "index", title: "Home" },
-        { name: "vrview", title: "Virtual Tour" },
+        { name: "virtual_tours", title: "Virtual Tour" },
         { name: "souvenirs", title: "Souvenirs" },
     ];
     const url = Linking.useLinkingURL();

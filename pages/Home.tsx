@@ -42,7 +42,7 @@ type ListItem =
           subHeading: string;
           data: typeof districtData;
           cardComponent: typeof CardVertical | typeof CardHorizontal;
-          viewAll: () => void;
+          viewAll?: () => void;
       };
 
 const Home = () => {
@@ -79,7 +79,6 @@ const Home = () => {
             subHeading: "Districts",
             data: districtData,
             cardComponent: CardVertical,
-            viewAll: () => router.push("/vrview"),
         },
         {
             type: "section",
@@ -87,7 +86,7 @@ const Home = () => {
             subHeading: "360 View",
             data: districtData,
             cardComponent: CardHorizontal,
-            viewAll: () => router.push("/vrview"),
+            viewAll: () => router.push("/virtual_tours"),
         },
         {
             type: "section",
