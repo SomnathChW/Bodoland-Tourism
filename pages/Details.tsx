@@ -19,6 +19,7 @@ import FestivalDetails from "@/components/UI/Details/FestivalDetails/FestivalDet
 import CuisineDetails from "@/components/UI/Details/CuisineDetails/CuisineDetails";
 import TransportDetails from "@/components/UI/Details/TransportDetails/TransportDetails";
 import StickyPurchaseButtons from "@/components/UI/Details/SouvenirDetails/StickyPurchaseButtons";
+import DetailsError from "@/components/UI/Details/Common/DetailsError";
 
 const { height } = Dimensions.get("screen");
 const HEADER_MAX_HEIGHT = height * 0.45;
@@ -97,15 +98,23 @@ const Details = () => {
                     <SouvenirDetails
                         identifier={identifier}
                         onDataFetched={handleDataFetched}
+                        onError={handleFetchError}
                     />
                 );
             case "stay":
-                return <StayDetails identifier={identifier} />;
+                return (
+                    <StayDetails
+                        identifier={identifier}
+                        onDataFetched={handleDataFetched}
+                        onError={handleFetchError}
+                    />
+                );
             case "festival":
                 return (
                     <FestivalDetails
                         identifier={identifier}
                         onDataFetched={handleDataFetched}
+                        onError={handleFetchError}
                     />
                 );
             case "cuisine":
@@ -113,10 +122,17 @@ const Details = () => {
                     <CuisineDetails
                         identifier={identifier}
                         onDataFetched={handleDataFetched}
+                        onError={handleFetchError}
                     />
                 );
             case "transport":
-                return <TransportDetails identifier={identifier} />;
+                return (
+                    <TransportDetails
+                        identifier={identifier}
+                        onDataFetched={handleDataFetched}
+                        onError={handleFetchError}
+                    />
+                );
             default:
                 return (
                     <AttractionDetails
@@ -131,6 +147,11 @@ const Details = () => {
     // Check if current page is for souvenirs
     const isSouvenirDetail =
         (identifier as string).split(/[-_]/)[0].toLowerCase() === "souvenir";
+
+    // Show error state and parent notified by onError callback through hook
+    if (isError) {
+        return <DetailsError />;
+    }
 
     return (
         <View style={styles.container}>

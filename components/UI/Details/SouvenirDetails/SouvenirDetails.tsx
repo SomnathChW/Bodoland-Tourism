@@ -1,47 +1,34 @@
-import { useDataStore } from "@/store/useDataStore";
-import { useEffect, useMemo } from "react";
-import { StyleSheet, Text, View } from "react-native";
 import TitleSection from "../Common/TitleSection";
 import PricingSection from "./PricingSection";
 import AboutSection from "../Common/AboutSection";
 import DetailsSectionGroup from "./DetailsSection";
+import { useSouvenirDetails } from "@/hooks/useEntityDetails";
+import DetailsLoader from "@/components/UI/Details/Common/DetailsLoader";
+import { View } from "react-native";
 
 const SouvenirDetails = ({
     identifier,
     onDataFetched,
+    onError,
 }: {
     identifier: string;
     onDataFetched: (data: any) => void;
+    onError?: () => void;
 }) => {
-    // Use zustand hook properly to subscribe to state changes
-    const souvenirs = useDataStore((state) => state.souvenirs);
-    
-    // Memoize the souvenir details to prevent unnecessary re-computations
-    const souvenirDetails = useMemo(() => {
-        return souvenirs.find((souvenir) => souvenir.identifier === identifier);
-    }, [souvenirs, identifier]);
+    // Use the souvenirdetails hook to fetch souvenir data
+    const { souvenirDetails, isLoading, error } = useSouvenirDetails({
+        identifier,
+        onDataFetched,
+        onError,
+    });
 
-    // Send data back to parent component when souvenir details are found
-    useEffect(() => {
-        if (souvenirDetails && onDataFetched) {
-            onDataFetched(souvenirDetails);
-        }
-    }, [souvenirDetails, onDataFetched]);
+    // Show loading state with skeleton loader
+    if (isLoading) {
+        return <DetailsLoader />;
+    }
 
-    if (!souvenirDetails) {
-        return (
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
-            >
-                <Text style={{ color: "#ff6b6b", fontSize: 16 }}>
-                    Souvenir not found
-                </Text>
-            </View>
-        );
+    if (error) {
+        return null;
     }
 
     return (
@@ -75,5 +62,3 @@ const SouvenirDetails = ({
 };
 
 export default SouvenirDetails;
-
-const styles = StyleSheet.create({});

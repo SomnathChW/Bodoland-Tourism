@@ -1,41 +1,37 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
+import React from "react";
 import TitleSection from "../Common/TitleSection";
 import AboutSection from "../Common/AboutSection";
-import { useDataStore } from "@/store/useDataStore";
+import { useCuisineDetails } from "@/hooks/useEntityDetails";
+import DetailsLoader from "@/components/UI/Details/Common/DetailsLoader";
+import DetailsError from "../Common/DetailsError";
 
 interface CuisineDetailsProps {
     identifier: string;
     onDataFetched?: (data: any) => void;
+    onError?: () => void;
 }
 
-const CuisineDetails = ({ identifier, onDataFetched }: CuisineDetailsProps) => {
+const CuisineDetails = ({
+    identifier,
+    onDataFetched,
+    onError,
+}: CuisineDetailsProps) => {
     // Try to get the cuisine details based on the identifier from store
-    const cuisineDetails = useDataStore
-        .getState()
-        .cuisine.find((cuisine) => cuisine.identifier === identifier);
+    const { cuisineDetails, isLoading, error } = useCuisineDetails({
+        identifier,
+        onDataFetched,
+        onError,
+    });
 
-    // Send data back to parent component when cuisine details are found
-    useEffect(() => {
-        if (cuisineDetails && onDataFetched) {
-            onDataFetched(cuisineDetails);
-        }
-    }, [cuisineDetails, onDataFetched]);
+    // Show loading state with skeleton loader
+    if (isLoading) {
+        return <DetailsLoader />;
+    }
 
-    if (!cuisineDetails) {
-        return (
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
-            >
-                <Text style={{ color: "#ff6b6b", fontSize: 16 }}>
-                    Cuisine not found
-                </Text>
-            </View>
-        );
+    // Show error state and parent notified by onError callback through hook
+    if (error) {
+        return null;
     }
 
     return (
@@ -55,5 +51,3 @@ const CuisineDetails = ({ identifier, onDataFetched }: CuisineDetailsProps) => {
 };
 
 export default CuisineDetails;
-
-const styles = StyleSheet.create({});

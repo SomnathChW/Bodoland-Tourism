@@ -9,8 +9,7 @@ import PackagesSection from "./PackagesSection";
 import CustomAlertDialog from "../../CustomAlertDialog";
 import { Package } from "./PackagesSection"; // Import the Package type
 import { useAttractionDetails } from "@/hooks/useEntityDetails";
-import { Ionicons } from "@expo/vector-icons";
-import DetailsLoader from "@/components/DetailsLoader";
+import DetailsLoader from "@/components/UI/Details/Common/DetailsLoader";
 
 interface AttractionDetailsProps {
     identifier: string;
@@ -94,15 +93,8 @@ const AttractionDetails = ({
         return <DetailsLoader />;
     }
 
-    // Show error state and notify parent
     if (error) {
-        return (
-            <View style={styles.errorContainer}>
-                {/* Warning Icon */}
-                <Ionicons name="warning-outline" size={24} color="#ff6b6b" />
-                <Text style={styles.errorText}>Attraction Not Found</Text>
-            </View>
-        );
+        return null;
     }
 
     return (
@@ -175,28 +167,3 @@ const AttractionDetails = ({
 };
 
 export default AttractionDetails;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#0d1116",
-    },
-    errorContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    errorText: {
-        color: "#ff6b6b",
-        fontSize: 16,
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    loadingText: {
-        fontSize: 16,
-        color: "#666",
-    },
-});

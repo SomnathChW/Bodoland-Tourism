@@ -4,34 +4,34 @@ import { useDataStore } from "@/store/useDataStore";
 import TitleSection from "../Common/TitleSection";
 import AboutSection from "../Common/AboutSection";
 import { Ionicons } from "@expo/vector-icons";
+import { useFestivalDetails } from "@/hooks/useEntityDetails";
+import DetailsLoader from "@/components/UI/Details/Common/DetailsLoader";
 
 interface FestivalDetailsProps {
     identifier: string;
     onDataFetched?: (data: any) => void;
+    onError?: () => void;
 }
 
 const FestivalDetails = ({
     identifier,
     onDataFetched,
+    onError,
 }: FestivalDetailsProps) => {
-    // Get the festival details based on the identifier from store
-    const festivalDetails = useDataStore
-        .getState()
-        .festivals.find((festival) => festival.identifier === identifier);
+    const { festivalDetails, isLoading, error } = useFestivalDetails({
+        identifier,
+        onDataFetched,
+        onError,
+    });
 
-    // Send data back to parent component when festival details are found
-    useEffect(() => {
-        if (festivalDetails && onDataFetched) {
-            onDataFetched(festivalDetails);
-        }
-    }, [festivalDetails, onDataFetched]);
+    // Show loading state with skeleton loader
+    if (isLoading) {
+        return <DetailsLoader />;
+    }
 
-    if (!festivalDetails) {
-        return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>Festival not found</Text>
-            </View>
-        );
+    // Show error state and notify parent
+    if (error) {
+        return null;
     }
 
     return (

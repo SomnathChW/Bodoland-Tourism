@@ -5,7 +5,7 @@ export type State = {
     districts: any[];
     cuisines: any[];
     festivals: any[];
-    hotels: any[];
+    stays: any[];
     virtual_tours: any[];
     emergency_contacts: any[];
     souvenirs: any[];
@@ -23,7 +23,7 @@ export const useDataStore = create<State & Actions>((set) => ({
     districts: [],
     cuisines: [],
     festivals: [],
-    hotels: [],
+    stays: [],
     virtual_tours: [],
     emergency_contacts: [],
     souvenirs: [],

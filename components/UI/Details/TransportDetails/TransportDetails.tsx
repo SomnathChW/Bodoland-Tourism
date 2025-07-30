@@ -1,7 +1,18 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const TransportDetails = ({ identifier }: { identifier: string }) => {
+type TransportDetailsProps = {
+    identifier: string;
+    onDataFetched?: (data: any) => void;
+    onError?: () => void;
+};
+
+const TransportDetails = ({
+    identifier,
+    onDataFetched,
+    onError,
+}: TransportDetailsProps) => {
+
     return (
         <View>
             <Text>TransportDetails for: {identifier}</Text>
