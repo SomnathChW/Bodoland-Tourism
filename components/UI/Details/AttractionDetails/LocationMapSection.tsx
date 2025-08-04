@@ -1,6 +1,6 @@
 /**
  * LocationMapSection Component
- * Author: GitHub Copilot
+ * Author: SomnathChW
  * Created: 2025-07-09
  *
  * This component provides a button to open coordinates in map application.
@@ -108,7 +108,7 @@ const LocationMapSection: React.FC<LocationMapProps> = ({
 
 const styles = StyleSheet.create({
     locationSection: {
-        marginBottom: 30,
+        marginBottom: 25,
     },
     sectionTitle: {
         color: "#646f7e",

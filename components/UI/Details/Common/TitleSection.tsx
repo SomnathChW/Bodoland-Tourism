@@ -1,6 +1,6 @@
 /**
  * TitleSection Component
- * Author: SomnathCh
+ * Author: SomnathChW
  * Created: 2025-04-14 08:21:22 UTC
  *
  * This component renders the title, rating, and location information
@@ -92,7 +92,7 @@ const TitleSection = ({ title, rating, location }: TitleSectionProps) => {
 const styles = StyleSheet.create({
     titleSection: {
         marginTop: 20,
-        marginBottom: 25,
+        marginBottom: 20,
     },
     title: {
         color: "#fff",

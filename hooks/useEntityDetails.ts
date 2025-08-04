@@ -3,7 +3,6 @@ import { useDataStore, State } from "@/store/useDataStore";
 import { useAppwriteDetailsQuery } from "./useAppwriteDetailsQuery";
 
 interface UseEntityDetailsParams<T extends keyof State> {
-    entityType: string;
     identifier: string;
     onDataFetched?: (data: any) => void;
     onError?: () => void;
@@ -23,6 +22,8 @@ export const useEntityDetails = <T extends keyof State>({
     // Try to get the entity details based on the identifier from store
     const storeState = useDataStore.getState();
     // get the entity type from the generic type (split along - or _) and add an "s" at the end
+    // this is to handle cases like "attraction-123" or "souvenir_456" to get "attractions" or "souvenirs"
+    // because the store state and API is structured with plural keys
     const entityType = identifier.split(/[-_]/)[0].toLowerCase() + "s";
 
     const entityDetailsFromStore = storeState[entityType as keyof State]?.find(
@@ -66,7 +67,6 @@ export const useAttractionDetails = ({
     onError,
 }: Omit<UseEntityDetailsParams<"attractions">, "entityType">) => {
     const result = useEntityDetails({
-        entityType: "attractions",
         identifier,
         onDataFetched,
         onError,
@@ -88,7 +88,6 @@ export const useSouvenirDetails = ({
     onError,
 }: Omit<UseEntityDetailsParams<"souvenirs">, "entityType">) => {
     const result = useEntityDetails({
-        entityType: "souvenirs",
         identifier,
         onDataFetched,
         onError,
@@ -110,7 +109,6 @@ export const useCuisineDetails = ({
     onError,
 }: Omit<UseEntityDetailsParams<"cuisines">, "entityType">) => {
     const result = useEntityDetails({
-        entityType: "cuisine",
         identifier,
         onDataFetched,
         onError,
@@ -132,7 +130,6 @@ export const useFestivalDetails = ({
     onError,
 }: Omit<UseEntityDetailsParams<"festivals">, "entityType">) => {
     const result = useEntityDetails({
-        entityType: "festivals",
         identifier,
         onDataFetched,
         onError,
@@ -152,9 +149,8 @@ export const useHotelDetails = ({
     identifier,
     onDataFetched,
     onError,
-}: Omit<UseEntityDetailsParams<"hotels">, "entityType">) => {
+}: Omit<UseEntityDetailsParams<"stays">, "entityType">) => {
     const result = useEntityDetails({
-        entityType: "hotels",
         identifier,
         onDataFetched,
         onError,
@@ -176,7 +172,6 @@ export const useVirtualTourDetails = ({
     onError,
 }: Omit<UseEntityDetailsParams<"virtual_tours">, "entityType">) => {
     const result = useEntityDetails({
-        entityType: "virtual_tours",
         identifier,
         onDataFetched,
         onError,

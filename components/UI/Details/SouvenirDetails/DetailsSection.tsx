@@ -1,17 +1,6 @@
-/**
- * DetailsSectionGroup Component (formerly TabsDetailSection)
- * Author: SomnathChW
- * Created: 2025-07-10
- * Updated: 2025-07-10
- *
- * This component renders product details in grouped sections
- * for the Souvenir Details page.
- */
-
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Animated, { FadeIn } from "react-native-reanimated";
 
 interface DetailsSectionGroupProps {
     weight?: string;
@@ -44,7 +33,7 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
             (is_vegan !== null || is_vegetarian !== null || expiration_date));
 
     return (
-        <Animated.View style={styles.container} entering={FadeIn.duration(300)}>
+        <View style={styles.container}>
             {/* Section Title */}
             <Text style={styles.sectionTitle}>Product Details</Text>
 
@@ -225,7 +214,7 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                     </View>
                 </View>
             )}
-        </Animated.View>
+        </View>
     );
 };
 

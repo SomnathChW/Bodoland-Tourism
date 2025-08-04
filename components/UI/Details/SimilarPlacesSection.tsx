@@ -132,7 +132,7 @@ const SimilarPlacesSection: React.FC<SimilarPlacesSectionProps> = ({
 
 const styles = StyleSheet.create({
     similarSection: {
-        marginBottom: 30,
+        marginBottom: 25,
     },
     sectionTitle: {
         color: "#646f7e",

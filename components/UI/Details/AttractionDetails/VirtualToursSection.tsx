@@ -1,6 +1,6 @@
 /**
  * VirtualToursSection Component
- * Author: GitHub Copilot
+ * Author: SomnathChW
  * Created: 2025-07-09
  *
  * This component renders a horizontal scrollable list of virtual tours
@@ -224,7 +224,7 @@ const VirtualToursSection: React.FC<VirtualToursSectionProps> = ({
 
 const styles = StyleSheet.create({
     toursSection: {
-        marginBottom: 30,
+        marginBottom: 25,
     },
     sectionTitle: {
         color: "#646f7e",

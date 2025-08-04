@@ -2,6 +2,10 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import TitleSection from "../Common/TitleSection";
 import AboutSection from "../Common/AboutSection";
+import IngredientsSection from "./IngredientsSection";
+import CulturalSignificanceSection from "./CulturalSignificanceSection";
+import NutritionalInfoSection from "./NutritionalInfoSection";
+import RecipeSection from "./RecipeSection";
 import { useCuisineDetails } from "@/hooks/useEntityDetails";
 import DetailsLoader from "@/components/UI/Details/Common/DetailsLoader";
 import DetailsError from "../Common/DetailsError";
@@ -39,13 +43,19 @@ const CuisineDetails = ({
             <TitleSection title={cuisineDetails.name} rating={undefined} />
             <AboutSection description={cuisineDetails.long_description} />
 
-            {/* Additional sections can be added here as needed:
-               - Ingredients section
-               - Preparation method
-               - Nutritional info
-               - Cultural significance
-               - etc.
-            */}
+            <CulturalSignificanceSection
+                culturalSignificance={cuisineDetails.cultural_significance}
+                isVegan={cuisineDetails.is_vegan}
+                isVegetarian={cuisineDetails.is_vegetarian}
+            />
+
+            <NutritionalInfoSection
+                nutritionalInfo={cuisineDetails.nutritional_info}
+            />
+
+            <IngredientsSection ingredients={cuisineDetails.ingredients} />
+
+            <RecipeSection recipeUrl={cuisineDetails.recipe_url} />
         </View>
     );
 };

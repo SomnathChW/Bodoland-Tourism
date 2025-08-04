@@ -80,7 +80,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
 
 const styles = StyleSheet.create({
     featuresSection: {
-        marginBottom: 30,
+        marginBottom: 25,
     },
     sectionTitle: {
         color: "#646f7e",

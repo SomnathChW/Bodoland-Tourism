@@ -225,7 +225,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
 
 const styles = StyleSheet.create({
     packagesSection: {
-        marginBottom: 30,
+        marginBottom: 25,
     },
     sectionTitle: {
         color: "#646f7e",

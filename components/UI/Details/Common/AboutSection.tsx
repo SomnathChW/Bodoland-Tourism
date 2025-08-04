@@ -20,9 +20,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
     description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisis, nunc vel tincidunt vestibulum, risus leo varius nisl, a dignissim velit massa eu mauris.",
 }) => {
     return (
-        <Animated.View
-            style={styles.detailsSection}
-        >
+        <Animated.View style={styles.detailsSection}>
             {/* Section Title */}
             <Text style={styles.sectionTitle}>About</Text>
 
@@ -37,7 +35,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
 
 const styles = StyleSheet.create({
     detailsSection: {
-        marginBottom: 30,
+        marginBottom: 25,
     },
     sectionTitle: {
         color: "#646f7e",

@@ -1,6 +1,6 @@
 /**
  * EntryFeeSection Component
- * Author: GitHub Copilot
+ * Author: SomnathChW
  * Created: 2025-07-09
  *
  * This component renders detailed entry fee information for attractions
@@ -171,7 +171,7 @@ const EntryFeeSection: React.FC<EntryFeeProps> = ({
 
 const styles = StyleSheet.create({
     entryFeeSection: {
-        marginBottom: 30,
+        marginBottom: 25,
     },
     sectionTitle: {
         color: "#646f7e",

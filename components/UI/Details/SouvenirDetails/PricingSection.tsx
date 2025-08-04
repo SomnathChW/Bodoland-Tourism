@@ -10,7 +10,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Animated, { FadeIn } from "react-native-reanimated";
 
 interface PricingSectionProps {
     originalPrice?: string;
@@ -29,9 +28,8 @@ const PricingSection: React.FC<PricingSectionProps> = ({
     inStock,
 }) => {
     return (
-        <Animated.View
+        <View
             style={styles.pricingSection}
-            entering={FadeIn.duration(300)}
         >
             {/* Section Title */}
             <Text style={styles.sectionTitle}>Pricing</Text>
@@ -73,13 +71,13 @@ const PricingSection: React.FC<PricingSectionProps> = ({
                     </Text>
                 </View>
             </View>
-        </Animated.View>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     pricingSection: {
-        marginBottom: 30,
+        marginBottom: 25,
     },
     sectionTitle: {
         color: "#646f7e",
