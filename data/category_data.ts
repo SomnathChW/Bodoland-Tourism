@@ -15,7 +15,7 @@ export const categoryData = [
         identifier: "category-vr",
         title: "Virtual Tours",
         image: require("@/assets/images/icons/vr.png"),
-        route: "/vrview",
+        route: "/virtual_tours",
     },
     {
         identifier: "category-transport",
