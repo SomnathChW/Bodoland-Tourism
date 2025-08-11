@@ -1,9 +1,17 @@
 /**
  * RelatedLinksSection Component
  * Author: SomnathChW
- * Created: 2025-08-09
- *
- * This component renders related links and external resources for festivals.
+ * Created: 2025-08                        <View style={styles.linkTextContainer}>
+                            <Text style={styles.linkTitle}>{link.label}</Text>
+                            <Text style={styles.linkDescription}>
+                                Learn more about this festival topic
+                            </Text>
+                        </View>
+                        <Ionicons
+                            name="chevron-forward"
+                            size={20}
+                            color="#ffffff"
+                        />his component renders related links and external resources for festivals.
  */
 
 import React from "react";
@@ -59,7 +67,12 @@ const RelatedLinksSection: React.FC<RelatedLinksSectionProps> = ({
             {relatedLinks.map((link, index) => (
                 <TouchableOpacity
                     key={index}
-                    style={styles.linkCard}
+                    style={[
+                        styles.linkCard,
+                        index === relatedLinks.length - 1 && {
+                            marginBottom: 0,
+                        },
+                    ]}
                     onPress={() => handleLinkPress(link.url)}
                     activeOpacity={0.7}
                 >
@@ -67,8 +80,8 @@ const RelatedLinksSection: React.FC<RelatedLinksSectionProps> = ({
                         <View style={styles.linkIconContainer}>
                             <MaterialCommunityIcons
                                 name="open-in-new"
-                                size={20}
-                                color="#646f7e"
+                                size={24}
+                                color="#ffffff"
                             />
                         </View>
                         <View style={styles.linkTextContainer}>
@@ -110,18 +123,18 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         borderLeftWidth: 3,
         borderLeftColor: "#646f7e",
-        marginBottom: 12,
+        marginBottom: 8,
         overflow: "hidden",
     },
     linkContent: {
         flexDirection: "row",
         alignItems: "center",
-        padding: 16,
+        padding: 12,
     },
     linkIconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 48,
+        height: 48,
+        borderRadius: 24,
         backgroundColor: "rgba(100,111,126,0.15)",
         justifyContent: "center",
         alignItems: "center",
@@ -138,9 +151,9 @@ const styles = StyleSheet.create({
         fontFamily: "SfProMedium",
     },
     linkDescription: {
-        fontSize: 14,
-        color: "#ffffff",
-        opacity: 0.7,
+        fontSize: 12,
+        color: "#646f7e",
+        opacity: 1,
         fontFamily: "SfProMedium",
     },
 });

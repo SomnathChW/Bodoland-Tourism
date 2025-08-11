@@ -8,7 +8,7 @@
 
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 
 interface CulturalSignificanceSectionProps {
     culturalSignificance?: string;
@@ -31,19 +31,18 @@ const CulturalSignificanceSection: React.FC<
             <View style={styles.separator} />
 
             {/* Cultural Significance Content */}
-            <View style={styles.contentContainer}>
-                <View style={styles.iconContainer}>
+            <View style={styles.significanceCard}>
+                <View style={styles.cardHeader}>
                     <MaterialCommunityIcons
                         name="book-open-variant"
-                        size={24}
-                        color="#646f7e"
+                        size={18}
+                        color="#ffffff"
                     />
+                    <Text style={styles.cardHeaderText}>Cultural Context</Text>
                 </View>
-                <View style={styles.textContainer}>
-                    <Text style={styles.significanceText}>
-                        {culturalSignificance}
-                    </Text>
-                </View>
+                <Text style={styles.significanceText}>
+                    {culturalSignificance}
+                </Text>
             </View>
         </View>
     );
@@ -56,42 +55,57 @@ const styles = StyleSheet.create({
     sectionTitle: {
         color: "#646f7e",
         fontFamily: "SfProMedium",
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: "bold",
         marginBottom: 5,
     },
     separator: {
         height: 2,
-        backgroundColor: "rgba(100, 111, 126, 0.2)",
+        backgroundColor: "#646f7e",
         marginBottom: 15,
-        width: "100%",
     },
-    contentContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: "rgba(100, 111, 126, 0.08)",
+    significanceCard: {
+        backgroundColor: "#1a2029",
         borderRadius: 12,
-        padding: 16,
+        padding: 12,
         borderLeftWidth: 3,
         borderLeftColor: "#646f7e",
     },
-    iconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: "rgba(100,111,126,0.15)",
-        justifyContent: "center",
+    cardHeader: {
+        flexDirection: "row",
         alignItems: "center",
-        marginRight: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: "rgba(255,255,255,0.1)",
+        paddingBottom: 8,
+        marginBottom: 8,
     },
-    textContainer: {
-        flex: 1,
+    cardHeaderText: {
+        color: "#ffffff",
+        fontFamily: "SfProMedium",
+        fontSize: 15,
+        fontWeight: "bold",
+        marginLeft: 8,
     },
     significanceText: {
         color: "#FFFFFF",
         fontSize: 14,
         lineHeight: 22,
         textAlign: "justify",
+    },
+    noteContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 8,
+        backgroundColor: "rgba(0,0,0,0.2)",
+        padding: 6,
+        borderRadius: 6,
+    },
+    noteText: {
+        color: "#646f7e",
+        fontFamily: "SfProMedium",
+        fontSize: 12,
+        marginLeft: 5,
+        flex: 1,
     },
 });
 

@@ -75,29 +75,33 @@ const FestivalDatesSection: React.FC<FestivalDatesSectionProps> = ({
             <View style={styles.separator} />
 
             {/* Date Information */}
-            <View style={styles.dateContainer}>
+            <View style={styles.dateCard}>
+                <View style={styles.cardHeader}>
+                    <Ionicons
+                        name="calendar-outline"
+                        size={18}
+                        color="#ffffff"
+                    />
+                    <Text style={styles.cardHeaderText}>Date Information</Text>
+                </View>
                 <View style={styles.dateRow}>
-                    <View style={styles.iconContainer}>
+                    <Text style={styles.dateLabel}>Date:</Text>
+                    <Text style={styles.dateText}>{dateText}</Text>
+                </View>
+                {(dates.exact || (dates.general && !dates.exact)) && (
+                    <View style={styles.noteContainer}>
                         <Ionicons
-                            name="calendar-outline"
-                            size={20}
+                            name="information-circle-outline"
+                            size={12}
                             color="#646f7e"
                         />
+                        <Text style={styles.noteText}>
+                            {dates.exact
+                                ? "Exact celebration dates confirmed"
+                                : "General celebration period - check local sources for specific dates"}
+                        </Text>
                     </View>
-                    <View style={styles.textContainer}>
-                        <Text style={styles.dateText}>{dateText}</Text>
-                        {dates.exact && (
-                            <Text style={styles.dateTypeText}>
-                                Exact celebration dates
-                            </Text>
-                        )}
-                        {dates.general && !dates.exact && (
-                            <Text style={styles.dateTypeText}>
-                                General celebration period
-                            </Text>
-                        )}
-                    </View>
-                </View>
+                )}
             </View>
         </View>
     );
@@ -110,50 +114,69 @@ const styles = StyleSheet.create({
     sectionTitle: {
         color: "#646f7e",
         fontFamily: "SfProMedium",
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: "bold",
         marginBottom: 5,
     },
     separator: {
         height: 2,
-        backgroundColor: "rgba(100, 111, 126, 0.2)",
+        backgroundColor: "#646f7e",
         marginBottom: 15,
-        width: "100%",
     },
-    dateContainer: {
-        backgroundColor: "rgba(100, 111, 126, 0.1)",
+    dateCard: {
+        backgroundColor: "#1a2029",
         borderRadius: 12,
-        padding: 16,
+        padding: 12,
         borderLeftWidth: 3,
         borderLeftColor: "#646f7e",
     },
-    dateRow: {
+    cardHeader: {
         flexDirection: "row",
         alignItems: "center",
+        borderBottomWidth: 1,
+        borderBottomColor: "rgba(255,255,255,0.1)",
+        paddingBottom: 8,
+        marginBottom: 8,
     },
-    iconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: "rgba(100,111,126,0.15)",
-        justifyContent: "center",
+    cardHeaderText: {
+        color: "#ffffff",
+        fontFamily: "SfProMedium",
+        fontSize: 15,
+        fontWeight: "bold",
+        marginLeft: 8,
+    },
+    dateRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
         alignItems: "center",
-        marginRight: 16,
+        marginBottom: 8,
     },
-    textContainer: {
-        flex: 1,
+    dateLabel: {
+        color: "#ffffff",
+        fontSize: 14,
+        fontFamily: "SfProMedium",
+        fontWeight: "500",
     },
     dateText: {
         color: "#FFFFFF",
-        fontSize: 16,
-        fontWeight: "600",
-        marginBottom: 4,
+        fontSize: 14,
+        fontWeight: "bold",
         fontFamily: "SfProMedium",
     },
-    dateTypeText: {
+    noteContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 8,
+        backgroundColor: "rgba(0,0,0,0.2)",
+        padding: 6,
+        borderRadius: 6,
+    },
+    noteText: {
         color: "#646f7e",
+        fontFamily: "SfProMedium",
         fontSize: 12,
-        fontStyle: "italic",
+        marginLeft: 5,
+        flex: 1,
     },
 });
 
