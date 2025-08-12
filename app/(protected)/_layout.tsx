@@ -71,6 +71,22 @@ const StackLayout = React.memo(() => {
                         navigationBarHidden: true,
                     }}
                 />
+                <Stack.Screen
+                    name="vr_view_fullscreen"
+                    options={{
+                        title: "VR View",
+                        headerShown: false,
+                        navigationBarHidden: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="vr_view_cardboard"
+                    options={{
+                        title: "VR View",
+                        headerShown: false,
+                        navigationBarHidden: true,
+                    }}
+                />
             </Stack>
             <Drawer />
         </QueryClientProvider>

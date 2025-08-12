@@ -29,6 +29,8 @@ const MIN_IMAGE_HEIGHT = height * 0.18; // Similar to your StaysCard component
 
 const VrCard = ({ item, index }: Props) => {
     const router = useRouter();
+    const tourUrl =
+        "https://as2.ftcdn.net/jpg/01/83/48/17/1000_F_183481794_XVV7tm8VdFmlmdIcK0TI94hc9mDqDSnb.jpg";
 
     return (
         <View
@@ -46,8 +48,8 @@ const VrCard = ({ item, index }: Props) => {
             <Pressable
                 onPress={() =>
                     router.navigate({
-                        pathname: "/details",
-                        params: { identifier: item.identifier },
+                        pathname: "/vr_view_fullscreen",
+                        params: { tourUrl: tourUrl },
                     })
                 }
             >
