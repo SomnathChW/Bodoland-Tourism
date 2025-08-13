@@ -59,17 +59,17 @@ const Details = () => {
         };
     }, []);
 
-    // Handler for when data is fetched
-    const handleDataFetched = (data: any) => {
+    // Memoized handler for when data is fetched
+    const handleDataFetched = React.useCallback((data: any) => {
         setFetchedData(data);
         setIsLoading(false);
-    };
+    }, []);
 
-    // Handler for error cases
-    const handleFetchError = () => {
+    // Memoized handler for error cases
+    const handleFetchError = React.useCallback(() => {
         setIsLoading(false);
         setIsError(true);
-    };
+    }, []);
 
     // Static styles calculated once
     const staticStyles = React.useMemo(
@@ -81,14 +81,16 @@ const Details = () => {
         []
     );
 
-    // Function to return structure based on identifier
-    const getDetailsStructure = (identifier: string) => {
-        const detail_type = identifier.split(/[-_]/)[0].toLowerCase();
+    // Memoized function to return structure based on identifier
+    const getDetailsStructure = React.useMemo(() => {
+        const detail_type = (identifier as string)
+            .split(/[-_]/)[0]
+            .toLowerCase();
         switch (detail_type) {
             case "attraction":
                 return (
                     <AttractionDetails
-                        identifier={identifier}
+                        identifier={identifier as string}
                         onDataFetched={handleDataFetched}
                         onError={handleFetchError}
                     />
@@ -96,7 +98,7 @@ const Details = () => {
             case "souvenir":
                 return (
                     <SouvenirDetails
-                        identifier={identifier}
+                        identifier={identifier as string}
                         onDataFetched={handleDataFetched}
                         onError={handleFetchError}
                     />
@@ -104,7 +106,7 @@ const Details = () => {
             case "stay":
                 return (
                     <StayDetails
-                        identifier={identifier}
+                        identifier={identifier as string}
                         onDataFetched={handleDataFetched}
                         onError={handleFetchError}
                     />
@@ -112,7 +114,7 @@ const Details = () => {
             case "festival":
                 return (
                     <FestivalDetails
-                        identifier={identifier}
+                        identifier={identifier as string}
                         onDataFetched={handleDataFetched}
                         onError={handleFetchError}
                     />
@@ -120,7 +122,7 @@ const Details = () => {
             case "cuisine":
                 return (
                     <CuisineDetails
-                        identifier={identifier}
+                        identifier={identifier as string}
                         onDataFetched={handleDataFetched}
                         onError={handleFetchError}
                     />
@@ -128,7 +130,7 @@ const Details = () => {
             case "transport":
                 return (
                     <TransportDetails
-                        identifier={identifier}
+                        identifier={identifier as string}
                         onDataFetched={handleDataFetched}
                         onError={handleFetchError}
                     />
@@ -136,13 +138,13 @@ const Details = () => {
             default:
                 return (
                     <AttractionDetails
-                        identifier={identifier}
+                        identifier={identifier as string}
                         onDataFetched={handleDataFetched}
                         onError={handleFetchError}
                     />
                 );
         }
-    };
+    }, [identifier, handleDataFetched, handleFetchError]);
 
     // Check if current page is for souvenirs
     const isSouvenirDetail =
@@ -180,14 +182,16 @@ const Details = () => {
                 ]}
                 showsVerticalScrollIndicator={false}
                 onScroll={scrollHandler}
-                scrollEventThrottle={16}
+                scrollEventThrottle={8} // Reduced from 16 for smoother animations
                 removeClippedSubviews={true}
-                overScrollMode="never"
+                overScrollMode="auto"
                 keyboardShouldPersistTaps="handled"
                 scrollEnabled={!isLoading && !isError}
+                // Performance optimizations
+                disableIntervalMomentum={true}
             >
                 {/* Render sections based on structure */}
-                {getDetailsStructure(identifier as string)}
+                {getDetailsStructure}
             </Animated.ScrollView>
 
             {/* Sticky Purchase Buttons - Only for souvenirs */}
@@ -208,4 +212,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Details;
+export default React.memo(Details);

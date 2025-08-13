@@ -120,7 +120,7 @@ export function ModelViewer({
                     height: "100%",
                     backgroundColor,
                 }}
-                resizeMode={FastImage.resizeMode.contain}
+                resizeMode={FastImage.resizeMode.cover}
             />
 
             {/* Action Buttons */}

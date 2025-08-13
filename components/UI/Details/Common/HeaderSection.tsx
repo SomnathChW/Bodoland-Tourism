@@ -31,11 +31,6 @@ interface HeaderSectionProps {
     data?: any;
 }
 
-const carouselImages = [
-    "https://cloud.appwrite.io/v1/storage/buckets/placeholders/files/67eaf1f3002191537bba/view?project=bodoland-tourism",
-    // Add more image URLs as needed
-];
-
 const HeaderSection = ({
     scrollY,
     animationPhase,
@@ -46,7 +41,7 @@ const HeaderSection = ({
     data,
 }: HeaderSectionProps) => {
     // State for dynamic images from data
-    const [displayImages, setDisplayImages] = useState(carouselImages);
+    const [displayImages, setDisplayImages] = useState([]);
     const [model, setModel] = useState<string | null>(null);
     const [modelImageUrl, setModelImageUrl] = useState<string | null>(null);
     const [hasModel, setHasModel] = useState(false);
@@ -68,43 +63,23 @@ const HeaderSection = ({
         setCurrentPage(hasModel ? 1 : 0);
     }, [hasModel]);
 
-    // Optimized derived animations with worklet
+    // Optimized derived animations with worklet - Combined for better performance
     const animations = useDerivedValue(() => {
         "worklet";
-        // Full animations for phase 2+
+        const scrollValue = scrollY.value;
+        const scrollProgress = scrollValue / scrollDistance;
+        const clampedProgress = Math.min(Math.max(scrollProgress, 0), 1);
+
         return {
-            headerHeight: interpolate(
-                scrollY.value,
-                [0, scrollDistance],
-                [HEADER_MAX_HEIGHT, minimizedHeaderHeight],
-                Extrapolation.CLAMP
-            ),
-            imageOpacity: interpolate(
-                scrollY.value,
-                [0, scrollDistance],
-                [1, 0],
-                Extrapolation.CLAMP
-            ),
-            imageScale: interpolate(
-                scrollY.value,
-                [0, scrollDistance],
-                [1, 1.2],
-                Extrapolation.CLAMP
-            ),
-            minimizedHeaderOpacity: interpolate(
-                scrollY.value,
-                [scrollDistance * 0.7, scrollDistance],
-                [0, 1],
-                Extrapolation.CLAMP
-            ),
-            backButtonOpacity: interpolate(
-                scrollY.value,
-                [0, scrollDistance * 0.5],
-                [1, 0],
-                Extrapolation.CLAMP
-            ),
+            headerHeight: HEADER_MAX_HEIGHT - scrollDistance * clampedProgress,
+            imageOpacity: 1 - clampedProgress,
+            imageScale: 1 + 0.2 * clampedProgress,
+            minimizedHeaderOpacity:
+                scrollProgress > 0.7 ? (scrollProgress - 0.7) / 0.3 : 0,
+            backButtonOpacity:
+                scrollProgress > 0.5 ? 0 : 1 - scrollProgress * 2,
         };
-    }, [animationPhase, scrollDistance, minimizedHeaderHeight]);
+    }, [scrollDistance, minimizedHeaderHeight]);
 
     const headerAnimatedStyle = useAnimatedStyle(() => {
         "worklet";
@@ -161,18 +136,45 @@ const HeaderSection = ({
     type ImagePage = { type: "image"; uri: string };
     type Page = ModelPage | ImagePage;
 
-    const pages: Page[] = hasModel
-        ? [
-              {
-                  type: "model",
-                  model_url: model || "",
-                  model_image_url: modelImageUrl || "",
-              } as ModelPage,
-              ...displayImages.map(
-                  (uri): ImagePage => ({ type: "image", uri })
-              ),
-          ]
-        : displayImages.map((uri): ImagePage => ({ type: "image", uri }));
+    // Memoized page component for better performance
+    const renderPage = React.useCallback((page: Page, index: number) => {
+        return (
+            <View key={index} style={styles.pageContainer}>
+                {page.type === "model" ? (
+                    <ModelViewer
+                        scale={3}
+                        model={page.model_url}
+                        model_image_url={page.model_image_url}
+                    />
+                ) : page.type === "image" ? (
+                    <FastImage
+                        source={{
+                            uri: page.uri,
+                            priority: FastImage.priority.high,
+                            cache: FastImage.cacheControl.immutable,
+                        }}
+                        style={styles.carouselImage}
+                        resizeMode={FastImage.resizeMode.cover}
+                    />
+                ) : null}
+            </View>
+        );
+    }, []);
+
+    const pages: Page[] = React.useMemo(() => {
+        return hasModel
+            ? [
+                  {
+                      type: "model",
+                      model_url: model || "",
+                      model_image_url: modelImageUrl || "",
+                  } as ModelPage,
+                  ...displayImages.map(
+                      (uri): ImagePage => ({ type: "image", uri })
+                  ),
+              ]
+            : displayImages.map((uri): ImagePage => ({ type: "image", uri }));
+    }, [hasModel, model, modelImageUrl, displayImages]);
 
     return (
         <Animated.View style={[styles.header, headerAnimatedStyle]}>
@@ -191,29 +193,11 @@ const HeaderSection = ({
                         onPageSelected={(e) =>
                             setCurrentPage(e.nativeEvent.position)
                         }
+                        // Performance optimizations
+                        offscreenPageLimit={2}
+                        overdrag={false}
                     >
-                        {pages.map((page, index) => (
-                            <View key={index} style={styles.pageContainer}>
-                                {page.type === "model" ? (
-                                    <ModelViewer
-                                        scale={3}
-                                        model={page.model_url}
-                                        model_image_url={page.model_image_url}
-                                    />
-                                ) : page.type === "image" ? (
-                                    <FastImage
-                                        source={{
-                                            uri: page.uri,
-                                            priority: FastImage.priority.high,
-                                            cache: FastImage.cacheControl
-                                                .immutable,
-                                        }}
-                                        style={styles.carouselImage}
-                                        resizeMode={FastImage.resizeMode.cover}
-                                    />
-                                ) : null}
-                            </View>
-                        ))}
+                        {pages.map((page, index) => renderPage(page, index))}
                     </PagerView>
 
                     {/* Page indicators */}
