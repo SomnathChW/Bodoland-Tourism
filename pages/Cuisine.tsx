@@ -77,17 +77,12 @@ const Cuisine = () => {
                         />
                         <View>
                             <Text style={styles.headingText}>Cuisine</Text>
-                            <Text
-                                style={styles.mainSubHeaddingText}
-                                numberOfLines={1}
-                            >
-                                Explore the rich culture of Bodoland
+                            <Text style={styles.mainSubHeaddingText}>
+                                Savor the local flavors
                             </Text>
                         </View>
                     </View>
-                    <Ionicons name="search" size={30} style={styles.buttons} />
-                </View>
-
+                </View>{" "}
                 {isLoading ? (
                     // Display loading skeleton while data is loading
                     <FlashList

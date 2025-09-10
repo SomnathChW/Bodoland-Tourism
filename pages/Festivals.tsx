@@ -77,17 +77,12 @@ const Festivals = () => {
                         />
                         <View>
                             <Text style={styles.headingText}>Festivals</Text>
-                            <Text
-                                style={styles.mainSubHeaddingText}
-                                numberOfLines={1}
-                            >
-                                Explore the rich culture of Bodoland
+                            <Text style={styles.mainSubHeaddingText}>
+                                Celebrate with the locals
                             </Text>
                         </View>
                     </View>
-                    <Ionicons name="search" size={30} style={styles.buttons} />
-                </View>
-
+                </View>{" "}
                 {isLoading ? (
                     // Display loading skeleton while data is loading
                     <FlashList

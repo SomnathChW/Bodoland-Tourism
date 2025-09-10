@@ -74,7 +74,6 @@ const Stays = React.memo(() => {
                             </Text>
                         </View>
                     </View>
-                    <Ionicons name="search" size={30} style={styles.buttons} />
                 </View>
 
                 {/* Sorting and Filtering Component */}

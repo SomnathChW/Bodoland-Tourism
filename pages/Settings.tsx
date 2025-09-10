@@ -24,7 +24,6 @@ const Settings = () => {
                             </Text>
                         </View>
                     </View>
-                    <Ionicons name="search" size={30} style={styles.buttons} />
                 </View>
 
                 <View style={styles.pageContent}>

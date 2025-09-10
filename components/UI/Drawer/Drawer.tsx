@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, memo } from "react";
+import React, { useEffect, useCallback, memo, useState } from "react";
 import {
     View,
     StyleSheet,
@@ -10,6 +10,7 @@ import {
     Text,
 } from "react-native";
 import { useDrawer } from "@/context/DrawerContext";
+import { useAuth } from "@/context/AuthContext";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -24,6 +25,7 @@ import { useRouter } from "expo-router";
 import MenuItem from "@/components/UI/Drawer/MenuItem";
 import FooterItem from "@/components/UI/Drawer/FooterItem";
 import ProfileSection from "@/components/UI/Drawer/ProfileSection";
+import AlertDialog from "@/components/UI/AlertDialog";
 import {
     drawerItems,
     drawerFooterItems,
@@ -38,9 +40,21 @@ const STATUS_BAR_HEIGHT =
 
 function DrawerComponent(): JSX.Element {
     const { isDrawerOpen, toggleDrawer, currentPath } = useDrawer();
+    const { signOut } = useAuth();
     const drawerProgress = useSharedValue(0);
     const router = useRouter();
     const renderIcon = useIconRenderer();
+
+    const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+
+    const handleLogoutDialog = () => {
+        setShowLogoutDialog(!showLogoutDialog);
+    };
+
+    const handleSignOut = async () => {
+        handleLogoutDialog();
+        await signOut();
+    };
 
     useEffect(() => {
         drawerProgress.value = withTiming(isDrawerOpen ? 1 : 0, {
@@ -110,11 +124,14 @@ function DrawerComponent(): JSX.Element {
 
     const handleFooterItemPress = useCallback(
         (key: string) => {
-            console.log(`Selected footer: ${key}`);
-            // Add specific handling for footer items if needed
-            toggleDrawer();
+            if (key === "logout") {
+                handleLogoutDialog();
+            } else {
+                console.log(`Selected footer: ${key}`);
+                toggleDrawer();
+            }
         },
-        [toggleDrawer]
+        [toggleDrawer, handleLogoutDialog]
     );
 
     const handleHelpItemPress = useCallback(
@@ -295,6 +312,15 @@ function DrawerComponent(): JSX.Element {
                     ))}
                 </View>
             </Animated.View>
+
+            {/* Logout AlertDialog */}
+            <AlertDialog
+                visible={showLogoutDialog}
+                title="Sign Out"
+                description="Are you sure you want to sign out?"
+                onCancel={handleLogoutDialog}
+                onConfirm={handleSignOut}
+            />
         </>
     );
 }

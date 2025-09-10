@@ -7,7 +7,6 @@ import {
     FlatList,
 } from "react-native";
 import { useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 import Section from "@/components/UI/Section/Section";
@@ -20,8 +19,6 @@ import CategoryCard from "@/components/UI/QuickLinks/CategoryCard";
 
 import { districtData } from "@/data/district_data";
 import { categoryData } from "@/data/category_data";
-import { useAuth } from "@/context/AuthContext";
-import AlertDialog from "@/components/UI/AlertDialog";
 import { useDrawer } from "@/context/DrawerContext";
 
 type ListItem =
@@ -47,19 +44,7 @@ type ListItem =
 
 const Home = () => {
     const router = useRouter();
-    const { signOut } = useAuth();
     const { toggleDrawer } = useDrawer();
-
-    const [showDialog, setShowDialog] = useState(false);
-
-    const handleDialog = () => {
-        setShowDialog(!showDialog);
-    };
-
-    const handleSignOut = async () => {
-        handleDialog();
-        await signOut();
-    };
 
     const listData: ListItem[] = [
         {
@@ -157,12 +142,6 @@ const Home = () => {
                             </Text>
                         </View>
                     </View>
-                    <Ionicons
-                        name="search"
-                        size={30}
-                        style={styles.buttons}
-                        onPress={handleDialog}
-                    />
                 </View>
 
                 {/* FlashList now includes the Carousel */}
@@ -177,15 +156,6 @@ const Home = () => {
                         removeClippedSubviews={false}
                     />
                 </View>
-
-                {/* AlertDialog remains the same */}
-                <AlertDialog
-                    visible={showDialog}
-                    title="Sign Out"
-                    description="Are you sure you want to sign out?"
-                    onCancel={handleDialog}
-                    onConfirm={handleSignOut}
-                />
             </View>
         </View>
     );
