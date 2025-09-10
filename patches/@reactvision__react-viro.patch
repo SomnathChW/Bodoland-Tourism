@@ -1,0 +1,17 @@
+diff --git a/dist/plugins/withViroAndroid.js b/dist/plugins/withViroAndroid.js
+index 9f16a8ba68804acf1d9b61eb029de2b366795542..3b3d37101ab7f4670185b0e1ebb80e3e4ed8d433 100644
+--- a/dist/plugins/withViroAndroid.js
++++ b/dist/plugins/withViroAndroid.js
+@@ -32,10 +32,10 @@ const withBranchAndroid = (config) => {
+             }
+             fs_1.default.readFile(mainApplicationPath, "utf-8", (err, data) => {
+                 if (isJava) {
+-                    data = (0, insertLinesHelper_1.insertLinesHelper)("import com.viromedia.bridge.ReactViroPackage;", `package ${config?.android?.package};`, data);
++                    data = (0, insertLinesHelper_1.insertLinesHelper)("import com.viromedia.bridge.ReactViroPackage;", "import com.facebook.soloader.SoLoader", data);
+                 }
+                 else {
+-                    data = (0, insertLinesHelper_1.insertLinesHelper)("import com.viromedia.bridge.ReactViroPackage", `package ${config?.android?.package}`, data);
++                    data = (0, insertLinesHelper_1.insertLinesHelper)("import com.viromedia.bridge.ReactViroPackage", "import com.facebook.soloader.SoLoader", data);
+                 }
+                 const viroPlugin = config?.plugins?.find((plugin) => Array.isArray(plugin) && plugin[0] === "@reactvision/react-viro");
+                 if (Array.isArray(viroPlugin)) {
