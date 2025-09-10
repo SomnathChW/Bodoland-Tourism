@@ -58,7 +58,12 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                     </View>
                     <View style={styles.contentContainer}>
                         {weight && (
-                            <View style={styles.detailRow}>
+                            <View
+                                style={[
+                                    styles.detailRow,
+                                    !dimensions && styles.lastRow,
+                                ]}
+                            >
                                 <View style={styles.detailTypeContainer}>
                                     <Ionicons
                                         name="scale-outline"
@@ -73,7 +78,7 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                             </View>
                         )}
                         {dimensions && (
-                            <View style={styles.detailRow}>
+                            <View style={[styles.detailRow, styles.lastRow]}>
                                 <View style={styles.detailTypeContainer}>
                                     <Ionicons
                                         name="resize-outline"
@@ -107,7 +112,12 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                         </Text>
                     </View>
                     <View style={styles.contentContainer}>
-                        <View style={styles.detailRow}>
+                        <View
+                            style={[
+                                styles.detailRow,
+                                !shipping_time_estimate && styles.lastRow,
+                            ]}
+                        >
                             <View style={styles.detailTypeContainer}>
                                 <Ionicons
                                     name="checkmark-circle-outline"
@@ -131,7 +141,7 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                             </Text>
                         </View>
                         {shipping_time_estimate && (
-                            <View style={styles.detailRow}>
+                            <View style={[styles.detailRow, styles.lastRow]}>
                                 <View style={styles.detailTypeContainer}>
                                     <Ionicons
                                         name="time-outline"
@@ -166,7 +176,18 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                     </View>
                     <View style={styles.contentContainer}>
                         {categories && (
-                            <View style={styles.detailRow}>
+                            <View
+                                style={[
+                                    styles.detailRow,
+                                    categories !== "food & beverages" &&
+                                        styles.lastRow,
+                                    categories === "food & beverages" &&
+                                        is_vegan === null &&
+                                        is_vegetarian === null &&
+                                        !expiration_date &&
+                                        styles.lastRow,
+                                ]}
+                            >
                                 <View style={styles.detailTypeContainer}>
                                     <Ionicons
                                         name="grid-outline"
@@ -190,7 +211,14 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                         {categories === "food & beverages" && (
                             <>
                                 {is_vegan !== null && (
-                                    <View style={styles.detailRow}>
+                                    <View
+                                        style={[
+                                            styles.detailRow,
+                                            is_vegetarian === null &&
+                                                !expiration_date &&
+                                                styles.lastRow,
+                                        ]}
+                                    >
                                         <View
                                             style={styles.detailTypeContainer}
                                         >
@@ -218,7 +246,12 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                                     </View>
                                 )}
                                 {is_vegetarian !== null && (
-                                    <View style={styles.detailRow}>
+                                    <View
+                                        style={[
+                                            styles.detailRow,
+                                            !expiration_date && styles.lastRow,
+                                        ]}
+                                    >
                                         <View
                                             style={styles.detailTypeContainer}
                                         >
@@ -246,7 +279,12 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                                     </View>
                                 )}
                                 {expiration_date && (
-                                    <View style={styles.detailRow}>
+                                    <View
+                                        style={[
+                                            styles.detailRow,
+                                            styles.lastRow,
+                                        ]}
+                                    >
                                         <View
                                             style={styles.detailTypeContainer}
                                         >
@@ -280,7 +318,7 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
 
 const styles = StyleSheet.create({
     container: {
-        marginBottom: 25,
+        marginBottom: 8,
     },
     sectionTitle: {
         color: "#646f7e",
@@ -295,6 +333,7 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     sectionContainer: {
+        marginTop: 14,
         marginBottom: 16,
     },
     sectionHeader: {
@@ -316,6 +355,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#1a2029",
         borderRadius: 12,
         padding: 16,
+        paddingTop: 12,
         marginBottom: 8,
         borderLeftWidth: 3,
         borderLeftColor: "#646f7e",
@@ -324,8 +364,11 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: 10,
+        marginBottom: 8,
         paddingVertical: 2,
+    },
+    lastRow: {
+        marginBottom: 0,
     },
     detailTypeContainer: {
         flexDirection: "row",
