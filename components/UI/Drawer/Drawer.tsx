@@ -8,6 +8,7 @@ import {
     ScrollView,
     Platform,
     Text,
+    Linking,
 } from "react-native";
 import { useDrawer } from "@/context/DrawerContext";
 import { useAuth } from "@/context/AuthContext";
@@ -126,6 +127,13 @@ function DrawerComponent(): JSX.Element {
         (key: string) => {
             if (key === "logout") {
                 handleLogoutDialog();
+            } else if (key === "privacy") {
+                // Open privacy policy link
+                const privacyPolicyUrl = "https://example.com/privacy-policy"; // Replace with actual URL
+                Linking.openURL(privacyPolicyUrl).catch((err) =>
+                    console.error("Failed to open privacy policy URL:", err)
+                );
+                toggleDrawer();
             } else {
                 console.log(`Selected footer: ${key}`);
                 toggleDrawer();
@@ -136,12 +144,21 @@ function DrawerComponent(): JSX.Element {
 
     const handleHelpItemPress = useCallback(
         (key: string) => {
-            // Map help item keys to actual routes
+            // Handle Help Center as external link
+            if (key === "help") {
+                const helpCenterUrl = "https://example.com/help-center"; // Replace with actual URL
+                Linking.openURL(helpCenterUrl).catch((err) =>
+                    console.error("Failed to open help center URL:", err)
+                );
+                toggleDrawer();
+                return;
+            }
+
+            // Map other help item keys to actual routes
             const helpRouteMap: { [key: string]: string } = {
                 emergency: "/(protected)/emergency_contacts",
                 about: "/(protected)/about",
                 settings: "/(protected)/settings",
-                help: "/(protected)/help",
                 orders: "/(protected)/orders",
             };
 
