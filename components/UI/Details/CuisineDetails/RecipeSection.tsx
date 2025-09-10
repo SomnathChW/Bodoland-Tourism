@@ -7,6 +7,7 @@ import {
     TouchableWithoutFeedback,
 } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 interface RecipeSectionProps {
     recipeUrl?: string;
@@ -24,7 +25,10 @@ const RecipeSection: React.FC<RecipeSectionProps> = ({ recipeUrl }) => {
     }
 
     return (
-        <View style={styles.recipeSection}>
+        <Animated.View
+            style={styles.recipeSection}
+            entering={FadeIn.duration(300)}
+        >
             {/* Section Title */}
             <Text style={styles.sectionTitle}>Recipe</Text>
 
@@ -54,7 +58,7 @@ const RecipeSection: React.FC<RecipeSectionProps> = ({ recipeUrl }) => {
                     />
                 </View>
             </TouchableWithoutFeedback>
-        </View>
+        </Animated.View>
     );
 };
 

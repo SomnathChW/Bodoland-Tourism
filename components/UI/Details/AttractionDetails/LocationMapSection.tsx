@@ -61,7 +61,7 @@ const LocationMapSection: React.FC<LocationMapProps> = ({
     return (
         <Animated.View
             style={styles.locationSection}
-            entering={FadeIn.duration(600)}
+            entering={FadeIn.duration(300)}
         >
             {/* Section Title */}
             <Text style={styles.sectionTitle}>Location</Text>

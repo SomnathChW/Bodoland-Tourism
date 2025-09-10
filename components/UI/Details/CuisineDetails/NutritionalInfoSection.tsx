@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 interface NutritionalInfoSectionProps {
     nutritionalInfo?: {
@@ -38,8 +39,9 @@ const NutritionalInfoSection: React.FC<NutritionalInfoSectionProps> = ({
     }
 
     return (
-        <View
+        <Animated.View
             style={styles.nutritionalSection}
+            entering={FadeIn.duration(300)}
         >
             {/* Section Title */}
             <Text style={styles.sectionTitle}>Nutritional Information</Text>
@@ -109,7 +111,7 @@ const NutritionalInfoSection: React.FC<NutritionalInfoSectionProps> = ({
                     </View>
                 )}
             </View>
-        </View>
+        </Animated.View>
     );
 };
 

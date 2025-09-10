@@ -9,6 +9,7 @@
 
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 
 interface PricingSectionProps {
@@ -28,8 +29,9 @@ const PricingSection: React.FC<PricingSectionProps> = ({
     inStock,
 }) => {
     return (
-        <View
+        <Animated.View
             style={styles.pricingSection}
+            entering={FadeIn.duration(300)}
         >
             {/* Section Title */}
             <Text style={styles.sectionTitle}>Pricing</Text>
@@ -59,19 +61,19 @@ const PricingSection: React.FC<PricingSectionProps> = ({
                     <Ionicons
                         name={inStock ? "checkmark-circle" : "close-circle"}
                         size={16}
-                        color={inStock ? "#4CAF50" : "#F44336"}
+                        color={inStock ? "#27ae60" : "#e74c3c"}
                     />
                     <Text
                         style={[
                             styles.stockText,
-                            { color: inStock ? "#4CAF50" : "#F44336" },
+                            { color: inStock ? "#27ae60" : "#e74c3c" },
                         ]}
                     >
                         {inStock ? "In Stock" : "Out of Stock"}
                     </Text>
                 </View>
             </View>
-        </View>
+        </Animated.View>
     );
 };
 
@@ -100,7 +102,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     currentPrice: {
-        color: "#fff",
+        color: "#ffffff",
         fontFamily: "SfProMedium",
         fontSize: 24,
         fontWeight: "bold",
@@ -120,7 +122,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     discountText: {
-        color: "#4CAF50",
+        color: "#27ae60",
         fontSize: 12,
         fontWeight: "bold",
     },

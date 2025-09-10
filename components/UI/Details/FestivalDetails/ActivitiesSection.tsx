@@ -9,6 +9,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 interface ActivitiesSectionProps {
     activities?: string[];
@@ -23,7 +24,10 @@ const ActivitiesSection: React.FC<ActivitiesSectionProps> = ({
     }
 
     return (
-        <View style={styles.sectionContainer}>
+        <Animated.View
+            style={styles.sectionContainer}
+            entering={FadeIn.duration(300)}
+        >
             {/* Section Title */}
             <Text style={styles.sectionTitle}>Festival Activities</Text>
 
@@ -76,7 +80,7 @@ const ActivitiesSection: React.FC<ActivitiesSectionProps> = ({
                     </Text>
                 </View>
             </View>
-        </View>
+        </Animated.View>
     );
 };
 

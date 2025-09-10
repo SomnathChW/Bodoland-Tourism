@@ -23,6 +23,7 @@ import {
     Linking,
 } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 interface RelatedLink {
     label: string;
@@ -56,7 +57,10 @@ const RelatedLinksSection: React.FC<RelatedLinksSectionProps> = ({
     };
 
     return (
-        <View style={styles.sectionContainer}>
+        <Animated.View
+            style={styles.sectionContainer}
+            entering={FadeIn.duration(300)}
+        >
             {/* Section Title */}
             <Text style={styles.sectionTitle}>Learn More</Text>
 
@@ -98,7 +102,7 @@ const RelatedLinksSection: React.FC<RelatedLinksSectionProps> = ({
                     </View>
                 </TouchableOpacity>
             ))}
-        </View>
+        </Animated.View>
     );
 };
 

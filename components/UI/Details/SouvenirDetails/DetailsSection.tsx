@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 
 interface DetailsSectionGroupProps {
@@ -33,7 +34,7 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
             (is_vegan !== null || is_vegetarian !== null || expiration_date));
 
     return (
-        <View style={styles.container}>
+        <Animated.View style={styles.container} entering={FadeIn.duration(300)}>
             {/* Section Title */}
             <Text style={styles.sectionTitle}>Product Details</Text>
 
@@ -48,8 +49,8 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                     <View style={styles.sectionHeader}>
                         <Ionicons
                             name="cube-outline"
-                            size={16}
-                            color="#646f7e"
+                            size={18}
+                            color="#ffffff"
                         />
                         <Text style={styles.sectionHeaderText}>
                             Specifications
@@ -58,25 +59,31 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                     <View style={styles.contentContainer}>
                         {weight && (
                             <View style={styles.detailRow}>
-                                <Ionicons
-                                    name="cube-outline"
-                                    size={16}
-                                    color="#646f7e"
-                                />
-                                <Text style={styles.detailLabel}>Weight:</Text>
+                                <View style={styles.detailTypeContainer}>
+                                    <Ionicons
+                                        name="scale-outline"
+                                        size={14}
+                                        color="#ffffff"
+                                    />
+                                    <Text style={styles.detailLabel}>
+                                        Weight
+                                    </Text>
+                                </View>
                                 <Text style={styles.detailValue}>{weight}</Text>
                             </View>
                         )}
                         {dimensions && (
                             <View style={styles.detailRow}>
-                                <Ionicons
-                                    name="resize-outline"
-                                    size={16}
-                                    color="#646f7e"
-                                />
-                                <Text style={styles.detailLabel}>
-                                    Dimensions:
-                                </Text>
+                                <View style={styles.detailTypeContainer}>
+                                    <Ionicons
+                                        name="resize-outline"
+                                        size={14}
+                                        color="#ffffff"
+                                    />
+                                    <Text style={styles.detailLabel}>
+                                        Dimensions
+                                    </Text>
+                                </View>
                                 <Text style={styles.detailValue}>
                                     {dimensions}
                                 </Text>
@@ -92,45 +99,54 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                     <View style={styles.sectionHeader}>
                         <Ionicons
                             name="car-outline"
-                            size={16}
-                            color="#646f7e"
+                            size={18}
+                            color="#ffffff"
                         />
-                        <Text style={styles.sectionHeaderText}>Shipping</Text>
+                        <Text style={styles.sectionHeaderText}>
+                            Shipping & Availability
+                        </Text>
                     </View>
                     <View style={styles.contentContainer}>
-                        {shipping_time_estimate && (
-                            <View style={styles.detailRow}>
+                        <View style={styles.detailRow}>
+                            <View style={styles.detailTypeContainer}>
                                 <Ionicons
-                                    name="time-outline"
-                                    size={16}
-                                    color="#646f7e"
+                                    name="checkmark-circle-outline"
+                                    size={14}
+                                    color="#ffffff"
                                 />
                                 <Text style={styles.detailLabel}>
-                                    Delivery Time:
+                                    Stock Status
                                 </Text>
+                            </View>
+                            <Text
+                                style={[
+                                    styles.detailValue,
+                                    {
+                                        color: in_stock ? "#27ae60" : "#e74c3c",
+                                        fontWeight: "bold",
+                                    },
+                                ]}
+                            >
+                                {in_stock ? "✓ In Stock" : "✗ Out of Stock"}
+                            </Text>
+                        </View>
+                        {shipping_time_estimate && (
+                            <View style={styles.detailRow}>
+                                <View style={styles.detailTypeContainer}>
+                                    <Ionicons
+                                        name="time-outline"
+                                        size={14}
+                                        color="#ffffff"
+                                    />
+                                    <Text style={styles.detailLabel}>
+                                        Delivery Time
+                                    </Text>
+                                </View>
                                 <Text style={styles.detailValue}>
                                     {shipping_time_estimate}
                                 </Text>
                             </View>
                         )}
-                        <View style={styles.detailRow}>
-                            <Ionicons
-                                name="checkmark-circle-outline"
-                                size={16}
-                                color="#646f7e"
-                            />
-                            <Text style={styles.detailLabel}>
-                                Availability:
-                            </Text>
-                            <Text
-                                style={[
-                                    styles.detailValue,
-                                    { color: in_stock ? "#4CAF50" : "#F44336" },
-                                ]}
-                            >
-                                {in_stock ? "In Stock" : "Out of Stock"}
-                            </Text>
-                        </View>
                     </View>
                 </View>
             )}
@@ -141,23 +157,32 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                     <View style={styles.sectionHeader}>
                         <Ionicons
                             name="list-outline"
-                            size={16}
-                            color="#646f7e"
+                            size={18}
+                            color="#ffffff"
                         />
-                        <Text style={styles.sectionHeaderText}>Category</Text>
+                        <Text style={styles.sectionHeaderText}>
+                            Product Information
+                        </Text>
                     </View>
                     <View style={styles.contentContainer}>
                         {categories && (
                             <View style={styles.detailRow}>
-                                <Ionicons
-                                    name="list-outline"
-                                    size={16}
-                                    color="#646f7e"
-                                />
-                                <Text style={styles.detailLabel}>
-                                    Category:
-                                </Text>
-                                <Text style={styles.detailValue}>
+                                <View style={styles.detailTypeContainer}>
+                                    <Ionicons
+                                        name="grid-outline"
+                                        size={14}
+                                        color="#ffffff"
+                                    />
+                                    <Text style={styles.detailLabel}>
+                                        Category
+                                    </Text>
+                                </View>
+                                <Text
+                                    style={[
+                                        styles.detailValue,
+                                        styles.categoryTag,
+                                    ]}
+                                >
                                     {categories}
                                 </Text>
                             </View>
@@ -166,45 +191,80 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                             <>
                                 {is_vegan !== null && (
                                     <View style={styles.detailRow}>
-                                        <Ionicons
-                                            name="leaf-outline"
-                                            size={16}
-                                            color="#646f7e"
-                                        />
-                                        <Text style={styles.detailLabel}>
-                                            Vegan:
-                                        </Text>
-                                        <Text style={styles.detailValue}>
-                                            {is_vegan ? "Yes" : "No"}
+                                        <View
+                                            style={styles.detailTypeContainer}
+                                        >
+                                            <Ionicons
+                                                name="leaf-outline"
+                                                size={14}
+                                                color="#ffffff"
+                                            />
+                                            <Text style={styles.detailLabel}>
+                                                Vegan Friendly
+                                            </Text>
+                                        </View>
+                                        <Text
+                                            style={[
+                                                styles.detailValue,
+                                                {
+                                                    color: is_vegan
+                                                        ? "#27ae60"
+                                                        : "#ff6b6b",
+                                                },
+                                            ]}
+                                        >
+                                            {is_vegan ? "✓ Yes" : "✗ No"}
                                         </Text>
                                     </View>
                                 )}
                                 {is_vegetarian !== null && (
                                     <View style={styles.detailRow}>
-                                        <Ionicons
-                                            name="nutrition-outline"
-                                            size={16}
-                                            color="#646f7e"
-                                        />
-                                        <Text style={styles.detailLabel}>
-                                            Vegetarian:
-                                        </Text>
-                                        <Text style={styles.detailValue}>
-                                            {is_vegetarian ? "Yes" : "No"}
+                                        <View
+                                            style={styles.detailTypeContainer}
+                                        >
+                                            <Ionicons
+                                                name="nutrition-outline"
+                                                size={14}
+                                                color="#ffffff"
+                                            />
+                                            <Text style={styles.detailLabel}>
+                                                Vegetarian
+                                            </Text>
+                                        </View>
+                                        <Text
+                                            style={[
+                                                styles.detailValue,
+                                                {
+                                                    color: is_vegetarian
+                                                        ? "#27ae60"
+                                                        : "#ff6b6b",
+                                                },
+                                            ]}
+                                        >
+                                            {is_vegetarian ? "✓ Yes" : "✗ No"}
                                         </Text>
                                     </View>
                                 )}
                                 {expiration_date && (
                                     <View style={styles.detailRow}>
-                                        <Ionicons
-                                            name="calendar-outline"
-                                            size={16}
-                                            color="#646f7e"
-                                        />
-                                        <Text style={styles.detailLabel}>
-                                            Expires:
-                                        </Text>
-                                        <Text style={styles.detailValue}>
+                                        <View
+                                            style={styles.detailTypeContainer}
+                                        >
+                                            <Ionicons
+                                                name="calendar-outline"
+                                                size={14}
+                                                color="#ffffff"
+                                            />
+                                            <Text style={styles.detailLabel}>
+                                                Best Before
+                                            </Text>
+                                        </View>
+                                        <Text
+                                            style={[
+                                                styles.detailValue,
+                                                styles.expiryDate,
+                                            ]}
+                                        >
                                             {expiration_date}
                                         </Text>
                                     </View>
@@ -214,60 +274,89 @@ const DetailsSectionGroup: React.FC<DetailsSectionGroupProps> = ({
                     </View>
                 </View>
             )}
-        </View>
+        </Animated.View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        marginBottom: 20,
+        marginBottom: 25,
     },
     sectionTitle: {
         color: "#646f7e",
         fontFamily: "SfProMedium",
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: "bold",
         marginBottom: 5,
     },
     separator: {
-        height: 1,
+        height: 2,
         backgroundColor: "#646f7e",
-        marginBottom: 10,
+        marginBottom: 15,
     },
     sectionContainer: {
-        marginBottom: 12,
+        marginBottom: 16,
     },
     sectionHeader: {
         flexDirection: "row",
         alignItems: "center",
-        marginBottom: 6,
+        borderBottomWidth: 1,
+        borderBottomColor: "rgba(255,255,255,0.1)",
+        paddingBottom: 8,
+        marginBottom: 12,
     },
     sectionHeaderText: {
-        color: "#646f7e",
-        fontSize: 14,
-        fontWeight: "500",
-        marginLeft: 6,
+        color: "#ffffff",
+        fontSize: 15,
+        fontWeight: "bold",
+        fontFamily: "SfProMedium",
+        marginLeft: 8,
     },
     contentContainer: {
-        padding: 12,
-        backgroundColor: "rgba(100, 111, 126, 0.1)",
-        borderRadius: 8,
+        backgroundColor: "#1a2029",
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 8,
+        borderLeftWidth: 3,
+        borderLeftColor: "#646f7e",
     },
     detailRow: {
         flexDirection: "row",
+        justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: 4,
+        marginBottom: 10,
+        paddingVertical: 2,
+    },
+    detailTypeContainer: {
+        flexDirection: "row",
+        alignItems: "center",
     },
     detailLabel: {
-        color: "#646f7e",
-        fontSize: 12,
-        marginLeft: 6,
-        marginRight: 4,
+        color: "#ffffff",
+        fontSize: 14,
+        fontFamily: "SfProMedium",
+        marginLeft: 10,
     },
     detailValue: {
-        color: "#fff",
-        fontSize: 12,
-        fontWeight: "500",
+        color: "#ffffff",
+        fontSize: 14,
+        fontWeight: "bold",
+        fontFamily: "SfProMedium",
+        textAlign: "right",
+    },
+    categoryTag: {
+        backgroundColor: "rgba(46, 204, 113, 0.15)",
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 6,
+        color: "#2ecc71",
+        textTransform: "capitalize",
+        fontSize: 14,
+        fontWeight: "bold",
+    },
+    expiryDate: {
+        color: "#f39c12",
+        fontWeight: "600",
     },
 });
 

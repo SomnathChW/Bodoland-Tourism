@@ -8,7 +8,8 @@
 
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 interface FestivalDatesSectionProps {
     dates?: {
@@ -67,7 +68,10 @@ const FestivalDatesSection: React.FC<FestivalDatesSectionProps> = ({
     }
 
     return (
-        <View style={styles.sectionContainer}>
+        <Animated.View
+            style={styles.sectionContainer}
+            entering={FadeIn.duration(300)}
+        >
             {/* Section Title */}
             <Text style={styles.sectionTitle}>Festival Dates</Text>
 
@@ -103,7 +107,7 @@ const FestivalDatesSection: React.FC<FestivalDatesSectionProps> = ({
                     </View>
                 )}
             </View>
-        </View>
+        </Animated.View>
     );
 };
 

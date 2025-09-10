@@ -36,7 +36,7 @@ const EntryFeeSection: React.FC<EntryFeeProps> = ({
     return (
         <Animated.View
             style={styles.entryFeeSection}
-            entering={FadeIn.duration(600).delay(300)}
+            entering={FadeIn.duration(300)}
         >
             {/* Section Title */}
             <Text style={styles.sectionTitle}>

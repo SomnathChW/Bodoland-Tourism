@@ -9,6 +9,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 interface CulturalSignificanceSectionProps {
     culturalSignificance?: string;
@@ -23,7 +24,10 @@ const CulturalSignificanceSection: React.FC<
     }
 
     return (
-        <View style={styles.sectionContainer}>
+        <Animated.View
+            style={styles.sectionContainer}
+            entering={FadeIn.duration(300)}
+        >
             {/* Section Title */}
             <Text style={styles.sectionTitle}>Cultural Significance</Text>
 
@@ -44,7 +48,7 @@ const CulturalSignificanceSection: React.FC<
                     {culturalSignificance}
                 </Text>
             </View>
-        </View>
+        </Animated.View>
     );
 };
 
