@@ -94,7 +94,7 @@ function DrawerComponent(): JSX.Element {
                 "attractions",
                 "stays",
                 "souvenirs",
-                "vrview",
+                "virtual_tours",
             ].some((path) => currentPath.includes(path));
 
             if (key === currentPath) {
@@ -155,7 +155,7 @@ function DrawerComponent(): JSX.Element {
                 "attractions",
                 "stays",
                 "souvenirs",
-                "vrview",
+                "virtual_tours",
             ].some((path) => currentPath.includes(path));
 
             if (route === currentPath) {

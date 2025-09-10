@@ -8,7 +8,7 @@ const validPages = [
     "attractions",
     "stays",
     "index",
-    "vrview",
+    "virtual_tours",
     "souvenirs",
     "festivals",
     "cuisine",
