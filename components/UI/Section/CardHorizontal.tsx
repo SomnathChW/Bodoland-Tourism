@@ -7,7 +7,7 @@ type Props = {
     item: {
         identifier: string;
         image: any;
-        title?: string;
+        name?: string;
     };
 };
 
@@ -33,11 +33,18 @@ const CardHorizontal = ({ item }: Props) => {
                 }
                 style={styles.pressable}
             >
-                <FastImage source={item.image} style={styles.image} />
-                {item.title && (
+                <FastImage
+                    source={
+                        typeof item.image === "string"
+                            ? { uri: item.image }
+                            : item.image
+                    }
+                    style={styles.image}
+                />
+                {item.name && (
                     <View style={styles.textView}>
                         <Text style={styles.title} numberOfLines={1}>
-                            {item.title}
+                            {item.name}
                         </Text>
                     </View>
                 )}

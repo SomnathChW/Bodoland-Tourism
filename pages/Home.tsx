@@ -20,6 +20,7 @@ import CategoryCard from "@/components/UI/QuickLinks/CategoryCard";
 import { districtData } from "@/data/district_data";
 import { categoryData } from "@/data/category_data";
 import { useDrawer } from "@/context/DrawerContext";
+import { useAppwriteQuery } from "@/hooks/useAppwriteQuery";
 
 type ListItem =
     | {
@@ -37,7 +38,7 @@ type ListItem =
           type: "section";
           id: string;
           subHeading: string;
-          data: typeof districtData;
+          data: any[];
           cardComponent: typeof CardVertical | typeof CardHorizontal;
           viewAll?: () => void;
       };
@@ -45,6 +46,77 @@ type ListItem =
 const Home = () => {
     const router = useRouter();
     const { toggleDrawer } = useDrawer();
+
+    // Fetch attractions data from Appwrite
+    const {
+        data: attractionsResponse,
+        isLoading: attractionsLoading,
+        error: attractionsError,
+    } = useAppwriteQuery({
+        queryKey: ["attractions", "homepage"],
+        route: "attractions",
+        limit: 5,
+        expectedFields: [
+            "identifier",
+            "name",
+            "image",
+            "location",
+            "price",
+            "short_description",
+            "district",
+        ],
+        staleTime: 30 * 60 * 1000, // 30 minutes
+    });
+
+    const attractionsData = attractionsResponse?.data || [];
+
+    // Fetch souvenirs data from Appwrite
+    const {
+        data: souvenirsResponse,
+        isLoading: souvenirsLoading,
+        error: souvenirsError,
+    } = useAppwriteQuery({
+        queryKey: ["souvenirs", "homepage"],
+        route: "souvenirs",
+        limit: 5,
+        expectedFields: [
+            "identifier",
+            "name",
+            "image",
+            "short_description",
+            "price",
+            "original_price",
+            "discount_percentage",
+            "rating",
+            "in_stock",
+            "categories",
+        ],
+        staleTime: 30 * 60 * 1000, // 30 minutes
+    });
+
+    const souvenirsData = souvenirsResponse?.data || [];
+
+    // Fetch VR data from Appwrite
+    const {
+        data: vrResponse,
+        isLoading: vrLoading,
+        error: vrError,
+    } = useAppwriteQuery({
+        queryKey: ["vr", "homepage"],
+        route: "vr",
+        limit: 5,
+        expectedFields: [
+            "identifier",
+            "name",
+            "image",
+            "location",
+            "short_description",
+            "vr_link",
+        ],
+        staleTime: 30 * 60 * 1000, // 30 minutes
+    });
+
+    const vrData = vrResponse?.data || [];
 
     const listData: ListItem[] = [
         {
@@ -69,7 +141,7 @@ const Home = () => {
             type: "section",
             id: "360view",
             subHeading: "360 View",
-            data: districtData,
+            data: vrData,
             cardComponent: CardHorizontal,
             viewAll: () => router.push("/virtual_tours"),
         },
@@ -77,7 +149,7 @@ const Home = () => {
             type: "section",
             id: "souvenirs",
             subHeading: "Souvenirs",
-            data: districtData,
+            data: souvenirsData,
             cardComponent: CardVertical,
             viewAll: () => router.push("/souvenirs"),
         },
@@ -85,7 +157,7 @@ const Home = () => {
             type: "section",
             id: "attractions",
             subHeading: "Attractions",
-            data: districtData,
+            data: attractionsData,
             cardComponent: CardHorizontal,
             viewAll: () => router.push("/attractions"),
         },
@@ -108,6 +180,43 @@ const Home = () => {
                     />
                 );
             case "section":
+                // Special handling for sections with Appwrite data
+                if (item.id === "attractions") {
+                    return (
+                        <Section
+                            subHeading={item.subHeading}
+                            data={attractionsLoading ? [] : item.data}
+                            cardComponent={item.cardComponent}
+                            viewAll={item.viewAll}
+                            isLoading={attractionsLoading}
+                            loadingCardCount={3}
+                        />
+                    );
+                }
+                if (item.id === "souvenirs") {
+                    return (
+                        <Section
+                            subHeading={item.subHeading}
+                            data={souvenirsLoading ? [] : item.data}
+                            cardComponent={item.cardComponent}
+                            viewAll={item.viewAll}
+                            isLoading={souvenirsLoading}
+                            loadingCardCount={3}
+                        />
+                    );
+                }
+                if (item.id === "360view") {
+                    return (
+                        <Section
+                            subHeading={item.subHeading}
+                            data={vrLoading ? [] : item.data}
+                            cardComponent={item.cardComponent}
+                            viewAll={item.viewAll}
+                            isLoading={vrLoading}
+                            loadingCardCount={3}
+                        />
+                    );
+                }
                 return (
                     <Section
                         subHeading={item.subHeading}

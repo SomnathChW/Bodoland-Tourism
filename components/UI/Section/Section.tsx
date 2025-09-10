@@ -8,10 +8,20 @@ type SectionProps = {
     cardComponent: React.ElementType; // This will be the component name
     viewAll?: () => void; // Make the viewAll prop optional
     style?: any;
+    isLoading?: boolean;
+    loadingCardCount?: number;
 };
 
 const Section = React.memo(
-    ({ subHeading, data, cardComponent, viewAll, style }: SectionProps) => {
+    ({
+        subHeading,
+        data,
+        cardComponent,
+        viewAll,
+        style,
+        isLoading = false,
+        loadingCardCount = 3,
+    }: SectionProps) => {
         return (
             <View style={[{ marginBottom: 20 }, style]}>
                 <View style={styles.mainBodyPaddingView}>
@@ -28,7 +38,12 @@ const Section = React.memo(
                         )}
                     </View>
                 </View>
-                <CardList itemList={data} CardComponent={cardComponent} />
+                <CardList
+                    itemList={data}
+                    CardComponent={cardComponent}
+                    isLoading={isLoading}
+                    loadingCardCount={loadingCardCount}
+                />
             </View>
         );
     }

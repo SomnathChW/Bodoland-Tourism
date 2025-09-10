@@ -7,7 +7,7 @@ type Props = {
     item: {
         identifier: string;
         image: any;
-        title?: string;
+        name?: string;
     };
 };
 
@@ -18,7 +18,7 @@ const NUM_CARDS_ON_SCREEN = 2.85;
 
 const CARD_WIDTH = Math.ceil(width * WIDTH_RATIO);
 const CARD_HEIGHT = Math.ceil(height * HEIGHT_RATIO);
-const TEXT_HEIGHT = Math.ceil(CARD_HEIGHT * 0.2);
+const TEXT_HEIGHT = Math.ceil(CARD_HEIGHT * 0.25); // Increased from 0.2 to 0.25
 
 const CardVertical = ({ item }: Props) => {
     const router = useRouter();
@@ -33,11 +33,18 @@ const CardVertical = ({ item }: Props) => {
                 }
                 style={styles.pressable}
             >
-                <FastImage source={item.image} style={styles.image} />
-                {item.title && (
+                <FastImage
+                    source={
+                        typeof item.image === "string"
+                            ? { uri: item.image }
+                            : item.image
+                    }
+                    style={styles.image}
+                />
+                {item.name && (
                     <View style={styles.textView}>
                         <Text style={styles.title} numberOfLines={1}>
-                            {item.title}
+                            {item.name}
                         </Text>
                     </View>
                 )}

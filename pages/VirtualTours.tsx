@@ -3,7 +3,6 @@ import React from "react";
 
 import { VRData } from "@/data/vr_data";
 
-import { Ionicons } from "@expo/vector-icons";
 import VrCard from "@/components/VrCard";
 import MenuButton from "@/components/UI/MenuButton";
 import { FlashList } from "@shopify/flash-list";
