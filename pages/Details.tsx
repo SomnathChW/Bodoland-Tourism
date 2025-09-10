@@ -10,7 +10,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HeaderSection from "@/components/UI/Details/Common/HeaderSection";
-import HeaderLoader from "@/components/HeaderLoader";
+import HeaderLoader from "@/components/UI/Details/Common/HeaderLoader";
 
 // Import data
 import AttractionDetails from "@/components/UI/Details/AttractionDetails/AttractionDetails";

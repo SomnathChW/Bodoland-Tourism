@@ -1,0 +1,119 @@
+import React, { useState } from "react";
+import {
+    View,
+    StyleSheet,
+    ViewStyle,
+    DimensionValue,
+    ActivityIndicator,
+} from "react-native";
+import FastImage from "react-native-fast-image";
+
+interface FastImageWLoaderProps {
+    source: {
+        uri: string;
+        priority?: any;
+        cache?: any;
+    };
+    style?: ViewStyle;
+    resizeMode?: any;
+    width?: DimensionValue;
+    height?: DimensionValue;
+    borderRadius?: number;
+    indicatorSize?: "small" | "large" | number;
+    onLoad?: () => void;
+    onError?: () => void;
+    onLoadStart?: () => void;
+    onLoadEnd?: () => void;
+}
+
+const FastImageWLoader: React.FC<FastImageWLoaderProps> = ({
+    source,
+    style,
+    resizeMode = FastImage.resizeMode.cover,
+    width = "100%",
+    height = "100%",
+    borderRadius = 0,
+    indicatorSize = "small",
+    onLoad,
+    onError,
+    onLoadStart,
+    onLoadEnd,
+}) => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [hasError, setHasError] = useState(false);
+
+    const handleLoadStart = () => {
+        setIsLoading(true);
+        setHasError(false);
+        onLoadStart?.();
+    };
+
+    const handleLoad = () => {
+        setIsLoading(false);
+        onLoad?.();
+    };
+
+    const handleLoadEnd = () => {
+        setIsLoading(false);
+        onLoadEnd?.();
+    };
+
+    const handleError = () => {
+        setIsLoading(false);
+        setHasError(true);
+        onError?.();
+    };
+
+    return (
+        <View
+            style={[styles.container, { width, height, borderRadius }, style]}
+        >
+            {/* Show loading animation while image is loading */}
+            {isLoading && !hasError && (
+                <View style={styles.loaderContainer}>
+                    <ActivityIndicator size={indicatorSize} color="#ffffff" />
+                </View>
+            )}
+
+            {/* FastImage component */}
+            <FastImage
+                source={source}
+                style={[styles.image, { borderRadius }]}
+                resizeMode={resizeMode}
+                onLoadStart={handleLoadStart}
+                onLoad={handleLoad}
+                onLoadEnd={handleLoadEnd}
+                onError={handleError}
+            />
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        position: "relative",
+        overflow: "hidden",
+    },
+    loaderContainer: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "#1a2029", // Light background like attraction details cards
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1,
+    },
+    lottie: {
+        width: 120,
+        height: 120,
+        opacity: 0.7,
+    },
+    image: {
+        width: "100%",
+        height: "100%",
+    },
+});
+
+export default FastImageWLoader;

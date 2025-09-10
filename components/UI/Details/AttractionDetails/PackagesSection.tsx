@@ -16,7 +16,8 @@ import {
     TouchableOpacity,
     Dimensions,
 } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import FastImageWLoader from "@/components/FastImageWLoader";
 import FastImage from "react-native-fast-image";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
@@ -67,7 +68,7 @@ const PackageCard = React.memo(
             >
                 {/* Card Image */}
                 <View style={styles.packageCardImageContainer}>
-                    <FastImage
+                    <FastImageWLoader
                         source={{
                             uri: packageItem.image,
                             priority: FastImage.priority.normal,
@@ -104,12 +105,12 @@ const EndDataCard = React.memo(({ cardWidth }: { cardWidth: number }) => {
         <View style={[styles.endCard, { width: cardWidth }]}>
             {/* Dummy image and text for height matching, hidden from view */}
             <View style={styles.packageCardImageContainer}>
-                <FastImage
+                <FastImageWLoader
                     source={{
                         uri: "https://dummyimage.com/300x100/1a2432/fff.png&text=Dummy",
                         priority: FastImage.priority.low,
                     }}
-                    style={[styles.packageCardImage, { opacity: 0 }]}
+                    style={{ ...styles.packageCardImage, opacity: 0 }}
                     resizeMode={FastImage.resizeMode.cover}
                 />
             </View>

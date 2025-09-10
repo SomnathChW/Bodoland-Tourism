@@ -1,14 +1,16 @@
 import React from "react";
 import {
-    StyleSheet,
-    Text,
     View,
-    TouchableOpacity,
-    Linking,
+    Text,
+    StyleSheet,
+    Pressable,
     Dimensions,
+    Alert,
+    Linking,
+    TouchableOpacity,
 } from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import FastImage from "react-native-fast-image";
+import { MaterialIcons, Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import FastImageWLoader from "@/components/FastImageWLoader";
 import { EmergencyContact } from "@/data/emergency_data";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -19,9 +21,9 @@ interface EmergencyCardProps {
 
 // Define colors for emergency services
 const EMERGENCY_COLORS = {
-    police: "#7dd3fc",  // Sky blue
-    fire: "#fb923c",    // Orange
-    ambulance: "#4ade80" // Green
+    police: "#7dd3fc", // Sky blue
+    fire: "#fb923c", // Orange
+    ambulance: "#4ade80", // Green
 };
 
 const { width } = Dimensions.get("window");
@@ -59,7 +61,7 @@ const EmergencyCard: React.FC<EmergencyCardProps> = ({ item, index }) => {
         >
             {/* Image section with text overlay */}
             <View style={styles.imageContainer}>
-                <FastImage
+                <FastImageWLoader
                     source={{ uri: item.image }}
                     style={styles.image}
                     resizeMode="cover"
@@ -109,10 +111,10 @@ const EmergencyCard: React.FC<EmergencyCardProps> = ({ item, index }) => {
                             ]}
                             style={styles.buttonGradient}
                         >
-                            <Ionicons 
-                                name="flame" 
-                                size={14} 
-                                color={EMERGENCY_COLORS.fire} 
+                            <Ionicons
+                                name="flame"
+                                size={14}
+                                color={EMERGENCY_COLORS.fire}
                             />
                             <Text style={styles.contactText}>Fire</Text>
                         </LinearGradient>

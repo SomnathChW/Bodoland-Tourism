@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
-import FastImage from "react-native-fast-image";
+import FastImageWLoader from "@/components/FastImageWLoader";
 
 type Props = {
     item: {
@@ -12,7 +12,7 @@ type Props = {
         discount_percentage?: string;
         original_price?: string;
         price: string;
-        rating?: number; 
+        rating?: number;
     };
     index: number;
 };
@@ -75,7 +75,7 @@ const ProductCard = ({ item, index }: Props) => {
                     flexDirection: "column",
                 }}
             >
-                <FastImage
+                <FastImageWLoader
                     source={{ uri: item.image }}
                     style={{
                         width: CARD_WIDTH,
@@ -84,7 +84,6 @@ const ProductCard = ({ item, index }: Props) => {
                         flexShrink: 0,
                         flexBasis: MIN_IMAGE_HEIGHT,
                     }}
-                    resizeMode="cover"
                 />
 
                 {item.name && (
@@ -201,7 +200,7 @@ const styles = StyleSheet.create({
     },
     priceAlignContainer: {
         flexDirection: "row",
-        alignItems: "baseline", 
+        alignItems: "baseline",
     },
     title: {
         fontFamily: "SfProMedium",

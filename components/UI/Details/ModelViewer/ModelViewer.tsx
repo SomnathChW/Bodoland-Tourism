@@ -12,6 +12,7 @@ import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { isARSupportedOnDevice } from "@reactvision/react-viro";
+import FastImageWLoader from "@/components/FastImageWLoader";
 import FastImage from "react-native-fast-image";
 
 const modelPath =
@@ -113,7 +114,7 @@ export function ModelViewer({
 
     return (
         <View style={styles.container}>
-            <FastImage
+            <FastImageWLoader
                 source={{ uri: imageUrl }}
                 style={{
                     width: "100%",
@@ -121,6 +122,7 @@ export function ModelViewer({
                     backgroundColor,
                 }}
                 resizeMode={FastImage.resizeMode.cover}
+                indicatorSize={"large"}
             />
 
             {/* Action Buttons */}

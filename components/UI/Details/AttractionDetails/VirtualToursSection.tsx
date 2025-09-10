@@ -16,7 +16,8 @@ import {
     TouchableOpacity,
     Dimensions,
 } from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import FastImageWLoader from "@/components/FastImageWLoader";
 import FastImage from "react-native-fast-image";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
@@ -62,7 +63,7 @@ const VirtualTourCard = React.memo(
             >
                 {/* Card Image */}
                 <View style={styles.tourCardImageContainer}>
-                    <FastImage
+                    <FastImageWLoader
                         source={{
                             uri: tour.image,
                             priority: FastImage.priority.normal,
@@ -100,12 +101,12 @@ const EndDataCard = React.memo(({ cardWidth }: { cardWidth: number }) => {
         <View style={[styles.endCard, { width: cardWidth }]}>
             {/* Dummy image and text for height matching, hidden from view */}
             <View style={styles.tourCardImageContainer}>
-                <FastImage
+                <FastImageWLoader
                     source={{
                         uri: "https://dummyimage.com/300x100/1a2432/fff.png&text=Dummy",
                         priority: FastImage.priority.low,
                     }}
-                    style={[styles.tourCardImage, { opacity: 0 }]}
+                    style={{ ...styles.tourCardImage, opacity: 0 }}
                     resizeMode={FastImage.resizeMode.cover}
                 />
                 <View style={[styles.vrIconContainer, { opacity: 0 }]}>

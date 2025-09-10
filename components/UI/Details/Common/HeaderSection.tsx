@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo, memo } from "react";
 import {
     StyleSheet,
     TouchableOpacity,
@@ -17,16 +17,21 @@ import FastImage from "react-native-fast-image";
 import { EdgeInsets } from "react-native-safe-area-context";
 import PagerView from "react-native-pager-view";
 import { ModelViewer } from "../ModelViewer/ModelViewer";
+import FastImageWLoader from "@/components/FastImageWLoader";
 
 interface HeaderSectionProps {
     scrollY: SharedValue<number>;
-    isReady: SharedValue<number>;
     animationPhase: number;
     minimizedHeaderHeight: number;
     scrollDistance: number;
     onBack: () => void;
     insets: EdgeInsets;
-    data?: any;
+    data?: {
+        name?: string;
+        image_carousel?: string[];
+        model_data?: string;
+        model_image_url?: string;
+    };
 }
 
 const HeaderSection = ({
@@ -39,12 +44,13 @@ const HeaderSection = ({
     data,
 }: HeaderSectionProps) => {
     // State for dynamic images from data
-    const [displayImages, setDisplayImages] = useState([]);
+    const [displayImages, setDisplayImages] = useState<string[]>([]);
     const [model, setModel] = useState<string | null>(null);
     const [modelImageUrl, setModelImageUrl] = useState<string | null>(null);
     const [hasModel, setHasModel] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
 
-    // Update images when data is received
+    // Update images and model when data is received
     useEffect(() => {
         if (data?.image_carousel && data.image_carousel.length > 0) {
             setDisplayImages(data.image_carousel);
@@ -53,13 +59,12 @@ const HeaderSection = ({
             setModelImageUrl(data.model_image_url);
             setModel(data.model_data);
             setHasModel(true);
+            setCurrentPage(1); // Set to model page when model is available
+        } else {
+            setHasModel(false);
+            setCurrentPage(0); // Set to first image when no model
         }
     }, [data]);
-
-    // Update current page when model availability changes
-    useEffect(() => {
-        setCurrentPage(hasModel ? 1 : 0);
-    }, [hasModel]);
 
     // Optimized derived animations with worklet - Combined for better performance
     const headerHeight = useDerivedValue(() => {
@@ -125,7 +130,7 @@ const HeaderSection = ({
     }, []);
 
     // Static styles
-    const staticStyles = React.useMemo(
+    const staticStyles = useMemo(
         () => ({
             minimizedHeaderContainer: {
                 height: minimizedHeaderHeight,
@@ -139,8 +144,6 @@ const HeaderSection = ({
         [insets.top, minimizedHeaderHeight]
     );
 
-    const [currentPage, setCurrentPage] = useState(hasModel ? 1 : 0);
-
     // Define types for pages
     type ModelPage = {
         type: "model";
@@ -151,7 +154,7 @@ const HeaderSection = ({
     type Page = ModelPage | ImagePage;
 
     // Memoized page component for better performance
-    const renderPage = React.useCallback((page: Page, index: number) => {
+    const renderPage = useCallback((page: Page, index: number) => {
         return (
             <View key={index} style={styles.pageContainer}>
                 {page.type === "model" ? (
@@ -161,7 +164,7 @@ const HeaderSection = ({
                         model_image_url={page.model_image_url}
                     />
                 ) : page.type === "image" ? (
-                    <FastImage
+                    <FastImageWLoader
                         source={{
                             uri: page.uri,
                             priority: FastImage.priority.normal,
@@ -169,15 +172,14 @@ const HeaderSection = ({
                         }}
                         style={styles.carouselImage}
                         resizeMode={FastImage.resizeMode.cover}
-                        onLoadStart={() => {}}
-                        onLoad={() => {}}
+                        indicatorSize={"large"}
                     />
                 ) : null}
             </View>
         );
     }, []);
 
-    const pages: Page[] = React.useMemo(() => {
+    const pages: Page[] = useMemo(() => {
         return hasModel
             ? [
                   {
@@ -385,4 +387,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default HeaderSection;
+export default memo(HeaderSection);

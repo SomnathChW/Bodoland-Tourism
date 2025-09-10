@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
 import { Entypo, FontAwesome } from "@expo/vector-icons";
-import FastImage from "react-native-fast-image";
+import FastImageWLoader from "@/components/FastImageWLoader";
 
 type Props = {
     item: {
@@ -57,7 +57,7 @@ const AttractionsCard = ({ item, index }: Props) => {
                 style={{ flex: 1 }}
             >
                 {/* Image section with minimum height */}
-                <FastImage
+                <FastImageWLoader
                     source={{ uri: item.image }}
                     style={{
                         width: CARD_WIDTH,

@@ -1,4 +1,10 @@
-import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from "react-native";
+import {
+    StyleSheet,
+    Text,
+    View,
+    Dimensions,
+    TouchableOpacity,
+} from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
@@ -7,6 +13,7 @@ import Animated, {
     SharedValue,
     useAnimatedStyle,
 } from "react-native-reanimated";
+import FastImageWLoader from "@/components/FastImageWLoader";
 import FastImage from "react-native-fast-image";
 import { router } from "expo-router";
 import * as Linking from "expo-linking";
@@ -73,13 +80,16 @@ const CarouselCard = React.memo(({ item, index, scrollX }: Props) => {
     };
 
     return (
-        <TouchableOpacity 
-            activeOpacity={1} 
+        <TouchableOpacity
+            activeOpacity={1}
             onPress={handlePress}
             disabled={item.type === "none"}
         >
             <Animated.View style={[styles.card, animatedStyle]}>
-                <FastImage source={{ uri: item.image }} style={styles.image} />
+                <FastImageWLoader
+                    source={{ uri: item.image }}
+                    style={styles.image}
+                />
                 <LinearGradient
                     colors={["transparent", " rgba(0, 0, 0, 0.6)"]}
                     style={styles.textView}

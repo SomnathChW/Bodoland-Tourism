@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import FastImageWLoader from "@/components/FastImageWLoader";
 import FastImage from "react-native-fast-image";
 
 type Props = {
@@ -54,7 +55,7 @@ const VrCard = ({ item, index }: Props) => {
                 }
             >
                 {/* Image with fixed minimum height but can grow */}
-                <FastImage
+                <FastImageWLoader
                     source={{ uri: item.image }}
                     style={{
                         width: CARD_WIDTH,

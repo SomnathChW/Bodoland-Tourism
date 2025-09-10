@@ -10,6 +10,7 @@
 import React from "react";
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import FastImageWLoader from "@/components/FastImageWLoader";
 import FastImage from "react-native-fast-image";
 import Animated, { FadeIn, SlideInRight } from "react-native-reanimated";
 
@@ -61,7 +62,7 @@ const SimilarCard = React.memo(
             <Animated.View style={styles.similarCard}>
                 {/* Card Image */}
                 <View style={styles.similarCardImageContainer}>
-                    <FastImage
+                    <FastImageWLoader
                         source={{
                             uri: place.imageUri,
                             priority: FastImage.priority.low,
