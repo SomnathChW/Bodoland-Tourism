@@ -8,8 +8,6 @@ import {
 } from "react-native";
 import Animated, {
     useAnimatedStyle,
-    interpolate,
-    Extrapolation,
     useDerivedValue,
     SharedValue,
     FadeIn,
@@ -64,49 +62,65 @@ const HeaderSection = ({
     }, [hasModel]);
 
     // Optimized derived animations with worklet - Combined for better performance
-    const animations = useDerivedValue(() => {
+    const headerHeight = useDerivedValue(() => {
+        "worklet";
+        const scrollValue = scrollY.value;
+        const scrollProgress = scrollValue / scrollDistance;
+        const clampedProgress = Math.min(Math.max(scrollProgress, 0), 1);
+        return HEADER_MAX_HEIGHT - scrollDistance * clampedProgress;
+    }, [scrollDistance]);
+
+    const imageAnimations = useDerivedValue(() => {
         "worklet";
         const scrollValue = scrollY.value;
         const scrollProgress = scrollValue / scrollDistance;
         const clampedProgress = Math.min(Math.max(scrollProgress, 0), 1);
 
         return {
-            headerHeight: HEADER_MAX_HEIGHT - scrollDistance * clampedProgress,
-            imageOpacity: 1 - clampedProgress,
-            imageScale: 1 + 0.2 * clampedProgress,
+            opacity: 1 - clampedProgress,
+            scale: 1 + 0.2 * clampedProgress,
+        };
+    }, [scrollDistance]);
+
+    const uiAnimations = useDerivedValue(() => {
+        "worklet";
+        const scrollValue = scrollY.value;
+        const scrollProgress = scrollValue / scrollDistance;
+
+        return {
             minimizedHeaderOpacity:
                 scrollProgress > 0.7 ? (scrollProgress - 0.7) / 0.3 : 0,
             backButtonOpacity:
                 scrollProgress > 0.5 ? 0 : 1 - scrollProgress * 2,
         };
-    }, [scrollDistance, minimizedHeaderHeight]);
+    }, [scrollDistance]);
 
     const headerAnimatedStyle = useAnimatedStyle(() => {
         "worklet";
         return {
-            height: animations.value.headerHeight,
+            height: headerHeight.value,
         };
     }, []);
 
     const imageAnimatedStyle = useAnimatedStyle(() => {
         "worklet";
         return {
-            opacity: animations.value.imageOpacity,
-            transform: [{ scale: animations.value.imageScale }],
+            opacity: imageAnimations.value.opacity,
+            transform: [{ scale: imageAnimations.value.scale }],
         };
     }, []);
 
     const minimizedHeaderStyle = useAnimatedStyle(() => {
         "worklet";
         return {
-            opacity: animations.value.minimizedHeaderOpacity,
+            opacity: uiAnimations.value.minimizedHeaderOpacity,
         };
     }, []);
 
     const floatingBackButtonStyle = useAnimatedStyle(() => {
         "worklet";
         return {
-            opacity: animations.value.backButtonOpacity,
+            opacity: uiAnimations.value.backButtonOpacity,
         };
     }, []);
 
@@ -150,11 +164,13 @@ const HeaderSection = ({
                     <FastImage
                         source={{
                             uri: page.uri,
-                            priority: FastImage.priority.high,
-                            cache: FastImage.cacheControl.immutable,
+                            priority: FastImage.priority.normal,
+                            cache: FastImage.cacheControl.web,
                         }}
                         style={styles.carouselImage}
                         resizeMode={FastImage.resizeMode.cover}
+                        onLoadStart={() => {}}
+                        onLoad={() => {}}
                     />
                 ) : null}
             </View>
@@ -194,8 +210,10 @@ const HeaderSection = ({
                             setCurrentPage(e.nativeEvent.position)
                         }
                         // Performance optimizations
-                        offscreenPageLimit={2}
+                        offscreenPageLimit={1}
                         overdrag={false}
+                        scrollEnabled={true}
+                        pageMargin={0}
                     >
                         {pages.map((page, index) => renderPage(page, index))}
                     </PagerView>

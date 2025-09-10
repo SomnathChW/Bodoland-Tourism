@@ -5,6 +5,7 @@ import Animated, {
     useSharedValue,
     useAnimatedScrollHandler,
     cancelAnimation,
+    runOnJS,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -43,11 +44,23 @@ const Details = () => {
     const scrollY = useSharedValue(0);
     const isReady = useSharedValue(1); // Always set to 1 since we don't need phased loading
 
-    // Scroll handler
+    // Scroll handler with optimized performance
     const scrollHandler = useAnimatedScrollHandler({
         onScroll: (event) => {
             "worklet";
-            scrollY.value = event.contentOffset.y;
+            // Only update if there's a meaningful change (reduce unnecessary updates)
+            const newScrollY = event.contentOffset.y;
+            if (Math.abs(newScrollY - scrollY.value) > 0.5) {
+                scrollY.value = newScrollY;
+            }
+        },
+        onBeginDrag: () => {
+            "worklet";
+            // Optional: Handle scroll start
+        },
+        onEndDrag: () => {
+            "worklet";
+            // Optional: Handle scroll end
         },
     });
 
@@ -76,6 +89,13 @@ const Details = () => {
         () => ({
             scrollContentContainer: {
                 paddingTop: HEADER_MAX_HEIGHT,
+            },
+            container: {
+                flex: 1,
+                backgroundColor: "#0d1116",
+            },
+            scrollViewContent: {
+                paddingHorizontal: 20,
             },
         }),
         []
@@ -156,7 +176,7 @@ const Details = () => {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={staticStyles.container}>
             {/* Loading header */}
             {isLoading && !isError && <HeaderLoader />}
 
@@ -176,19 +196,21 @@ const Details = () => {
 
             <Animated.ScrollView
                 contentContainerStyle={[
-                    styles.scrollViewContent,
+                    staticStyles.scrollViewContent,
                     staticStyles.scrollContentContainer,
                     isSouvenirDetail && { paddingBottom: 80 }, // Add padding for sticky buttons
                 ]}
                 showsVerticalScrollIndicator={false}
                 onScroll={scrollHandler}
-                scrollEventThrottle={8} // Reduced from 16 for smoother animations
+                scrollEventThrottle={4} // Increased for smoother animations
                 removeClippedSubviews={true}
                 overScrollMode="auto"
                 keyboardShouldPersistTaps="handled"
                 scrollEnabled={!isLoading && !isError}
                 // Performance optimizations
                 disableIntervalMomentum={true}
+                bounces={false}
+                directionalLockEnabled={true}
             >
                 {/* Render sections based on structure */}
                 {getDetailsStructure}
@@ -201,15 +223,5 @@ const Details = () => {
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#0d1116",
-    },
-    scrollViewContent: {
-        paddingHorizontal: 20,
-    },
-});
 
 export default React.memo(Details);
