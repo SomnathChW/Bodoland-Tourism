@@ -31,6 +31,9 @@ interface HeaderSectionProps {
         image_carousel?: string[];
         model_data?: string;
         model_image_url?: string;
+        price?: string;
+        dimensions?: string;
+        currency?: string;
     };
 }
 
@@ -162,6 +165,10 @@ const HeaderSection = ({
                         scale={3}
                         model={page.model_url}
                         model_image_url={page.model_image_url}
+                        souvenirName={data?.name}
+                        souvenirPrice={data?.price}
+                        souvenirDimensions={data?.dimensions}
+                        currency={data?.currency}
                     />
                 ) : page.type === "image" ? (
                     <FastImageWLoader

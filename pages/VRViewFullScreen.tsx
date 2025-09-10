@@ -117,13 +117,14 @@ const VRViewFullScreen = () => {
                 </TouchableOpacity>
 
                 {/* Cardboard Mode Button */}
-                <TouchableOpacity
+                {/* DISABLED FOR NOW */}
+                {/* <TouchableOpacity
                     style={[styles.cardboardButton]}
                     onPress={handleCardboardMode}
                     activeOpacity={0.8}
                 >
                     <FontAwesome6 name="vr-cardboard" size={20} color="#fff" />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
 
             {/* Loading Overlay */}

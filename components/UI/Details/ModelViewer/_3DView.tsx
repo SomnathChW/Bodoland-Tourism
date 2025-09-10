@@ -82,6 +82,10 @@ const Scene = ({ modelPath, skyBox }: SceneProps) => {
 
 type _3DViewProps = {
     modelPath?: string;
+    souvenirName?: string;
+    souvenirPrice?: string;
+    souvenirDimensions?: string;
+    currency?: string;
 };
 
 const _3DView = () => {
@@ -90,6 +94,10 @@ const _3DView = () => {
 
     const params = useLocalSearchParams<_3DViewProps>();
     const modelPath = params.modelPath;
+    const souvenirName = params.souvenirName;
+    const souvenirPrice = params.souvenirPrice;
+    const souvenirDimensions = params.souvenirDimensions;
+    const currency = params.currency || "INR";
 
     const fallbackModelPath =
         "https://raw.githubusercontent.com/google/filament/main/third_party/models/DamagedHelmet/DamagedHelmet.glb";
@@ -108,10 +116,22 @@ const _3DView = () => {
                 <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
 
-            {/* Placeholder Text */}
-            <View style={styles.container}>
-                <Text style={styles.text}>3D View</Text>
-            </View>
+            {/* Souvenir Info Overlay */}
+            {souvenirName && (
+                <View style={styles.infoOverlay}>
+                    <Text style={styles.souvenirName}>{souvenirName}</Text>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.priceText}>
+                            {currency} {souvenirPrice}
+                        </Text>
+                        {souvenirDimensions && (
+                            <Text style={styles.dimensionsText}>
+                                {souvenirDimensions}
+                            </Text>
+                        )}
+                    </View>
+                </View>
+            )}
         </View>
     );
 };
@@ -138,5 +158,38 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(0, 0, 0, 0.3)",
         justifyContent: "center",
         alignItems: "center",
+    },
+    infoOverlay: {
+        position: "absolute",
+        bottom: 30,
+        left: 20,
+        right: 20,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        borderRadius: 12,
+        padding: 16,
+        zIndex: 10,
+    },
+    souvenirName: {
+        color: "#ffffff",
+        fontSize: 18,
+        fontFamily: "SfProMedium",
+        fontWeight: "bold",
+        marginBottom: 8,
+    },
+    infoRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    priceText: {
+        color: "#4CAF50",
+        fontSize: 16,
+        fontFamily: "SfProMedium",
+        fontWeight: "600",
+    },
+    dimensionsText: {
+        color: "rgba(255, 255, 255, 0.8)",
+        fontSize: 14,
+        fontFamily: "SfProMedium",
     },
 });

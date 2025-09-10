@@ -67,6 +67,10 @@ interface ModelViewerProps {
     scale?: number;
     model: string;
     model_image_url: string;
+    souvenirName?: string;
+    souvenirPrice?: string;
+    souvenirDimensions?: string;
+    currency?: string;
 }
 
 const checkARSupport = async () => {
@@ -83,6 +87,10 @@ export function ModelViewer({
     model,
     bgColor,
     model_image_url,
+    souvenirName,
+    souvenirPrice,
+    souvenirDimensions,
+    currency,
 }: ModelViewerProps) {
     const backgroundColor = bgColor ?? "#222222";
     const [isARSupported, setIsARSupported] = React.useState(false);
@@ -108,7 +116,13 @@ export function ModelViewer({
     const handleView3D = () => {
         router.push({
             pathname: "/3d_view",
-            params: { modelPath: model ?? modelPath },
+            params: {
+                modelPath: model ?? modelPath,
+                souvenirName,
+                souvenirPrice,
+                souvenirDimensions,
+                currency,
+            },
         });
     };
 

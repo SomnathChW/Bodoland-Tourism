@@ -42,7 +42,6 @@ const Details = () => {
 
     // Animation values
     const scrollY = useSharedValue(0);
-    const isReady = useSharedValue(1); // Always set to 1 since we don't need phased loading
 
     // Scroll handler with optimized performance
     const scrollHandler = useAnimatedScrollHandler({
@@ -68,7 +67,6 @@ const Details = () => {
     useEffect(() => {
         return () => {
             cancelAnimation(scrollY);
-            cancelAnimation(isReady);
         };
     }, []);
 
@@ -184,7 +182,6 @@ const Details = () => {
             {!isLoading && !isError && (
                 <HeaderSection
                     scrollY={scrollY}
-                    isReady={isReady}
                     animationPhase={1}
                     minimizedHeaderHeight={minimizedHeaderHeight}
                     scrollDistance={scrollDistance}
