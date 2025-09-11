@@ -18,7 +18,7 @@ import Animated, {
 import { validateAuthInputs } from "@/utils/formValidator";
 
 const SignInPage = () => {
-    const { session, signIn, signUp } = useAuth();
+    const { session, signIn, signInWithGoogle, signUp } = useAuth();
     const [secureText, setSecureText] = useState(true);
     const [showNameInput, setShowNameInput] = useState(false);
 
@@ -30,7 +30,6 @@ const SignInPage = () => {
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
 
-    
     const handleSignIn = () => {
         if (!validateAuthInputs({ email, password, name: "signin" })) {
             return;
@@ -145,7 +144,7 @@ const SignInPage = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.googleButton}
-                    onPress={handleSignIn}
+                    onPress={signInWithGoogle}
                 >
                     <AntDesign name="google" size={22} color="white" />
                     <Text style={styles.signInButtonText}>

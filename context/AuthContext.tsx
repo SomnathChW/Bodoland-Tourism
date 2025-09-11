@@ -8,10 +8,12 @@ import {
 } from "react";
 import * as SystemUI from "expo-system-ui";
 import * as SecureStore from "expo-secure-store";
+import * as WebBrowser from "expo-web-browser";
+import { makeRedirectUri } from "expo-auth-session";
 import { Models } from "react-native-appwrite";
 import { toast } from "sonner-native";
 
-import { account, ID } from "@/lib/appwrite";
+import { account, ID, OAuthProvider } from "@/lib/appwrite";
 
 import { mockAccount } from "@/dev_helpers/mockAccount";
 import { Platform } from "react-native";
@@ -27,6 +29,7 @@ const AuthContext = createContext<{
         email: string;
         password: string;
     }) => Promise<void>;
+    signInWithGoogle: () => Promise<void>;
     signOut: () => Promise<void>;
     signUp: ({
         email,
@@ -42,6 +45,7 @@ const AuthContext = createContext<{
     session: null,
     loading: true,
     signIn: async () => {},
+    signInWithGoogle: async () => {},
     signOut: async () => {},
     signUp: async () => {},
 });
@@ -56,18 +60,42 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const checkUserFromBackend = async () => {
         try {
-            const responseSession = await account.getSession("current");
+            let responseSession = await account.getSession("current");
             // const responseSession = await mockAccount.getSession();
+            let tokenWasRefreshed = false;
+
+            // Refresh OAuth tokens on every visit to ensure fresh tokens
+            if (
+                responseSession.provider &&
+                responseSession.provider !== "email"
+            ) {
+                try {
+                    console.log("Refreshing OAuth token...");
+                    responseSession = await account.updateSession("current");
+                    tokenWasRefreshed = true;
+                    console.log("OAuth token refreshed successfully");
+                } catch (refreshError) {
+                    console.error(
+                        "Failed to refresh OAuth token:",
+                        refreshError
+                    );
+                    // If refresh fails, continue with the existing session
+                    // The user will need to re-authenticate if they encounter issues
+                }
+            }
+
             const responseUser = await account.get();
             // const responseUser = await mockAccount.get();
             setSession(responseSession);
             setUser(responseUser);
-            // check if secure store has session and user, if not, set them
-            // in secure store
+
+            // Check if secure store has session and user, if not, set them
             const sessionString = await SecureStore.getItemAsync("session");
             const userString = await SecureStore.getItemAsync("user");
             const loggedIn = await SecureStore.getItemAsync("loggedIn");
+
             if (!sessionString || !userString || !loggedIn) {
+                // First time storing - store everything
                 await SecureStore.setItemAsync(
                     "session",
                     JSON.stringify(responseSession)
@@ -77,7 +105,15 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                     JSON.stringify(responseUser)
                 );
                 await SecureStore.setItemAsync("loggedIn", true.toString());
+            } else if (tokenWasRefreshed) {
+                // Only update stored session if token was actually refreshed
+                await SecureStore.setItemAsync(
+                    "session",
+                    JSON.stringify(responseSession)
+                );
+                console.log("Updated stored session with refreshed token");
             }
+            // If token wasn't refreshed and we have stored data, no need to update storage
         } catch (error) {
             if (
                 error instanceof Error &&
@@ -216,6 +252,77 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
     };
 
+    const signInWithGoogle = async () => {
+        const toast_id = toast.loading("Signing in with Google...");
+        setLoading(true);
+
+        try {
+            // Create the redirect URI
+            const deepLink = new URL(
+                makeRedirectUri({ preferLocalhost: true })
+            );
+            const scheme = `${deepLink.protocol}//`; // e.g. 'exp://' or 'appwrite-callback-<PROJECT_ID>://'
+
+            // Start OAuth flow - get the login URL
+            const loginUrl = await account.createOAuth2Token(
+                OAuthProvider.Google,
+                `${deepLink}`,
+                `${deepLink}`
+            );
+
+            // Open loginUrl and listen for the scheme redirect
+            const result = await WebBrowser.openAuthSessionAsync(
+                `${loginUrl}`,
+                scheme
+            );
+
+            if (result.type === "success") {
+                // Extract credentials from OAuth redirect URL
+                const url = new URL(result.url);
+                const secret = url.searchParams.get("secret");
+                const userId = url.searchParams.get("userId");
+
+                if (secret && userId) {
+                    // Create session with OAuth credentials
+                    const responseSession = await account.createSession(
+                        userId,
+                        secret
+                    );
+                    const responseUser = await account.get();
+
+                    setUser(responseUser);
+                    setSession(responseSession);
+
+                    // Store in secure storage - same as email login
+                    await SecureStore.setItemAsync(
+                        "user",
+                        JSON.stringify(responseUser)
+                    );
+                    await SecureStore.setItemAsync(
+                        "session",
+                        JSON.stringify(responseSession)
+                    );
+                    await SecureStore.setItemAsync("loggedIn", true.toString());
+
+                    toast.success("Signed in with Google", { id: toast_id });
+                } else {
+                    throw new Error("Failed to get OAuth credentials");
+                }
+            } else {
+                throw new Error("OAuth login was cancelled or failed");
+            }
+        } catch (error) {
+            console.error("Google sign-in error:", error);
+            if (error instanceof Error) {
+                toast.error(error.message, { id: toast_id });
+            } else {
+                toast.error("Error signing in with Google", { id: toast_id });
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const signOut = async () => {
         const toast_id = toast.loading("Signing out...");
         setLoading(true);
@@ -251,6 +358,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         session,
         loading,
         signIn,
+        signInWithGoogle,
         signOut,
         signUp,
     };

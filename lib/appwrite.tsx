@@ -2,7 +2,13 @@
 // Ignore the env variables
 
 import { Platform } from "react-native";
-import { Account, Client, Functions, ID } from "react-native-appwrite";
+import {
+    Account,
+    Client,
+    Functions,
+    ID,
+    OAuthProvider,
+} from "react-native-appwrite";
 
 if (
     !process.env.EXPO_PUBLIC_ENDPOINT ||
@@ -34,4 +40,4 @@ switch (Platform.OS) {
 const account = new Account(client);
 const functions = new Functions(client);
 
-export { client, account, functions, ID };
+export { client, account, functions, ID, OAuthProvider };
