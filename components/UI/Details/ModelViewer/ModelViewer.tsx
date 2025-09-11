@@ -8,12 +8,13 @@ import React, { useEffect } from "react";
 //     Skybox,
 //     useCameraManipulator,
 // } from "react-native-filament";
-import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { isARSupportedOnDevice } from "@reactvision/react-viro";
 import FastImageWLoader from "@/components/FastImageWLoader";
 import FastImage from "react-native-fast-image";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const modelPath =
     "https://fra.cloud.appwrite.io/v1/storage/buckets/model_placeholders/files/khopari/view?project=bodoland-tourism";

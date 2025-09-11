@@ -88,7 +88,7 @@ const HeaderSection = ({
         const scrollProgress = scrollValue / scrollDistance;
         // Button should fade out as minimized header appears
         const opacity =
-            scrollProgress > 0.3 ? 1 - (scrollProgress - 0.3) / 0.3 : 1;
+            scrollProgress > 0.15 ? 1 - (scrollProgress - 0.15) / 0.15 : 1;
         return {
             opacity,
         };
