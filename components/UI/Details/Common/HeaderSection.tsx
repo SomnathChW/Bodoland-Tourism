@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import Animated, {
     useAnimatedStyle,
-    useDerivedValue,
     SharedValue,
     FadeIn,
 } from "react-native-reanimated";
@@ -21,7 +20,6 @@ import FastImageWLoader from "@/components/FastImageWLoader";
 
 interface HeaderSectionProps {
     scrollY: SharedValue<number>;
-    animationPhase: number;
     minimizedHeaderHeight: number;
     scrollDistance: number;
     onBack: () => void;
@@ -35,16 +33,19 @@ interface HeaderSectionProps {
         dimensions?: string;
         currency?: string;
     };
+    showOnlyMinimized?: boolean;
+    isInsideScrollView?: boolean;
 }
 
 const HeaderSection = ({
     scrollY,
-    animationPhase,
     minimizedHeaderHeight,
     scrollDistance,
     onBack,
     insets,
     data,
+    showOnlyMinimized = true,
+    isInsideScrollView = true,
 }: HeaderSectionProps) => {
     // State for dynamic images from data
     const [displayImages, setDisplayImages] = useState<string[]>([]);
@@ -69,68 +70,29 @@ const HeaderSection = ({
         }
     }, [data]);
 
-    // Optimized derived animations with worklet - Combined for better performance
-    const headerHeight = useDerivedValue(() => {
-        "worklet";
-        const scrollValue = scrollY.value;
-        const scrollProgress = scrollValue / scrollDistance;
-        const clampedProgress = Math.min(Math.max(scrollProgress, 0), 1);
-        return HEADER_MAX_HEIGHT - scrollDistance * clampedProgress;
-    }, [scrollDistance]);
-
-    const imageAnimations = useDerivedValue(() => {
-        "worklet";
-        const scrollValue = scrollY.value;
-        const scrollProgress = scrollValue / scrollDistance;
-        const clampedProgress = Math.min(Math.max(scrollProgress, 0), 1);
-
-        return {
-            opacity: 1 - clampedProgress,
-            scale: 1 + 0.2 * clampedProgress,
-        };
-    }, [scrollDistance]);
-
-    const uiAnimations = useDerivedValue(() => {
-        "worklet";
-        const scrollValue = scrollY.value;
-        const scrollProgress = scrollValue / scrollDistance;
-
-        return {
-            minimizedHeaderOpacity:
-                scrollProgress > 0.7 ? (scrollProgress - 0.7) / 0.3 : 0,
-            backButtonOpacity:
-                scrollProgress > 0.5 ? 0 : 1 - scrollProgress * 2,
-        };
-    }, [scrollDistance]);
-
-    const headerAnimatedStyle = useAnimatedStyle(() => {
-        "worklet";
-        return {
-            height: headerHeight.value,
-        };
-    }, []);
-
-    const imageAnimatedStyle = useAnimatedStyle(() => {
-        "worklet";
-        return {
-            opacity: imageAnimations.value.opacity,
-            transform: [{ scale: imageAnimations.value.scale }],
-        };
-    }, []);
-
+    // Only animation needed for minimized header opacity
     const minimizedHeaderStyle = useAnimatedStyle(() => {
         "worklet";
+        const scrollValue = scrollY.value;
+        const scrollProgress = scrollValue / scrollDistance;
+        const opacity = scrollProgress > 0.3 ? (scrollProgress - 0.3) / 0.3 : 0;
         return {
-            opacity: uiAnimations.value.minimizedHeaderOpacity,
+            opacity,
         };
-    }, []);
+    }, [scrollDistance]);
 
+    // Animation for floating back button opacity
     const floatingBackButtonStyle = useAnimatedStyle(() => {
         "worklet";
+        const scrollValue = scrollY.value;
+        const scrollProgress = scrollValue / scrollDistance;
+        // Button should fade out as minimized header appears
+        const opacity =
+            scrollProgress > 0.3 ? 1 - (scrollProgress - 0.3) / 0.3 : 1;
         return {
-            opacity: uiAnimations.value.backButtonOpacity,
+            opacity,
         };
-    }, []);
+    }, [scrollDistance]);
 
     // Static styles
     const staticStyles = useMemo(
@@ -201,18 +163,57 @@ const HeaderSection = ({
             : displayImages.map((uri): ImagePage => ({ type: "image", uri }));
     }, [hasModel, model, modelImageUrl, displayImages]);
 
-    return (
-        <Animated.View style={[styles.header, headerAnimatedStyle]}>
-            {/* Header Image - Wrapper for layout animation */}
-            <Animated.View entering={FadeIn.duration(250)}>
+    // If showing only minimized header (for fixed position)
+    if (showOnlyMinimized) {
+        return (
+            <>
                 <Animated.View
-                    style={animationPhase >= 2 ? imageAnimatedStyle : {}}
+                    style={[
+                        styles.minimizedHeader,
+                        staticStyles.minimizedHeaderContainer,
+                        minimizedHeaderStyle,
+                    ]}
                 >
+                    <TouchableOpacity
+                        style={styles.headerBackButton}
+                        onPress={onBack}
+                        activeOpacity={0.8}
+                    >
+                        <Ionicons name="arrow-back" size={24} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.minimizedTitle} numberOfLines={1}>
+                        {data?.name || ""}
+                    </Text>
+                    <View style={styles.headerRightPlaceholder} />
+                </Animated.View>
+
+                {/* Absolutely positioned floating back button */}
+                <Animated.View
+                    style={[
+                        styles.absoluteFloatingBackButton,
+                        { top: insets.top + 10 },
+                        floatingBackButtonStyle,
+                    ]}
+                >
+                    <TouchableOpacity onPress={onBack} activeOpacity={0.8}>
+                        <Ionicons name="arrow-back" size={24} color="#fff" />
+                    </TouchableOpacity>
+                </Animated.View>
+            </>
+        );
+    }
+
+    // If inside scroll view, render static header without animations
+    if (isInsideScrollView) {
+        return (
+            <View style={[styles.staticHeader, { height: HEADER_MAX_HEIGHT }]}>
+                {/* Header Image - Static version */}
+                <Animated.View entering={FadeIn.duration(250)}>
                     <PagerView
                         key={`pager-${hasModel}`}
                         style={[
                             styles.headerImage,
-                            { height: styles.headerImage.height },
+                            { height: HEADER_MAX_HEIGHT },
                         ]}
                         initialPage={hasModel ? 1 : 0}
                         onPageSelected={(e) =>
@@ -260,56 +261,18 @@ const HeaderSection = ({
                         })}
                     </View>
                 </Animated.View>
-            </Animated.View>
-
-            {/* Minimized Header (appears when scrolling) */}
-            <Animated.View
-                style={[
-                    styles.minimizedHeader,
-                    staticStyles.minimizedHeaderContainer,
-                    minimizedHeaderStyle,
-                ]}
-            >
-                <TouchableOpacity
-                    style={styles.headerBackButton}
-                    onPress={onBack}
-                    activeOpacity={0.8}
-                >
-                    <Ionicons name="arrow-back" size={24} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.minimizedTitle} numberOfLines={1}>
-                    {data?.name || ""}
-                </Text>
-                <View style={styles.headerRightPlaceholder} />
-            </Animated.View>
-
-            {/* Floating Back Button */}
-            <Animated.View
-                style={[
-                    styles.floatingBackButton,
-                    staticStyles.floatingBackButtonContainer,
-                    floatingBackButtonStyle,
-                ]}
-            >
-                <TouchableOpacity onPress={onBack} activeOpacity={0.8}>
-                    <Ionicons name="arrow-back" size={24} color="#fff" />
-                </TouchableOpacity>
-            </Animated.View>
-        </Animated.View>
-    );
+            </View>
+        );
+    }
 };
 
 const HEADER_MAX_HEIGHT = Dimensions.get("screen").height * 0.45;
 
 const styles = StyleSheet.create({
-    header: {
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
+    staticHeader: {
         overflow: "hidden",
-        zIndex: 10,
         backgroundColor: "#0d1116",
+        position: "relative",
     },
     headerImage: {
         width: "100%",
@@ -356,15 +319,20 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
+    absoluteFloatingBackButton: {
+        position: "absolute",
+        left: 20,
+        zIndex: 15,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: "rgba(0, 0, 0, 0.3)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
 
     pageContainer: {
         flex: 1,
-    },
-    modelContainer: {
-        flex: 1,
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
-        justifyContent: "center",
-        alignItems: "center",
     },
     carouselImage: {
         width: "100%",

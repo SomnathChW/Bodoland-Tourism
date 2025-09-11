@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Dimensions } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import Animated, {
     useSharedValue,
     useAnimatedScrollHandler,
     cancelAnimation,
-    runOnJS,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -38,28 +37,16 @@ const Details = () => {
     const [isError, setIsError] = useState(false);
 
     const minimizedHeaderHeight = HEADER_MIN_HEIGHT + insets.top;
-    const scrollDistance = HEADER_MAX_HEIGHT - minimizedHeaderHeight;
+    const scrollDistance = HEADER_MAX_HEIGHT;
 
     // Animation values
     const scrollY = useSharedValue(0);
 
-    // Scroll handler with optimized performance
+    // Simple scroll handler for minimized header
     const scrollHandler = useAnimatedScrollHandler({
         onScroll: (event) => {
             "worklet";
-            // Only update if there's a meaningful change (reduce unnecessary updates)
-            const newScrollY = event.contentOffset.y;
-            if (Math.abs(newScrollY - scrollY.value) > 0.5) {
-                scrollY.value = newScrollY;
-            }
-        },
-        onBeginDrag: () => {
-            "worklet";
-            // Optional: Handle scroll start
-        },
-        onEndDrag: () => {
-            "worklet";
-            // Optional: Handle scroll end
+            scrollY.value = event.contentOffset.y;
         },
     });
 
@@ -85,9 +72,6 @@ const Details = () => {
     // Static styles calculated once
     const staticStyles = React.useMemo(
         () => ({
-            scrollContentContainer: {
-                paddingTop: HEADER_MAX_HEIGHT,
-            },
             container: {
                 flex: 1,
                 backgroundColor: "#0d1116",
@@ -178,39 +162,46 @@ const Details = () => {
             {/* Loading header */}
             {isLoading && !isError && <HeaderLoader />}
 
-            {/* Dynamic header that shows when data is loaded */}
+            {/* Minimized header that appears on scroll - only when data is loaded */}
             {!isLoading && !isError && (
                 <HeaderSection
                     scrollY={scrollY}
-                    animationPhase={1}
                     minimizedHeaderHeight={minimizedHeaderHeight}
                     scrollDistance={scrollDistance}
                     onBack={() => router.back()}
                     insets={insets}
                     data={fetchedData}
+                    isInsideScrollView={false}
                 />
             )}
 
             <Animated.ScrollView
                 contentContainerStyle={[
-                    staticStyles.scrollViewContent,
-                    staticStyles.scrollContentContainer,
                     isSouvenirDetail && { paddingBottom: 80 }, // Add padding for sticky buttons
                 ]}
                 showsVerticalScrollIndicator={false}
                 onScroll={scrollHandler}
-                scrollEventThrottle={4} // Increased for smoother animations
-                removeClippedSubviews={true}
-                overScrollMode="auto"
+                scrollEventThrottle={16}
                 keyboardShouldPersistTaps="handled"
                 scrollEnabled={!isLoading && !isError}
-                // Performance optimizations
-                disableIntervalMomentum={true}
-                bounces={false}
-                directionalLockEnabled={true}
             >
-                {/* Render sections based on structure */}
-                {getDetailsStructure}
+                {/* Header inside scroll view - full width, no padding */}
+                {!isLoading && !isError && (
+                    <HeaderSection
+                        scrollY={scrollY}
+                        minimizedHeaderHeight={minimizedHeaderHeight}
+                        scrollDistance={scrollDistance}
+                        onBack={() => router.back()}
+                        insets={insets}
+                        data={fetchedData}
+                        showOnlyMinimized={false}
+                    />
+                )}
+
+                {/* Content sections with horizontal padding */}
+                <View style={staticStyles.scrollViewContent}>
+                    {getDetailsStructure}
+                </View>
             </Animated.ScrollView>
 
             {/* Sticky Purchase Buttons - Only for souvenirs */}

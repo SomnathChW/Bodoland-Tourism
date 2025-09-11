@@ -15,10 +15,6 @@ const HeaderLoader = () => {
     return (
         <View
             style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
                 backgroundColor: "#0d1116",
             }}
         >
