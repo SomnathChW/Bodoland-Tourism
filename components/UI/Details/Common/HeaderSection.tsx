@@ -119,34 +119,37 @@ const HeaderSection = ({
     type Page = ModelPage | ImagePage;
 
     // Memoized page component for better performance
-    const renderPage = useCallback((page: Page, index: number) => {
-        return (
-            <View key={index} style={styles.pageContainer}>
-                {page.type === "model" ? (
-                    <ModelViewer
-                        scale={3}
-                        model={page.model_url}
-                        model_image_url={page.model_image_url}
-                        souvenirName={data?.name}
-                        souvenirPrice={data?.price}
-                        souvenirDimensions={data?.dimensions}
-                        currency={data?.currency}
-                    />
-                ) : page.type === "image" ? (
-                    <FastImageWLoader
-                        source={{
-                            uri: page.uri,
-                            priority: FastImage.priority.normal,
-                            cache: FastImage.cacheControl.web,
-                        }}
-                        style={styles.carouselImage}
-                        resizeMode={FastImage.resizeMode.cover}
-                        indicatorSize={"large"}
-                    />
-                ) : null}
-            </View>
-        );
-    }, []);
+    const renderPage = useCallback(
+        (page: Page, index: number) => {
+            return (
+                <View key={index} style={styles.pageContainer}>
+                    {page.type === "model" ? (
+                        <ModelViewer
+                            scale={3}
+                            model={page.model_url}
+                            model_image_url={page.model_image_url}
+                            souvenirName={data?.name}
+                            souvenirPrice={data?.price}
+                            souvenirDimensions={data?.dimensions}
+                            currency={data?.currency}
+                        />
+                    ) : page.type === "image" ? (
+                        <FastImageWLoader
+                            source={{
+                                uri: page.uri,
+                                priority: FastImage.priority.normal,
+                                cache: FastImage.cacheControl.web,
+                            }}
+                            style={styles.carouselImage}
+                            resizeMode={FastImage.resizeMode.cover}
+                            indicatorSize={"large"}
+                        />
+                    ) : null}
+                </View>
+            );
+        },
+        [data]
+    );
 
     const pages: Page[] = useMemo(() => {
         return hasModel

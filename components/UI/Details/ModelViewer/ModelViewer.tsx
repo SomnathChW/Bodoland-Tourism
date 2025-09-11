@@ -94,7 +94,9 @@ export function ModelViewer({
     currency,
 }: ModelViewerProps) {
     const backgroundColor = bgColor ?? "#222222";
-    const [isARSupported, setIsARSupported] = React.useState(false);
+    const [isARSupported, setIsARSupported] = React.useState<boolean | null>(
+        null
+    );
     const router = useRouter();
 
     const imageUrl = model_image_url === "" ? modelImagePath : model_image_url;
@@ -142,7 +144,24 @@ export function ModelViewer({
 
             {/* Action Buttons */}
             <View style={styles.buttonContainer}>
-                {isARSupported ? (
+                {isARSupported === null ? (
+                    // Loading state - show a consistent button while checking AR support
+                    <TouchableOpacity
+                        style={styles.actionButton}
+                        onPress={() => {}} // No action while loading
+                        activeOpacity={0.8}
+                        disabled
+                    >
+                        <MaterialIcons
+                            name="view-in-ar"
+                            size={14}
+                            color="#ffffff"
+                        />
+                        <Text style={styles.buttonText} numberOfLines={1}>
+                            Checking AR...
+                        </Text>
+                    </TouchableOpacity>
+                ) : isARSupported ? (
                     <TouchableOpacity
                         style={styles.actionButton}
                         onPress={handleViewInRoom}
@@ -153,7 +172,9 @@ export function ModelViewer({
                             size={14}
                             color="#ffffff"
                         />
-                        <Text style={styles.buttonText}>View in your Room</Text>
+                        <Text style={styles.buttonText} numberOfLines={1}>
+                            View in your Room
+                        </Text>
                     </TouchableOpacity>
                 ) : (
                     <TouchableOpacity
@@ -167,7 +188,9 @@ export function ModelViewer({
                             size={14}
                             color="white"
                         />
-                        <Text style={styles.buttonText}>AR Not Supported</Text>
+                        <Text style={styles.buttonText} numberOfLines={1}>
+                            AR Not Supported
+                        </Text>
                     </TouchableOpacity>
                 )}
 
@@ -181,7 +204,9 @@ export function ModelViewer({
                         size={14}
                         color="#ffffff"
                     />
-                    <Text style={styles.buttonText}>View 3D</Text>
+                    <Text style={styles.buttonText} numberOfLines={1}>
+                        View 3D
+                    </Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -199,7 +224,7 @@ const styles = StyleSheet.create({
         right: 16,
         flexDirection: "row",
         justifyContent: "space-between",
-        gap: 80,
+        gap: 12,
     },
     actionButton: {
         borderColor: "rgba(255, 255, 255, 0.5)",
@@ -213,6 +238,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         gap: 4,
+        minHeight: 44, // Ensure consistent height
     },
     buttonText: {
         backgroundColor: "transparent",
