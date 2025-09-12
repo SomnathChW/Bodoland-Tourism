@@ -20,32 +20,32 @@ const VRViewFullScreen = () => {
     const params = useLocalSearchParams();
     const insets = useSafeAreaInsets();
 
-    // Get tourUrl from route parameters
-    const tourUrl = params?.tourUrl as string;
+    // Get tour_resource from route parameters
+    const tour_resource = params?.tour_resource as string;
 
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
     const [sceneKey, setSceneKey] = useState(0); // Add scene key for forcing re-render
     const sceneNavigatorRef = useRef<any>(null);
 
-    // Check if tourUrl is provided
+    // Check if tour_resource is provided
     useEffect(() => {
-        if (!tourUrl) {
+        if (!tour_resource) {
             setIsLoading(false);
             setHasError(true);
         }
-    }, [tourUrl]);
+    }, [tour_resource]);
 
     // Handle screen focus - reload scene when returning from cardboard mode
     useFocusEffect(
         React.useCallback(() => {
-            if (tourUrl) {
+            if (tour_resource) {
                 // Force scene reload by updating the key
                 setSceneKey((prev) => prev + 1);
                 setIsLoading(true);
                 setHasError(false);
             }
-        }, [tourUrl])
+        }, [tour_resource])
     );
 
     const handleBack = () => {
@@ -55,7 +55,7 @@ const VRViewFullScreen = () => {
     const handleCardboardMode = () => {
         router.push({
             pathname: "/vr_view_cardboard",
-            params: { tourUrl },
+            params: { tour_resource },
         });
     };
 
@@ -87,7 +87,7 @@ const VRViewFullScreen = () => {
                             handleLoadStart={handleLoadStart}
                             handleLoadEnd={handleLoadEnd}
                             handleError={handleError}
-                            tourUrl={tourUrl}
+                            tour_resource={tour_resource}
                         />
                     ),
                 }}
@@ -96,7 +96,7 @@ const VRViewFullScreen = () => {
                 hdrEnabled={true}
                 shadowsEnabled={true}
                 viroAppProps={{
-                    tourUrl: tourUrl,
+                    tour_resource: tour_resource,
                 }}
             />
 
@@ -160,7 +160,7 @@ const VRViewFullScreen = () => {
                                                 }
                                                 handleLoadEnd={handleLoadEnd}
                                                 handleError={handleError}
-                                                tourUrl={tourUrl}
+                                                tour_resource={tour_resource}
                                             />
                                         ),
                                     });

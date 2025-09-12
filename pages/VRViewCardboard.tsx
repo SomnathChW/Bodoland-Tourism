@@ -20,35 +20,38 @@ const VRViewCardboard = () => {
     const params = useLocalSearchParams();
     const insets = useSafeAreaInsets();
 
-    // Get tourUrl from route parameters
-    const tourUrl = params?.tourUrl as string;
+    // Get tour_resource from route parameters
+    const tour_resource = params?.tour_resource as string;
 
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
     const [sceneKey, setSceneKey] = useState(0); // Add scene key for forcing re-render
     const sceneNavigatorRef = useRef<any>(null);
 
-    // Check if tourUrl is provided
+    // Check if tour_resource is provided
     useEffect(() => {
-        console.log("VR Cardboard: tourUrl received:", tourUrl);
-        if (!tourUrl) {
+        console.log("VR Cardboard: tour_resource received:", tour_resource);
+        if (!tour_resource) {
             console.log(
-                "VR Cardboard: No tourUrl provided, setting error state"
+                "VR Cardboard: No tour_resource provided, setting error state"
             );
             setIsLoading(false);
             setHasError(true);
         } else {
             console.log(
-                "VR Cardboard: Valid tourUrl, proceeding with VR setup"
+                "VR Cardboard: Valid tour_resource, proceeding with VR setup"
             );
         }
-    }, [tourUrl]);
+    }, [tour_resource]);
 
     // Handle screen focus - reload scene when returning from fullscreen mode
     useFocusEffect(
         React.useCallback(() => {
-            console.log("VR Cardboard: Screen focused, tourUrl:", tourUrl);
-            if (tourUrl) {
+            console.log(
+                "VR Cardboard: Screen focused, tour_resource:",
+                tour_resource
+            );
+            if (tour_resource) {
                 console.log(
                     "VR Cardboard: Reloading scene with key:",
                     sceneKey + 1
@@ -58,7 +61,7 @@ const VRViewCardboard = () => {
                 setIsLoading(true);
                 setHasError(false);
             }
-        }, [tourUrl])
+        }, [tour_resource])
     );
 
     const handleBack = () => {
@@ -83,8 +86,8 @@ const VRViewCardboard = () => {
         <View style={styles.container}>
             <StatusBar hidden />
 
-            {/* Only render VR Navigator if we have a valid tourUrl */}
-            {tourUrl && !hasError && (
+            {/* Only render VR Navigator if we have a valid tour_resource */}
+            {tour_resource && !hasError && (
                 <ViroVRSceneNavigator
                     key={`cardboard-${sceneKey}`} // Force re-render with scene key
                     ref={sceneNavigatorRef}
@@ -94,7 +97,7 @@ const VRViewCardboard = () => {
                                 handleLoadStart={handleLoadStart}
                                 handleLoadEnd={handleLoadEnd}
                                 handleError={handleError}
-                                tourUrl={tourUrl}
+                                tour_resource={tour_resource}
                             />
                         ),
                     }}
@@ -102,7 +105,7 @@ const VRViewCardboard = () => {
                     vrModeEnabled={true}
                     autofocus={true}
                     viroAppProps={{
-                        tourUrl: tourUrl,
+                        tour_resource: tour_resource,
                     }}
                 />
             )}
@@ -157,7 +160,7 @@ const VRViewCardboard = () => {
                                                 }
                                                 handleLoadEnd={handleLoadEnd}
                                                 handleError={handleError}
-                                                tourUrl={tourUrl}
+                                                tour_resource={tour_resource}
                                             />
                                         ),
                                     });

@@ -9,9 +9,10 @@ type Props = {
     item: {
         identifier: string;
         image: any;
-        title?: string;
-        location?: string;
-        geohash?: string | null;
+        name: string;
+        tour_resource: string;
+        location: string;
+        linked_attraction?: string;
     };
     index: number;
 };
@@ -30,8 +31,6 @@ const MIN_IMAGE_HEIGHT = height * 0.18; // Similar to your StaysCard component
 
 const VrCard = ({ item, index }: Props) => {
     const router = useRouter();
-    const tourUrl =
-        "https://as2.ftcdn.net/jpg/01/83/48/17/1000_F_183481794_XVV7tm8VdFmlmdIcK0TI94hc9mDqDSnb.jpg";
 
     return (
         <View
@@ -47,12 +46,18 @@ const VrCard = ({ item, index }: Props) => {
             }}
         >
             <Pressable
-                onPress={() =>
-                    router.navigate({
-                        pathname: "/vr_view_fullscreen",
-                        params: { tourUrl: tourUrl },
-                    })
-                }
+                onPress={() => {
+                    try {
+                        if (item?.tour_resource) {
+                            router.navigate({
+                                pathname: "/vr_view_fullscreen",
+                                params: { tour_resource: item.tour_resource },
+                            });
+                        }
+                    } catch (error) {
+                        console.log("Navigation error in VrCard:", error);
+                    }
+                }}
             >
                 {/* Image with fixed minimum height but can grow */}
                 <FastImageWLoader
@@ -65,7 +70,7 @@ const VrCard = ({ item, index }: Props) => {
                 />
 
                 {/* Info section that grows based on content */}
-                {item.title && (
+                {item.name && (
                     <View style={styles.infoView}>
                         <View style={styles.textView}>
                             <Text
@@ -73,7 +78,7 @@ const VrCard = ({ item, index }: Props) => {
                                 numberOfLines={1}
                                 ellipsizeMode="tail"
                             >
-                                {item.title}
+                                {item.name}
                             </Text>
                             <View style={styles.locationRow}>
                                 <Entypo
@@ -96,13 +101,6 @@ const VrCard = ({ item, index }: Props) => {
                             size={30}
                             color="#646f7e"
                         />
-                    </View>
-                )}
-
-                {/* Geohash badge */}
-                {item.geohash && (
-                    <View style={styles.distanceCard}>
-                        <Text style={styles.distanceText}>{item.geohash}</Text>
                     </View>
                 )}
             </Pressable>

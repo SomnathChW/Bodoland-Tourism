@@ -4,22 +4,22 @@ const VRPhotoScene = ({
     handleLoadStart,
     handleLoadEnd,
     handleError,
-    tourUrl,
+    tour_resource: tour_resource,
 }: {
     handleLoadStart: () => void;
     handleLoadEnd: (event: any) => void;
     handleError: (event: any) => void;
-    tourUrl: string;
+    tour_resource: string;
 }) => {
-    // Don't render Viro360Image if no valid tourUrl
-    if (!tourUrl) {
+    // Don't render Viro360Image if no valid tour_resource
+    if (!tour_resource) {
         return <ViroScene />;
     }
 
     return (
         <ViroScene>
             <Viro360Image
-                source={{ uri: tourUrl }}
+                source={{ uri: tour_resource }}
                 onLoadStart={handleLoadStart}
                 onLoadEnd={handleLoadEnd}
                 onError={handleError}

@@ -96,27 +96,26 @@ const Home = () => {
 
     const souvenirsData = souvenirsResponse?.data || [];
 
-    // Fetch VR data from Appwrite
+    // Fetch Virtual Tours data from Appwrite
     const {
-        data: vrResponse,
-        isLoading: vrLoading,
-        error: vrError,
+        data: virtualToursResponse,
+        isLoading: virtualToursLoading,
+        error: virtualToursError,
     } = useAppwriteQuery({
-        queryKey: ["vr", "homepage"],
-        route: "vr",
+        queryKey: ["virtual_tours", "homepage"],
+        route: "virtual_tours",
         limit: 5,
         expectedFields: [
             "identifier",
             "name",
             "image",
             "location",
-            "short_description",
-            "vr_link",
+            "tour_resource",
         ],
         staleTime: 30 * 60 * 1000, // 30 minutes
     });
 
-    const vrData = vrResponse?.data || [];
+    const virtualToursData = virtualToursResponse?.data || [];
 
     const listData: ListItem[] = [
         {
@@ -139,9 +138,9 @@ const Home = () => {
         },
         {
             type: "section",
-            id: "360view",
-            subHeading: "360 View",
-            data: vrData,
+            id: "virtual_tours",
+            subHeading: "Virtual Tours",
+            data: virtualToursData,
             cardComponent: CardHorizontal,
             viewAll: () => router.push("/virtual_tours"),
         },
@@ -205,14 +204,14 @@ const Home = () => {
                         />
                     );
                 }
-                if (item.id === "360view") {
+                if (item.id === "virtual_tours") {
                     return (
                         <Section
                             subHeading={item.subHeading}
-                            data={vrLoading ? [] : item.data}
+                            data={virtualToursLoading ? [] : item.data}
                             cardComponent={item.cardComponent}
                             viewAll={item.viewAll}
-                            isLoading={vrLoading}
+                            isLoading={virtualToursLoading}
                             loadingCardCount={3}
                         />
                     );
