@@ -8,6 +8,7 @@ type Props = {
         identifier: string;
         image: any;
         name?: string;
+        tour_resource?: string;
     };
 };
 
@@ -25,12 +26,25 @@ const CardHorizontal = ({ item }: Props) => {
     return (
         <View style={styles.card}>
             <Pressable
-                onPress={() =>
-                    router.push({
-                        pathname: "/details",
-                        params: { identifier: item.identifier },
-                    })
-                }
+                onPress={() => {
+                    if (
+                        (item.identifier as string)
+                            .split(/[-_]/)[0]
+                            .toLowerCase() === "vt"
+                    ) {
+                        if (item?.tour_resource) {
+                            router.navigate({
+                                pathname: "/vr_view_fullscreen",
+                                params: { tour_resource: item.tour_resource },
+                            });
+                        }
+                    } else {
+                        router.push({
+                            pathname: "/details",
+                            params: { identifier: item.identifier },
+                        });
+                    }
+                }}
                 style={styles.pressable}
             >
                 <FastImage
