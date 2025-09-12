@@ -123,6 +123,7 @@ const Emergency = () => {
                     {/* Universal Emergency Numbers Section */}
                     <View style={styles.sectionContainer}>
                         <FlatList
+                            key="loader"
                             data={universalEmergencyNumbers}
                             renderItem={renderUniversalEmergencyCard}
                             keyExtractor={(item) => item.number}

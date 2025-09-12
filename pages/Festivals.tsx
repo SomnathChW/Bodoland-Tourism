@@ -86,6 +86,7 @@ const Festivals = () => {
                 {isLoading ? (
                     // Display loading skeleton while data is loading
                     <FlashList
+                        key="loader"
                         data={Array(10).fill(0)}
                         renderItem={({ index }) => (
                             <CardLoader

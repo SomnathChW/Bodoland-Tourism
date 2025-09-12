@@ -95,6 +95,7 @@ const Stays = React.memo(() => {
 
                 {loading ? (
                     <FlatList
+                        key="loader"
                         data={loaderItems}
                         renderItem={({ index }) => (
                             <CardLoader
