@@ -14,6 +14,7 @@ import { Models } from "react-native-appwrite";
 import { toast } from "sonner-native";
 
 import { account, ID, OAuthProvider } from "@/lib/appwrite";
+import { useDataStore } from "@/store/useDataStore";
 
 import { mockAccount } from "@/dev_helpers/mockAccount";
 import { Platform } from "react-native";
@@ -57,6 +58,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
     const [session, setSession] = useState<Models.Session | null>(null);
     const hasInitialized = useRef(false);
+    const { clearCart } = useDataStore();
 
     const checkUserFromBackend = async () => {
         try {
@@ -331,9 +333,16 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             // await mockAccount.deleteSession();
             setSession(null);
             setUser(null);
+
+            // Clear cart from Zustand store
+            clearCart();
+
+            // Clear all user data from SecureStore
             await SecureStore.deleteItemAsync("session");
             await SecureStore.deleteItemAsync("user");
             await SecureStore.deleteItemAsync("loggedIn");
+            await SecureStore.deleteItemAsync("cart"); // Clear cart from SecureStore
+
             toast.success("Signed out", { id: toast_id });
         } catch (error) {
             if (
@@ -344,8 +353,12 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 await SecureStore.deleteItemAsync("session");
                 await SecureStore.deleteItemAsync("user");
                 await SecureStore.deleteItemAsync("loggedIn");
+                await SecureStore.deleteItemAsync("cart"); // Clear cart from SecureStore
                 setSession(null);
                 setUser(null);
+
+                // Clear cart from Zustand store
+                clearCart();
             } else {
                 toast.error("Error signing out", { id: toast_id });
             }
