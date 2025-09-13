@@ -82,7 +82,7 @@ const Cuisine = () => {
                             </Text>
                         </View>
                     </View>
-                </View>{" "}
+                </View>
                 {isLoading ? (
                     // Display loading skeleton while data is loading
                     <FlashList
