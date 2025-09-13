@@ -107,7 +107,7 @@ const SignInPage = () => {
                     style={styles.passwordInput}
                     placeholder="Password"
                     placeholderTextColor="#3a3e50"
-                    cursorColor="white"
+                    cursorColor={"white"}
                     secureTextEntry={secureText}
                     onChangeText={(text) => setPassword(text)}
                 />
@@ -190,15 +190,14 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     buttonContainer: {
-        marginTop: 20,
+        marginTop: 30,
         alignItems: "center",
     },
     textInput: {
-        borderColor: "#3a3e50",
-        borderWidth: 2,
+        borderBottomColor: "#3a3e50",
+        borderBottomWidth: 2,
         marginBottom: 20,
         height: 50,
-        borderRadius: 10,
         padding: 10,
         color: "white",
         fontWeight: "bold",
@@ -212,9 +211,8 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: "row",
         alignItems: "center",
-        borderWidth: 2,
-        borderColor: "#3a3e50",
-        borderRadius: 10,
+        borderBottomWidth: 2,
+        borderBottomColor: "#3a3e50",
         paddingHorizontal: 10,
         height: 50,
     },
