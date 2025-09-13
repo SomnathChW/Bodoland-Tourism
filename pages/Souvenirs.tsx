@@ -9,7 +9,8 @@ import {
 } from "react-native";
 import React, { useMemo } from "react";
 import { useDrawer } from "@/context/DrawerContext";
-import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import ProductCard from "@/components/ProductCard";
 import DynamicSortFilterComponent from "@/components/UI/Header/DynamicSortFilterComponent";
@@ -23,6 +24,7 @@ const { width, height } = Dimensions.get("window");
 
 const Souvenirs = () => {
     const { toggleDrawer } = useDrawer();
+    const router = useRouter();
     const showSortFilter = false; // Set to true if you want to show sort/filter options
 
     const {
@@ -89,6 +91,19 @@ const Souvenirs = () => {
             fetchNextPage();
         }
     };
+
+    const handleCartPress = () => {
+        router.navigate({
+            pathname: "/(protected)/cart",
+        });
+    };
+
+    const handleOrdersPress = () => {
+        router.navigate({
+            pathname: "/(protected)/orders",
+        });
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.content}>
@@ -105,6 +120,28 @@ const Souvenirs = () => {
                                 Take a piece of Bodoland with you
                             </Text>
                         </View>
+                    </View>
+
+                    <View style={styles.headerButtons}>
+                        <TouchableOpacity
+                            style={styles.orderButton}
+                            onPress={handleOrdersPress}
+                            activeOpacity={0.7}
+                        >
+                            <MaterialIcons
+                                name="shopping-bag"
+                                size={24}
+                                color="#fff"
+                            />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.cartButton}
+                            onPress={handleCartPress}
+                            activeOpacity={0.7}
+                        >
+                            <Ionicons name="cart" size={24} color="#fff" />
+                        </TouchableOpacity>
                     </View>
                 </View>
 
@@ -204,6 +241,17 @@ const styles = StyleSheet.create({
     },
     buttons: {
         color: "#fff",
+    },
+    headerButtons: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
+    },
+    orderButton: {
+        padding: 8,
+    },
+    cartButton: {
+        padding: 8,
     },
     headingText: {
         fontSize: 24,

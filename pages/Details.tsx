@@ -206,7 +206,10 @@ const Details = () => {
 
             {/* Sticky Purchase Buttons - Only for souvenirs */}
             {isSouvenirDetail && fetchedData && (
-                <StickyPurchaseButtons inStock={fetchedData.in_stock} />
+                <StickyPurchaseButtons
+                    inStock={fetchedData.in_stock}
+                    souvenirIdentifier={identifier as string}
+                />
             )}
         </View>
     );

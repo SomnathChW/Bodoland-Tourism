@@ -88,6 +88,15 @@ export const useIconRenderer = () => {
                         style={styles.menuItemIcon}
                     />
                 );
+            case "cart":
+                return (
+                    <MaterialIcons
+                        name="shopping-cart"
+                        size={18}
+                        color="#fff"
+                        style={styles.menuItemIcon}
+                    />
+                );
             default:
                 return (
                     <Feather

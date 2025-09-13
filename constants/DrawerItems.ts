@@ -39,6 +39,11 @@ export const helpItems = [
         icon: "info",
     },
     {
+        label: "Cart",
+        key: "cart",
+        icon: "cart",
+    },
+    {
         label: "Orders",
         key: "orders",
         icon: "shopping-bag",

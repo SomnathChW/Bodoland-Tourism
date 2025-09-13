@@ -17,6 +17,9 @@ export type Actions = {
     setData: (data: Partial<State>) => void;
     addToData: (key: keyof State, item: any) => void;
     appendToData: (key: keyof State, items: any[]) => void;
+    addToCart: (identifier: string) => void;
+    removeFromCart: (identifier: string) => void;
+    clearCart: () => void;
 };
 
 export const useDataStore = create<State & Actions>((set) => ({
@@ -96,4 +99,31 @@ export const useDataStore = create<State & Actions>((set) => ({
             // Return the unchanged state if all items already exist
             return state;
         }),
+
+    addToCart: (identifier) =>
+        set((state) => {
+            // Check if item already exists in cart
+            const itemExists = state.cart.some(
+                (item) => item.identifier === identifier
+            );
+
+            if (!itemExists) {
+                return {
+                    cart: [...state.cart, { identifier }],
+                };
+            }
+
+            // Return unchanged state if item already exists
+            return state;
+        }),
+
+    removeFromCart: (identifier) =>
+        set((state) => ({
+            cart: state.cart.filter((item) => item.identifier !== identifier),
+        })),
+
+    clearCart: () =>
+        set((state) => ({
+            cart: [],
+        })),
 }));

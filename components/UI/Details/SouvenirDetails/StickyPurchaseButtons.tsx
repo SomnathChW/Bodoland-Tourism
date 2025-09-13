@@ -7,27 +7,77 @@
  * for souvenirs and other purchasable items.
  */
 
-import React from "react";
+import React, { useState } from "react";
 import {
     StyleSheet,
     Text,
     View,
     TouchableOpacity,
     Dimensions,
+    ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as SecureStore from "expo-secure-store";
+import { useDataStore } from "@/store/useDataStore";
+import { toast } from "sonner-native";
 
 interface StickyPurchaseButtonsProps {
     inStock: boolean;
+    souvenirIdentifier: string;
 }
 
 const { width } = Dimensions.get("window");
 
 const StickyPurchaseButtons: React.FC<StickyPurchaseButtonsProps> = ({
     inStock,
+    souvenirIdentifier,
 }) => {
     const insets = useSafeAreaInsets();
+    const [isAddingToCart, setIsAddingToCart] = useState(false);
+    const { addToCart } = useDataStore();
+
+    const handleAddToCart = async () => {
+        if (!souvenirIdentifier || isAddingToCart) return;
+
+        setIsAddingToCart(true);
+
+        try {
+            // Add to cart store
+            addToCart(souvenirIdentifier);
+
+            // Get existing cart from secure store
+            const existingCartString = await SecureStore.getItemAsync("cart");
+            let existingCart: string[] = [];
+
+            if (existingCartString) {
+                try {
+                    existingCart = JSON.parse(existingCartString);
+                } catch (error) {
+                    console.error(
+                        "Error parsing cart from secure store:",
+                        error
+                    );
+                }
+            }
+
+            // Check if item already exists in cart
+            if (!existingCart.includes(souvenirIdentifier)) {
+                existingCart.push(souvenirIdentifier);
+                await SecureStore.setItemAsync(
+                    "cart",
+                    JSON.stringify(existingCart)
+                );
+            }
+
+            toast.success("Added to cart!");
+        } catch (error) {
+            console.error("Error adding to cart:", error);
+            toast.error("Failed to add to cart");
+        } finally {
+            setIsAddingToCart(false);
+        }
+    };
 
     return (
         <View
@@ -38,11 +88,22 @@ const StickyPurchaseButtons: React.FC<StickyPurchaseButtonsProps> = ({
         >
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity
-                    style={[styles.button, styles.addToCartButton]}
-                    disabled={!inStock}
+                    style={[
+                        styles.button,
+                        styles.addToCartButton,
+                        isAddingToCart && styles.buttonDisabled,
+                    ]}
+                    disabled={!inStock || isAddingToCart}
+                    onPress={handleAddToCart}
                 >
-                    <Ionicons name="cart-outline" size={20} color="#FFF" />
-                    <Text style={styles.buttonText}>Add to Cart</Text>
+                    {isAddingToCart ? (
+                        <ActivityIndicator size="small" color="#FFF" />
+                    ) : (
+                        <Ionicons name="cart-outline" size={20} color="#FFF" />
+                    )}
+                    <Text style={styles.buttonText}>
+                        {isAddingToCart ? "Adding..." : "Add to Cart"}
+                    </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -103,6 +164,9 @@ const styles = StyleSheet.create({
     },
     buyNowText: {
         color: "#000",
+    },
+    buttonDisabled: {
+        opacity: 0.6,
     },
 });
 

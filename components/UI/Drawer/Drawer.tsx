@@ -31,7 +31,7 @@ import {
     drawerItems,
     drawerFooterItems,
     helpItems,
-} from "@/components/UI/Drawer/DrawerItems";
+} from "@/constants/DrawerItems";
 import { useIconRenderer } from "./IconRenderer";
 
 const { width } = Dimensions.get("window");
@@ -159,6 +159,7 @@ function DrawerComponent(): JSX.Element {
                 emergency: "/(protected)/emergency_contacts",
                 about: "/(protected)/about",
                 settings: "/(protected)/settings",
+                cart: "/(protected)/cart",
                 orders: "/(protected)/orders",
             };
 
@@ -220,6 +221,7 @@ function DrawerComponent(): JSX.Element {
                         "/(protected)/about",
                         "/(protected)/settings",
                         "/(protected)/help",
+                        "/(protected)/cart",
                         "/(protected)/orders",
                     ];
                     const matchesHelpItem = helpRoutes.some(
@@ -242,6 +244,7 @@ function DrawerComponent(): JSX.Element {
                 about: "/(protected)/about",
                 settings: "/(protected)/settings",
                 help: "/(protected)/help",
+                cart: "/(protected)/cart",
                 orders: "/(protected)/orders",
             };
 
