@@ -114,9 +114,13 @@ const Souvenirs = () => {
                             size={30}
                             color={styles.buttons.color}
                         />
-                        <View>
+                        <View style={styles.textContainer}>
                             <Text style={styles.headingText}>Souvenirs</Text>
-                            <Text style={styles.mainSubHeaddingText}>
+                            <Text
+                                style={styles.mainSubHeaddingText}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                            >
                                 Take a piece of Bodoland with you
                             </Text>
                         </View>
@@ -234,10 +238,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     logo: {
+        flex: 1,
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "flex-start",
         gap: 20,
+    },
+    textContainer: {
+        flex: 1,
+        marginRight: 10,
     },
     buttons: {
         color: "#fff",
