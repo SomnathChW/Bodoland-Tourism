@@ -2,7 +2,7 @@
     "expo": {
         "name": "BTR Tourism",
         "slug": "btr-tourism",
-        "version": "0.0.11",
+        "version": "0.0.12",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
         "scheme": "appwrite-callback-bodoland-tourism",
@@ -24,7 +24,7 @@
             },
             "package": "in.coolidance.btrtourism",
             "userInterfaceStyle": "dark",
-            "versionCode": 11
+            "versionCode": 12
         },
         "web": {
             "bundler": "metro",
