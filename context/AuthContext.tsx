@@ -149,14 +149,14 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             setSession(responseSession);
             setUser(responseUser);
 
-            console.log(
-                "User is authenticated:",
-                JSON.stringify(responseUser, null, 2)
-            );
-            console.log(
-                "Session details:",
-                JSON.stringify(responseSession, null, 2)
-            );
+            // console.log(
+            //     "User is authenticated:",
+            //     JSON.stringify(responseUser, null, 2)
+            // );
+            // console.log(
+            //     "Session details:",
+            //     JSON.stringify(responseSession, null, 2)
+            // );
         } catch (error) {
             await clearLocalData();
             if (

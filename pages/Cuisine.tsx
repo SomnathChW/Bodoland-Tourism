@@ -83,23 +83,7 @@ const Cuisine = () => {
                         </View>
                     </View>
                 </View>
-                {isLoading ? (
-                    // Display loading skeleton while data is loading
-                    <FlashList
-                        key="loader"
-                        data={Array(10).fill(0)}
-                        renderItem={({ index }) => (
-                            <CardLoader
-                                index={index}
-                                width={width}
-                                height={height}
-                            />
-                        )}
-                        keyExtractor={(_, index: number) => `loader-${index}`}
-                        numColumns={2}
-                        estimatedItemSize={300}
-                    />
-                ) : error ? (
+                {error ? (
                     // Display error state
                     <View style={styles.errorContainer}>
                         <Text style={styles.errorText}>
@@ -113,10 +97,19 @@ const Cuisine = () => {
                         </TouchableOpacity>
                     </View>
                 ) : (
-                    // Display loaded data
+                    // Single FlashList for both loading and data states
                     <FlashList
-                        data={cuisineData}
+                        data={isLoading ? Array(10).fill(0) : cuisineData}
                         renderItem={({ item, index }) => {
+                            if (isLoading) {
+                                return (
+                                    <CardLoader
+                                        index={index}
+                                        width={width}
+                                        height={height}
+                                    />
+                                );
+                            }
                             //We are sure it will have it everytime as we are ensuring the fields in the query itself thats why we have any
                             return (
                                 <CuisineCard item={item as any} index={index} />
@@ -126,11 +119,15 @@ const Cuisine = () => {
                         showsVerticalScrollIndicator={false}
                         numColumns={2}
                         estimatedItemSize={300}
-                        keyExtractor={(item) => item.identifier}
+                        keyExtractor={(item, index) =>
+                            isLoading ? `loader-${index}` : item.identifier
+                        }
                         contentContainerStyle={{}}
-                        onEndReached={handleLoadMore}
+                        onEndReached={isLoading ? undefined : handleLoadMore}
                         onEndReachedThreshold={0.7}
-                        ListFooterComponent={renderFooter}
+                        ListFooterComponent={
+                            isLoading ? undefined : renderFooter
+                        }
                     />
                 )}
             </View>

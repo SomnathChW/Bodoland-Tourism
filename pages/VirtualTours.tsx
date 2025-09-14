@@ -85,24 +85,7 @@ const VrView = () => {
                     </View>
                 </View>
 
-                {isLoading ? (
-                    <FlashList
-                        key="loader"
-                        data={Array(10).fill(0)}
-                        renderItem={({ index }) => (
-                            <View collapsable={false}>
-                                <CardLoader
-                                    index={index}
-                                    width={width}
-                                    height={height}
-                                />
-                            </View>
-                        )}
-                        keyExtractor={(_, index: number) => `loader-${index}`}
-                        numColumns={2}
-                        estimatedItemSize={300}
-                    />
-                ) : error ? (
+                {error ? (
                     <View style={styles.errorContainer}>
                         <Text style={styles.errorText}>
                             Failed to load virtual tours data
@@ -115,23 +98,36 @@ const VrView = () => {
                         </TouchableOpacity>
                     </View>
                 ) : (
+                    // Single FlashList for both loading and data states
                     <FlashList
-                        key="data" // force remount
-                        data={virtualToursData}
-                        renderItem={({ item, index }) => (
-                            <VrCard item={item as any} index={index} />
-                        )}
+                        data={isLoading ? Array(10).fill(0) : virtualToursData}
+                        renderItem={({ item, index }) => {
+                            if (isLoading) {
+                                return (
+                                    <View collapsable={false}>
+                                        <CardLoader
+                                            index={index}
+                                            width={width}
+                                            height={height}
+                                        />
+                                    </View>
+                                );
+                            }
+                            return <VrCard item={item as any} index={index} />;
+                        }}
                         horizontal={false}
                         showsVerticalScrollIndicator={false}
                         numColumns={2}
                         estimatedItemSize={300}
-                        keyExtractor={(item) =>
-                            item.identifier
+                        keyExtractor={(item, index) =>
+                            isLoading ? `loader-${index}` : item.identifier
                         }
                         contentContainerStyle={{}}
-                        onEndReached={handleLoadMore}
+                        onEndReached={isLoading ? undefined : handleLoadMore}
                         onEndReachedThreshold={0.7}
-                        ListFooterComponent={renderFooter}
+                        ListFooterComponent={
+                            isLoading ? undefined : renderFooter
+                        }
                     />
                 )}
             </View>

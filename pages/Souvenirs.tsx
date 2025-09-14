@@ -166,23 +166,7 @@ const Souvenirs = () => {
                     />
                 )}
 
-                {isLoading ? (
-                    // Display loading skeleton while data is loading
-                    <FlashList
-                        key="loader"
-                        data={Array(6).fill(0)}
-                        renderItem={({ index }) => (
-                            <CardLoader
-                                index={index}
-                                width={width}
-                                height={height}
-                            />
-                        )}
-                        keyExtractor={(_, index: number) => `loader-${index}`}
-                        numColumns={2}
-                        estimatedItemSize={300}
-                    />
-                ) : error ? (
+                {error ? (
                     // Display error state
                     <View style={styles.errorContainer}>
                         <Text style={styles.errorText}>
@@ -196,21 +180,36 @@ const Souvenirs = () => {
                         </TouchableOpacity>
                     </View>
                 ) : (
-                    // Display loaded data
+                    // Single FlashList for both loading and data states
                     <FlashList
-                        data={sortedAndFilteredData}
-                        renderItem={({ item, index }) => (
-                            <ProductCard item={item} index={index} />
-                        )}
+                        data={
+                            isLoading ? Array(6).fill(0) : sortedAndFilteredData
+                        }
+                        renderItem={({ item, index }) => {
+                            if (isLoading) {
+                                return (
+                                    <CardLoader
+                                        index={index}
+                                        width={width}
+                                        height={height}
+                                    />
+                                );
+                            }
+                            return <ProductCard item={item} index={index} />;
+                        }}
                         horizontal={false}
                         showsVerticalScrollIndicator={false}
                         numColumns={2}
                         estimatedItemSize={300}
-                        keyExtractor={(item) => item.identifier}
+                        keyExtractor={(item, index) =>
+                            isLoading ? `loader-${index}` : item.identifier
+                        }
                         contentContainerStyle={{}}
-                        onEndReached={handleLoadMore}
+                        onEndReached={isLoading ? undefined : handleLoadMore}
                         onEndReachedThreshold={0.7}
-                        ListFooterComponent={renderFooter}
+                        ListFooterComponent={
+                            isLoading ? undefined : renderFooter
+                        }
                     />
                 )}
             </View>

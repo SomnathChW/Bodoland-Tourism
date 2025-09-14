@@ -143,18 +143,7 @@ const Emergency = () => {
                             Local emergency services in BTR districts
                         </Text>
 
-                        {isLoading ? (
-                            // Display loading skeleton while data is loading
-                            <FlatList
-                                data={Array(6).fill(0)}
-                                renderItem={renderCardLoader}
-                                keyExtractor={(_, index) => `loader-${index}`}
-                                numColumns={2}
-                                scrollEnabled={false}
-                                contentContainerStyle={styles.districtGrid}
-                                columnWrapperStyle={styles.columnWrapper}
-                            />
-                        ) : error ? (
+                        {error ? (
                             // Display error state
                             <View style={styles.errorContainer}>
                                 <Text style={styles.errorText}>
@@ -170,16 +159,36 @@ const Emergency = () => {
                                 </TouchableOpacity>
                             </View>
                         ) : (
-                            // Display loaded data
+                            // Single FlatList for both loading and data states
                             <FlatList
-                                data={emergencyContacts}
-                                renderItem={renderDistrictEmergencyCard}
-                                keyExtractor={(item) => item.identifier}
+                                data={
+                                    isLoading
+                                        ? Array(6).fill(0)
+                                        : emergencyContacts
+                                }
+                                renderItem={({ item, index }) => {
+                                    if (isLoading) {
+                                        return renderCardLoader({ index });
+                                    }
+                                    return renderDistrictEmergencyCard({
+                                        item,
+                                        index,
+                                    });
+                                }}
+                                keyExtractor={(item, index) =>
+                                    isLoading
+                                        ? `loader-${index}`
+                                        : item.identifier
+                                }
                                 numColumns={2}
                                 scrollEnabled={false}
                                 contentContainerStyle={styles.districtGrid}
-                                ListFooterComponent={renderFooter}
-                                onEndReached={handleLoadMore}
+                                ListFooterComponent={
+                                    isLoading ? undefined : renderFooter
+                                }
+                                onEndReached={
+                                    isLoading ? undefined : handleLoadMore
+                                }
                                 onEndReachedThreshold={0.5}
                                 columnWrapperStyle={styles.columnWrapper}
                             />
