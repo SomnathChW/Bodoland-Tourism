@@ -14,7 +14,6 @@ import Animated, {
     useAnimatedStyle,
 } from "react-native-reanimated";
 import FastImageWLoader from "@/components/FastImageWLoader";
-import FastImage from "react-native-fast-image";
 import { router } from "expo-router";
 import * as Linking from "expo-linking";
 import { CarouselTypes } from "./Carousel";

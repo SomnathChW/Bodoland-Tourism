@@ -6,7 +6,6 @@ import {
     Platform,
     FlatList,
 } from "react-native";
-import { useState } from "react";
 import { useRouter } from "expo-router";
 
 import Section from "@/components/UI/Section/Section";
@@ -26,6 +25,7 @@ type ListItem =
     | {
           type: "carousel";
           id: string;
+          data: any[];
       }
     | {
           type: "quicklinks";
@@ -41,6 +41,10 @@ type ListItem =
           data: any[];
           cardComponent: typeof CardVertical | typeof CardHorizontal;
           viewAll?: () => void;
+      }
+    | {
+          type: "end";
+          id: "end";
       };
 
 const Home = () => {
@@ -117,10 +121,26 @@ const Home = () => {
 
     const virtualToursData = virtualToursResponse?.data || [];
 
+    // Fetch Featured/Carousel data from Appwrite
+    const {
+        data: featuredResponse,
+        isLoading: featuredLoading,
+        error: featuredError,
+    } = useAppwriteQuery({
+        queryKey: ["featured", "homepage"],
+        route: "featured",
+        limit: 20,
+        expectedFields: ["identifier", "title", "image", "description", "type"],
+        staleTime: 30 * 60 * 1000, // 30 minutes
+    });
+
+    const featuredData = featuredResponse?.data || [];
+
     const listData: ListItem[] = [
         {
             type: "carousel",
             id: "carousel",
+            data: featuredData,
         },
         {
             type: "quicklinks",
@@ -160,6 +180,10 @@ const Home = () => {
             cardComponent: CardHorizontal,
             viewAll: () => router.push("/attractions"),
         },
+        {
+            type: "end",
+            id: "end",
+        },
     ];
 
     const renderItem = ({ item }: { item: ListItem }) => {
@@ -167,7 +191,10 @@ const Home = () => {
             case "carousel":
                 return (
                     <View style={{ paddingBottom: 10 }}>
-                        <Carousel />
+                        <Carousel
+                            data={featuredLoading ? [] : item.data}
+                            isLoading={featuredLoading}
+                        />
                     </View>
                 );
             case "quicklinks":

@@ -11,7 +11,6 @@ import Animated, {
     useDerivedValue,
     SharedValue,
 } from "react-native-reanimated";
-import { useAppwriteQuery } from "@/hooks/useAppwriteQuery";
 
 const AUTO_SCROLL_INTERVAL = 5000; // 5 seconds
 
@@ -28,156 +27,159 @@ export interface CarouselTypes {
     type: CarouselItemType;
 }
 
-const Carousel = React.memo(() => {
-    const scrollX = useSharedValue(0);
-    const flatListRef = useRef<FlatList>(null);
-    const scrollPosition = useSharedValue(0);
-    const progressValue = useSharedValue(0);
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+interface CarouselProps {
+    data?: CarouselTypes[];
+    isLoading?: boolean;
+}
 
-    const { data, isLoading, error } = useAppwriteQuery<CarouselTypes>({
-        queryKey: ["featured"],
-        route: "featured",
-        limit: 20,
-        expectedFields: ["identifier", "title", "image", "description", "type"],
-    });
+const Carousel = React.memo(
+    ({ data = [], isLoading = false }: CarouselProps) => {
+        const scrollX = useSharedValue(0);
+        const flatListRef = useRef<FlatList>(null);
+        const scrollPosition = useSharedValue(0);
+        const progressValue = useSharedValue(0);
+        const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-    const itemList = data?.data || [];
+        const itemList = data;
 
-    const onScrollHandler = useAnimatedScrollHandler({
-        onScroll: (event) => {
-            scrollX.value = event.contentOffset.x;
-        },
-    });
-
-    const sortedItemList = React.useMemo(() => {
-        return [...itemList].sort((a, b) => {
-            if (a.tag && !b.tag) return -1;
-            if (!a.tag && b.tag) return 1;
-            return 0;
+        const onScrollHandler = useAnimatedScrollHandler({
+            onScroll: (event) => {
+                scrollX.value = event.contentOffset.x;
+            },
         });
-    }, [itemList]);
 
-    const startProgressAnimation = React.useCallback(() => {
-        progressValue.value = withTiming(1, { duration: AUTO_SCROLL_INTERVAL });
-    }, []);
-
-    const resetProgress = React.useCallback(() => {
-        progressValue.value = 0;
-    }, []);
-
-    const autoScroll = React.useCallback(() => {
-        if (flatListRef.current && sortedItemList.length > 0) {
-            const nextIndex =
-                (Math.floor(scrollPosition.value) + 1) % sortedItemList.length;
-            flatListRef.current.scrollToIndex({
-                index: nextIndex,
-                animated: true,
+        const sortedItemList = React.useMemo(() => {
+            return [...itemList].sort((a, b) => {
+                if (a.tag && !b.tag) return -1;
+                if (!a.tag && b.tag) return 1;
+                return 0;
             });
-            scrollPosition.value = nextIndex;
-            runOnJS(resetProgress)();
-            runOnJS(startProgressAnimation)();
-        }
-    }, [sortedItemList.length, resetProgress, startProgressAnimation]);
+        }, [itemList]);
 
-    const resetAutoScrollInterval = React.useCallback(() => {
-        if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-        }
-        intervalRef.current = setInterval(autoScroll, AUTO_SCROLL_INTERVAL);
-    }, [autoScroll]);
+        const startProgressAnimation = React.useCallback(() => {
+            progressValue.value = withTiming(1, {
+                duration: AUTO_SCROLL_INTERVAL,
+            });
+        }, []);
 
-    const keyExtractor = React.useCallback(
-        (item: CarouselTypes, index: number) => `${item.title}-${index}`,
-        []
-    );
+        const resetProgress = React.useCallback(() => {
+            progressValue.value = 0;
+        }, []);
 
-    const getItemLayout = React.useCallback(
-        (data: any, index: number) => ({
-            length: width,
-            offset: width * index,
-            index,
-        }),
-        []
-    );
+        const autoScroll = React.useCallback(() => {
+            if (flatListRef.current && sortedItemList.length > 0) {
+                const nextIndex =
+                    (Math.floor(scrollPosition.value) + 1) %
+                    sortedItemList.length;
+                flatListRef.current.scrollToIndex({
+                    index: nextIndex,
+                    animated: true,
+                });
+                scrollPosition.value = nextIndex;
+                runOnJS(resetProgress)();
+                runOnJS(startProgressAnimation)();
+            }
+        }, [sortedItemList.length, resetProgress, startProgressAnimation]);
 
-    const onMomentumScrollEnd = React.useCallback(
-        (event: any) => {
-            const contentOffsetX = event.nativeEvent.contentOffset.x;
-            const currentIndex = Math.round(contentOffsetX / width);
-            scrollPosition.value = currentIndex;
-            // Reset progress and timer when user manually scrolls
-            resetProgress();
-            startProgressAnimation();
-            resetAutoScrollInterval();
-        },
-        [resetProgress, startProgressAnimation, resetAutoScrollInterval]
-    );
-
-    useEffect(() => {
-        if (sortedItemList.length > 0) {
-            // Start initial progress animation
-            startProgressAnimation();
-            resetAutoScrollInterval();
-        }
-        return () => {
+        const resetAutoScrollInterval = React.useCallback(() => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
             }
-        };
-    }, [
-        sortedItemList,
-        autoScroll,
-        startProgressAnimation,
-        resetAutoScrollInterval,
-    ]);
+            intervalRef.current = setInterval(autoScroll, AUTO_SCROLL_INTERVAL);
+        }, [autoScroll]);
 
-    const renderItem = React.useCallback(
-        ({ item, index }: { item: CarouselTypes; index: number }) => (
-            <CarouselCard item={item} index={index} scrollX={scrollX} />
-        ),
-        [scrollX]
-    );
+        const keyExtractor = React.useCallback(
+            (item: CarouselTypes, index: number) => `${item.title}-${index}`,
+            []
+        );
 
-    if (isLoading) {
-        return <CarouselLoader />;
-    }
+        const getItemLayout = React.useCallback(
+            (data: any, index: number) => ({
+                length: width,
+                offset: width * index,
+                index,
+            }),
+            []
+        );
 
-    if (error || sortedItemList.length === 0) {
-        return <View style={styles.container} />;
-    }
+        const onMomentumScrollEnd = React.useCallback(
+            (event: any) => {
+                const contentOffsetX = event.nativeEvent.contentOffset.x;
+                const currentIndex = Math.round(contentOffsetX / width);
+                scrollPosition.value = currentIndex;
+                // Reset progress and timer when user manually scrolls
+                resetProgress();
+                startProgressAnimation();
+                resetAutoScrollInterval();
+            },
+            [resetProgress, startProgressAnimation, resetAutoScrollInterval]
+        );
 
-    return (
-        <View style={styles.container}>
-            <Animated.FlatList
-                ref={flatListRef}
-                data={sortedItemList}
-                renderItem={renderItem}
-                keyExtractor={keyExtractor}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                pagingEnabled
-                onScroll={onScrollHandler}
-                removeClippedSubviews={false}
-                initialScrollIndex={0}
-                getItemLayout={getItemLayout}
-                onMomentumScrollEnd={onMomentumScrollEnd}
-            />
+        useEffect(() => {
+            if (sortedItemList.length > 0) {
+                // Start initial progress animation
+                startProgressAnimation();
+                resetAutoScrollInterval();
+            }
+            return () => {
+                if (intervalRef.current) {
+                    clearInterval(intervalRef.current);
+                }
+            };
+        }, [
+            sortedItemList,
+            autoScroll,
+            startProgressAnimation,
+            resetAutoScrollInterval,
+        ]);
 
-            {/* Dot Indicators */}
-            <View style={styles.indicatorContainer}>
-                {sortedItemList.map((_, index) => (
-                    <DotIndicator
-                        key={index}
-                        index={index}
-                        progressValue={progressValue}
-                        scrollPosition={scrollPosition}
-                    />
-                ))}
+        const renderItem = React.useCallback(
+            ({ item, index }: { item: CarouselTypes; index: number }) => (
+                <CarouselCard item={item} index={index} scrollX={scrollX} />
+            ),
+            [scrollX]
+        );
+
+        if (isLoading) {
+            return <CarouselLoader />;
+        }
+
+        if (sortedItemList.length === 0) {
+            return <View style={styles.container} />;
+        }
+
+        return (
+            <View style={styles.container}>
+                <Animated.FlatList
+                    ref={flatListRef}
+                    data={sortedItemList}
+                    renderItem={renderItem}
+                    keyExtractor={keyExtractor}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    pagingEnabled
+                    onScroll={onScrollHandler}
+                    removeClippedSubviews={false}
+                    initialScrollIndex={0}
+                    getItemLayout={getItemLayout}
+                    onMomentumScrollEnd={onMomentumScrollEnd}
+                />
+
+                {/* Dot Indicators */}
+                <View style={styles.indicatorContainer}>
+                    {sortedItemList.map((_, index) => (
+                        <DotIndicator
+                            key={index}
+                            index={index}
+                            progressValue={progressValue}
+                            scrollPosition={scrollPosition}
+                        />
+                    ))}
+                </View>
             </View>
-        </View>
-    );
-});
+        );
+    }
+);
 
 // Separate component for animated dot indicators
 const DotIndicator = React.memo(
