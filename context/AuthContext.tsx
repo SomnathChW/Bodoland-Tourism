@@ -13,16 +13,36 @@ import { makeRedirectUri } from "expo-auth-session";
 import { Models } from "react-native-appwrite";
 import { toast } from "sonner-native";
 
-import { account, ID, OAuthProvider } from "@/lib/appwrite";
+import { account, ID, database, OAuthProvider } from "@/lib/appwrite";
 import { useDataStore } from "@/store/useDataStore";
 
 import { mockAccount } from "@/dev_helpers/mockAccount";
 import { Platform } from "react-native";
+import * as Application from "expo-application";
+import * as Network from "expo-network";
+
+const { nativeApplicationVersion } = Application;
+
+const checkInternetConnection = async () => {
+    try {
+        const networkState = await Network.getNetworkStateAsync();
+        return (
+            networkState.isConnected === true &&
+            networkState.isInternetReachable === true
+        );
+    } catch (error) {
+        console.error("Error checking internet connection:", error);
+        return false;
+    }
+};
 
 const AuthContext = createContext<{
     user: Models.User<{}> | null;
     session: Models.Session | null;
     loading: boolean;
+    isAppCurrentVersion: boolean;
+    isInternetConnected: boolean;
+    isAppReady: boolean;
     signIn: ({
         email,
         password,
@@ -41,14 +61,19 @@ const AuthContext = createContext<{
         password: string;
         name: string;
     }) => Promise<void>;
+    clearLocalData: () => Promise<void>;
 }>({
     user: null,
     session: null,
     loading: true,
+    isAppCurrentVersion: true,
+    isInternetConnected: true,
+    isAppReady: false,
     signIn: async () => {},
     signInWithGoogle: async () => {},
     signOut: async () => {},
     signUp: async () => {},
+    clearLocalData: async () => {},
 });
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -57,14 +82,48 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         null
     );
     const [session, setSession] = useState<Models.Session | null>(null);
+    const [isAppCurrentVersion, setIsAppCurrentVersion] =
+        useState<boolean>(true);
+    const [isInternetConnected, setIsInternetConnected] =
+        useState<boolean>(true);
+    const [isAppReady, setisAppReady] = useState<boolean>(false);
     const hasInitialized = useRef(false);
     const { clearCart } = useDataStore();
+
+    const clearLocalData = async () => {
+        setSession(null);
+        setUser(null);
+        clearCart();
+        await SecureStore.deleteItemAsync("cart");
+    };
+
+    const checkAppVersion = async () => {
+        try {
+            const appwriteVersionDoc = await database.getDocument(
+                process.env.EXPO_PUBLIC_DATABASE_APP_CHECK || "",
+                "version",
+                "version_id"
+            );
+            const appwriteVersion = appwriteVersionDoc.key;
+
+            if (appwriteVersion === nativeApplicationVersion) {
+                setIsAppCurrentVersion(true);
+                return true;
+            }
+
+            setIsAppCurrentVersion(false);
+            return false;
+        } catch (error) {
+            // If we can’t reach backend, just return false
+            console.error("Error checking app version:", error);
+            setIsAppCurrentVersion(false);
+            return false;
+        }
+    };
 
     const checkUserFromBackend = async () => {
         try {
             let responseSession = await account.getSession("current");
-            // const responseSession = await mockAccount.getSession();
-            let tokenWasRefreshed = false;
 
             // Refresh OAuth tokens on every visit to ensure fresh tokens
             if (
@@ -72,68 +131,48 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 responseSession.provider !== "email"
             ) {
                 try {
-                    console.log("Refreshing OAuth token...");
                     responseSession = await account.updateSession("current");
-                    tokenWasRefreshed = true;
-                    console.log("OAuth token refreshed successfully");
                 } catch (refreshError) {
                     console.error(
                         "Failed to refresh OAuth token:",
                         refreshError
                     );
-                    // If refresh fails, continue with the existing session
-                    // The user will need to re-authenticate if they encounter issues
+                    await signOut();
+                    toast.error("Session expired. Please sign in again.");
+                    return;
                 }
             }
 
             const responseUser = await account.get();
             // const responseUser = await mockAccount.get();
+            setLoading(false);
             setSession(responseSession);
             setUser(responseUser);
 
-            // Check if secure store has session and user, if not, set them
-            const sessionString = await SecureStore.getItemAsync("session");
-            const userString = await SecureStore.getItemAsync("user");
-            const loggedIn = await SecureStore.getItemAsync("loggedIn");
-
-            if (!sessionString || !userString || !loggedIn) {
-                // First time storing - store everything
-                await SecureStore.setItemAsync(
-                    "session",
-                    JSON.stringify(responseSession)
-                );
-                await SecureStore.setItemAsync(
-                    "user",
-                    JSON.stringify(responseUser)
-                );
-                await SecureStore.setItemAsync("loggedIn", true.toString());
-            } else if (tokenWasRefreshed) {
-                // Only update stored session if token was actually refreshed
-                await SecureStore.setItemAsync(
-                    "session",
-                    JSON.stringify(responseSession)
-                );
-                console.log("Updated stored session with refreshed token");
-            }
-            // If token wasn't refreshed and we have stored data, no need to update storage
+            console.log(
+                "User is authenticated:",
+                JSON.stringify(responseUser, null, 2)
+            );
+            console.log(
+                "Session details:",
+                JSON.stringify(responseSession, null, 2)
+            );
         } catch (error) {
+            await clearLocalData();
             if (
                 error instanceof Error &&
                 "type" in error &&
                 (error as any).type.includes("general_unauthorized_scope")
             ) {
-                const loggedIn = await SecureStore.getItemAsync("loggedIn");
-                if (loggedIn) {
-                    SecureStore.deleteItemAsync("loggedIn");
-                    toast.error("Please sign in to continue");
-                }
-                await SecureStore.deleteItemAsync("session");
-                await SecureStore.deleteItemAsync("user");
-                setSession(null);
-                setUser(null);
+                // TODO: Check if user was previously logged in and show message accordingly
+                // toast.info("Please SignIn to continue");
             } else {
-                toast.error("Error checking your account");
+                toast.error(
+                    "Unable to verify session. Please try again later."
+                );
             }
+            // Only set loading to false if we haven't already done so in the try block
+            setLoading(false);
         }
     };
 
@@ -149,25 +188,27 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const init = async () => {
-        await checkAuth();
-    };
+        // Step 1: check internet
+        const internetConnected = await checkInternetConnection();
+        setIsInternetConnected(internetConnected);
 
-    const checkAuth = async () => {
-        try {
-            const sessionString = await SecureStore.getItemAsync("session");
-            const userString = await SecureStore.getItemAsync("user");
-            if (sessionString) {
-                setSession(JSON.parse(sessionString));
-            }
-            if (userString) {
-                setUser(JSON.parse(userString));
-            }
+        if (!internetConnected) {
+            toast.error("No internet connection");
             setLoading(false);
-            checkUserFromBackend();
-        } catch (error) {
-            toast.error("Error checking your account");
-            setLoading(false);
+            setisAppReady(true);
+            return;
         }
+        // Step 2: check app version
+        const currentVersion = await checkAppVersion();
+        if (!currentVersion) {
+            toast.error("Please update the app to the latest version");
+            setLoading(false);
+            setisAppReady(true);
+            return;
+        }
+        // Step 3: if internet + version ok → verify user
+        await checkUserFromBackend();
+        setisAppReady(true);
     };
 
     const signIn = async ({
@@ -199,17 +240,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             const responseUser = await account.get();
             // const responseUser = await mockAccount.get();
             setUser(responseUser);
-            await SecureStore.setItemAsync(
-                "user",
-                JSON.stringify(responseUser)
-            );
             setSession(responseSession); // setting session here so that the user is already stored
-
-            await SecureStore.setItemAsync(
-                "session",
-                JSON.stringify(responseSession)
-            );
-            await SecureStore.setItemAsync("loggedIn", true.toString());
 
             if (!isSignup) {
                 toast.success(successMessage, { id: toast_id });
@@ -223,6 +254,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 }
             }
         } finally {
+            if (!isAppReady) {
+                setisAppReady(true);
+            }
             setLoading(false);
         }
     };
@@ -250,8 +284,8 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             await signIn({ email, password, isSignup: true });
         } catch {
             toast.error("Please Sign in Now", { id: toast_id });
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const signInWithGoogle = async () => {
@@ -263,7 +297,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             const deepLink = new URL(
                 makeRedirectUri({ preferLocalhost: true })
             );
-            const scheme = `${deepLink.protocol}//`; // e.g. 'exp://' or 'appwrite-callback-<PROJECT_ID>://'
+            const scheme = `${deepLink.protocol}//`;
 
             // Start OAuth flow - get the login URL
             const loginUrl = await account.createOAuth2Token(
@@ -292,19 +326,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                     );
                     const responseUser = await account.get();
 
+                    // Set user and session BEFORE setting loading to false
                     setUser(responseUser);
                     setSession(responseSession);
-
-                    // Store in secure storage - same as email login
-                    await SecureStore.setItemAsync(
-                        "user",
-                        JSON.stringify(responseUser)
-                    );
-                    await SecureStore.setItemAsync(
-                        "session",
-                        JSON.stringify(responseSession)
-                    );
-                    await SecureStore.setItemAsync("loggedIn", true.toString());
+                    setLoading(false);
 
                     toast.success("Signed in with Google", { id: toast_id });
                 } else {
@@ -316,11 +341,13 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         } catch (error) {
             console.error("Google sign-in error:", error);
             if (error instanceof Error) {
-                toast.error(error.message, { id: toast_id });
+                toast.error(
+                    "Failed to sign in with Google, Please Try Again or try a different account",
+                    { id: toast_id }
+                );
             } else {
                 toast.error("Error signing in with Google", { id: toast_id });
             }
-        } finally {
             setLoading(false);
         }
     };
@@ -331,17 +358,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             await account.deleteSession("current");
             // await mockAccount.deleteSession();
-            setSession(null);
-            setUser(null);
-
-            // Clear cart from Zustand store
-            clearCart();
-
-            // Clear all user data from SecureStore
-            await SecureStore.deleteItemAsync("session");
-            await SecureStore.deleteItemAsync("user");
-            await SecureStore.deleteItemAsync("loggedIn");
-            await SecureStore.deleteItemAsync("cart"); // Clear cart from SecureStore
+            await clearLocalData();
 
             toast.success("Signed out", { id: toast_id });
         } catch (error) {
@@ -350,15 +367,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 "type" in error &&
                 (error as any).type.includes("general_unauthorized_scope")
             ) {
-                await SecureStore.deleteItemAsync("session");
-                await SecureStore.deleteItemAsync("user");
-                await SecureStore.deleteItemAsync("loggedIn");
-                await SecureStore.deleteItemAsync("cart"); // Clear cart from SecureStore
-                setSession(null);
-                setUser(null);
+                await clearLocalData();
 
-                // Clear cart from Zustand store
-                clearCart();
+                toast.success("Signed out", { id: toast_id });
             } else {
                 toast.error("Error signing out", { id: toast_id });
             }
@@ -370,10 +381,14 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         session,
         loading,
+        isAppCurrentVersion,
+        isInternetConnected,
+        isAppReady,
         signIn,
         signInWithGoogle,
         signOut,
         signUp,
+        clearLocalData,
     };
     return (
         <AuthContext.Provider value={contextData}>

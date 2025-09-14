@@ -8,9 +8,6 @@
         "scheme": "appwrite-callback-bodoland-tourism",
         "userInterfaceStyle": "dark",
         "backgroundColor": "#0d1116",
-        "navigationBar": {
-            "backgroundColor": "#0d1116"
-        },
         "newArchEnabled": true,
         "ios": {
             "supportsTablet": true,

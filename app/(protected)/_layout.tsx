@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import Drawer from "@/components/UI/Drawer/Drawer";
 import { DrawerProvider } from "@/context/DrawerContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { StyleSheet, View } from "react-native";
 
 const client = new QueryClient({
     defaultOptions: {
@@ -95,15 +96,31 @@ const StackLayout = React.memo(() => {
 });
 
 const _layout = React.memo(() => {
-    const { session } = useAuth();
+    const { session, loading, isAppReady } = useAuth();
 
-    return !session ? (
-        <Redirect href="/signin" />
-    ) : (
-        <DrawerProvider>
-            <StackLayout />
-        </DrawerProvider>
-    );
+    if (!isAppReady) {
+        return <View style={styles.container} />;
+    }
+
+    // If no session and not loading, redirect to sign in
+    if (!session && !loading) {
+        return <Redirect href="/signin" />;
+    }
+
+    if (session && isAppReady) {
+        return (
+            <DrawerProvider>
+                <StackLayout />
+            </DrawerProvider>
+        );
+    }
 });
 
 export default _layout;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#1a223c",
+    },
+});

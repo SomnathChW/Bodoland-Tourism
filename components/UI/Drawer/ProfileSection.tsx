@@ -1,36 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import * as SecureStore from "expo-secure-store";
+import { useAuth } from "@/context/AuthContext";
 
 // Not memoized ProfileSection component
 const ProfileSection = () => {
-    const [userData, setUserData] = useState({
-        name: "",
-        email: "",
-    });
+    const { user } = useAuth();
 
-    // Fetch user data from SecureStore
-    useEffect(() => {
-        const getUserData = async () => {
-            try {
-                const user = await SecureStore.getItemAsync("user");
-                if (user) {
-                    const user_json = JSON.parse(user);
-                    setUserData({
-                        name: user_json.name || "",
-                        email: user_json.email || "",
-                    });
-                }
-            } catch (error) {
-                console.error(
-                    "Error fetching user data from SecureStore:",
-                    error
-                );
-            }
-        };
-
-        getUserData();
-    }, []); // Empty dependency array means this runs once on mount
+    const userData = {
+        name: user?.name || "",
+        email: user?.email || "",
+    };
 
     // Get user initials from name
     const getInitials = () => {

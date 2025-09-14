@@ -14,24 +14,35 @@ import { Toaster } from "sonner-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { View } from "react-native";
+import NoInternetScreen from "@/components/Warnings/NoInternetScreen";
+import UpdateScreen from "@/components/Warnings/UpdateScreen";
 import LottieView from "lottie-react-native";
 
 SplashScreen.preventAutoHideAsync();
 
 const RootLayoutContent = React.memo(() => {
-    const [loaded] = useFonts({
+    const [fontsLoaded] = useFonts({
         SfProMedium: require("../assets/fonts/sf-pro-display-medium.otf"),
     });
 
-    const { loading } = useAuth();
+    const { loading, isAppCurrentVersion, isInternetConnected, isAppReady } =
+        useAuth();
 
     useEffect(() => {
-        if (loaded && !loading) {
+        if (fontsLoaded && !loading && isAppReady) {
             SplashScreen.hideAsync();
         }
-    }, [loaded, loading]);
+    }, [fontsLoaded, loading, isAppReady]);
 
-    const showOverlay = !loaded || loading;
+    const showOverlay = !fontsLoaded || loading;
+
+    if (!isInternetConnected) {
+        return <NoInternetScreen />;
+    }
+
+    if (!isAppCurrentVersion) {
+        return <UpdateScreen />;
+    }
 
     return (
         <ThemeProvider value={DarkTheme}>
@@ -49,7 +60,6 @@ const RootLayoutContent = React.memo(() => {
                     "(protected)",
                     "signin",
                     "password_recovery",
-                    "warn",
                     "+not-found",
                 ].map((name) => (
                     <Stack.Screen
@@ -101,7 +111,7 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(0,0,0, 0.5)",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
         justifyContent: "center",
         alignItems: "center",
         position: "absolute",
