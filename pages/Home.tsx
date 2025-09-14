@@ -19,7 +19,7 @@ import CategoryCard from "@/components/UI/QuickLinks/CategoryCard";
 import { districtData } from "@/data/district_data";
 import { categoryData } from "@/data/category_data";
 import { useDrawer } from "@/context/DrawerContext";
-import { useAppwriteQuery } from "@/hooks/useAppwriteQuery";
+import { useHomePageData } from "@/hooks/useHomePageData";
 
 type ListItem =
     | {
@@ -51,90 +51,27 @@ const Home = () => {
     const router = useRouter();
     const { toggleDrawer } = useDrawer();
 
-    // Fetch attractions data from Appwrite
+    // Fetch all home page data from a single endpoint
     const {
-        data: attractionsResponse,
-        isLoading: attractionsLoading,
-        error: attractionsError,
-    } = useAppwriteQuery({
-        queryKey: ["attractions", "homepage"],
-        route: "attractions",
-        limit: 5,
-        expectedFields: [
-            "identifier",
-            "name",
-            "image",
-            "location",
-            "price",
-            "short_description",
-            "district",
-        ],
-        staleTime: 30 * 60 * 1000, // 30 minutes
+        data: homePageResponse,
+        isLoading: homePageLoading,
+        error: homePageError,
+    } = useHomePageData({
+        attractionsLimit: 5,
+        souvenirsLimit: 5,
+        virtualToursLimit: 5,
+        featuredLimit: 20,
+        festivalsLimit: 5,
+        cuisinesLimit: 5,
     });
 
-    const attractionsData = attractionsResponse?.data || [];
-
-    // Fetch souvenirs data from Appwrite
-    const {
-        data: souvenirsResponse,
-        isLoading: souvenirsLoading,
-        error: souvenirsError,
-    } = useAppwriteQuery({
-        queryKey: ["souvenirs", "homepage"],
-        route: "souvenirs",
-        limit: 5,
-        expectedFields: [
-            "identifier",
-            "name",
-            "image",
-            "short_description",
-            "price",
-            "original_price",
-            "discount_percentage",
-            "rating",
-            "in_stock",
-            "categories",
-        ],
-        staleTime: 30 * 60 * 1000, // 30 minutes
-    });
-
-    const souvenirsData = souvenirsResponse?.data || [];
-
-    // Fetch Virtual Tours data from Appwrite
-    const {
-        data: virtualToursResponse,
-        isLoading: virtualToursLoading,
-        error: virtualToursError,
-    } = useAppwriteQuery({
-        queryKey: ["virtual_tours", "homepage"],
-        route: "virtual_tours",
-        limit: 5,
-        expectedFields: [
-            "identifier",
-            "name",
-            "image",
-            "location",
-            "tour_resource",
-        ],
-        staleTime: 30 * 60 * 1000, // 30 minutes
-    });
-
-    const virtualToursData = virtualToursResponse?.data || [];
-
-    // Fetch Featured/Carousel data from Appwrite
-    const {
-        data: featuredResponse,
-        isLoading: featuredLoading,
-        error: featuredError,
-    } = useAppwriteQuery({
-        queryKey: ["featured", "homepage"],
-        route: "featured",
-        limit: 20,
-        expectedFields: ["identifier", "title", "image", "description", "type"],
-        staleTime: 30 * 60 * 1000, // 30 minutes
-    });
-
-    const featuredData = featuredResponse?.data || [];
+    // Extract data from the response
+    const attractionsData = homePageResponse?.data?.attractions?.items || [];
+    const souvenirsData = homePageResponse?.data?.souvenirs?.items || [];
+    const virtualToursData = homePageResponse?.data?.virtual_tours?.items || [];
+    const featuredData = homePageResponse?.data?.featured?.items || [];
+    const festivalsData = homePageResponse?.data?.festivals?.items || [];
+    const cuisinesData = homePageResponse?.data?.cuisines?.items || [];
 
     const listData: ListItem[] = [
         {
@@ -166,6 +103,22 @@ const Home = () => {
         },
         {
             type: "section",
+            id: "festivals",
+            subHeading: "Festivals",
+            data: festivalsData,
+            cardComponent: CardVertical,
+            viewAll: () => router.push("/festivals"),
+        },
+        {
+            type: "section",
+            id: "cuisines",
+            subHeading: "Cuisines",
+            data: cuisinesData,
+            cardComponent: CardHorizontal,
+            viewAll: () => router.push("/cuisines"),
+        },
+        {
+            type: "section",
             id: "souvenirs",
             subHeading: "Souvenirs",
             data: souvenirsData,
@@ -192,8 +145,8 @@ const Home = () => {
                 return (
                     <View style={{ paddingBottom: 10 }}>
                         <Carousel
-                            data={featuredLoading ? [] : item.data}
-                            isLoading={featuredLoading}
+                            data={homePageLoading ? [] : item.data}
+                            isLoading={homePageLoading}
                         />
                     </View>
                 );
@@ -206,49 +159,15 @@ const Home = () => {
                     />
                 );
             case "section":
-                // Special handling for sections with Appwrite data
-                if (item.id === "attractions") {
-                    return (
-                        <Section
-                            subHeading={item.subHeading}
-                            data={attractionsLoading ? [] : item.data}
-                            cardComponent={item.cardComponent}
-                            viewAll={item.viewAll}
-                            isLoading={attractionsLoading}
-                            loadingCardCount={3}
-                        />
-                    );
-                }
-                if (item.id === "souvenirs") {
-                    return (
-                        <Section
-                            subHeading={item.subHeading}
-                            data={souvenirsLoading ? [] : item.data}
-                            cardComponent={item.cardComponent}
-                            viewAll={item.viewAll}
-                            isLoading={souvenirsLoading}
-                            loadingCardCount={3}
-                        />
-                    );
-                }
-                if (item.id === "virtual_tours") {
-                    return (
-                        <Section
-                            subHeading={item.subHeading}
-                            data={virtualToursLoading ? [] : item.data}
-                            cardComponent={item.cardComponent}
-                            viewAll={item.viewAll}
-                            isLoading={virtualToursLoading}
-                            loadingCardCount={3}
-                        />
-                    );
-                }
+                // Handle all sections with consistent loading state
                 return (
                     <Section
                         subHeading={item.subHeading}
-                        data={item.data}
+                        data={homePageLoading ? [] : item.data}
                         cardComponent={item.cardComponent}
                         viewAll={item.viewAll}
+                        isLoading={homePageLoading}
+                        loadingCardCount={3}
                     />
                 );
             default:

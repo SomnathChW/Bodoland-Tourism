@@ -1,6 +1,6 @@
 export interface EmergencyContact {
     identifier: string;
-    title: string;
+    name: string;
     image: string;
     police: string;
     fire: string;

@@ -11,7 +11,7 @@ const validPages = [
     "virtual_tours",
     "souvenirs",
     "festivals",
-    "cuisine",
+    "cuisines",
     "details",
 ];
 

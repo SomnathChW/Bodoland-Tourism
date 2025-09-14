@@ -18,7 +18,7 @@ import CardLoader from "@/components/CardLoader";
 
 const { width, height } = Dimensions.get("window");
 
-const Cuisine = () => {
+const Cuisines = () => {
     const { toggleDrawer } = useDrawer();
 
     const {
@@ -30,8 +30,8 @@ const Cuisine = () => {
         error,
         refetch,
     } = useAppwriteInfiniteQuery({
-        queryKey: ["cuisine"],
-        route: "cuisine",
+        queryKey: ["cuisines"],
+        route: "cuisines",
         initialPageParam: 1,
         staleTime: 30 * 60 * 1000,
         limit: 10,
@@ -135,7 +135,7 @@ const Cuisine = () => {
     );
 };
 
-export default Cuisine;
+export default Cuisines;
 
 const styles = StyleSheet.create({
     container: {

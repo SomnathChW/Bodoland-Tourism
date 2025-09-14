@@ -1,6 +1,10 @@
 import { functions } from "@/lib/appwrite";
 import { ExecutionMethod } from "react-native-appwrite";
 import { useDataStore } from "@/store/useDataStore";
+import type {
+    HomePageApiResponse,
+    UseHomePageDataParams,
+} from "./useHomePageData";
 
 export const fetchPaginatedData = async <T extends Record<string, any>>({
     pageParam = 1,
@@ -220,6 +224,60 @@ export const fetchDetails = async <T extends Record<string, any>>({
         };
     } catch (error) {
         console.error("Error fetching details:", error);
+        throw error;
+    }
+};
+
+export const fetchHomePageData = async ({
+    attractionsLimit = 5,
+    souvenirsLimit = 5,
+    virtualToursLimit = 5,
+    featuredLimit = 20,
+    festivalsLimit = 5,
+    cuisinesLimit = 5,
+    staleTime = 30 * 60 * 1000, // Not used here but kept because it's part of the params interface to reduce making another interface
+}: UseHomePageDataParams): Promise<HomePageApiResponse> => {
+    try {
+        const queryParams = new URLSearchParams({
+            attractions_limit: attractionsLimit.toString(),
+            souvenirs_limit: souvenirsLimit.toString(),
+            virtual_tours_limit: virtualToursLimit.toString(),
+            featured_limit: featuredLimit.toString(),
+            festivals_limit: festivalsLimit.toString(),
+            cuisines_limit: cuisinesLimit.toString(),
+        });
+
+        const response = await functions.createExecution(
+            process.env.EXPO_PUBLIC_FUNCTION_DATA as string,
+            JSON.stringify({}),
+            false,
+            `/v1/home?${queryParams.toString()}`,
+            ExecutionMethod.GET,
+            {}
+        );
+
+        const statusCode = response.responseStatusCode;
+
+        if (statusCode !== 200) {
+            throw new Error(
+                `Error fetching home page data: ${response.responseBody} (Status Code: ${statusCode})`
+            );
+        }
+
+        // Parse the responseBody JSON string
+        const parsedBody: HomePageApiResponse = JSON.parse(
+            response.responseBody
+        );
+
+        if (!parsedBody.success) {
+            throw new Error(
+                parsedBody.error || "Failed to fetch home page data"
+            );
+        }
+
+        return parsedBody;
+    } catch (error) {
+        console.error("Error fetching home page data:", error);
         throw error;
     }
 };

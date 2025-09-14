@@ -43,7 +43,7 @@ const Emergency = () => {
         limit: 10,
         expectedFields: [
             "identifier",
-            "title",
+            "name",
             "image",
             "police",
             "fire",

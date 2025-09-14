@@ -98,7 +98,7 @@ const CarouselCard = React.memo(({ item, index, scrollX }: Props) => {
                             <Text style={styles.tag}>{item.tag}</Text>
                         </View>
                     )}
-                    <Text style={styles.title}>{item.title}</Text>
+                    <Text style={styles.title}>{item.name}</Text>
                     <Text style={styles.description} numberOfLines={1}>
                         {displayText}
                     </Text>
@@ -110,7 +110,7 @@ const CarouselCard = React.memo(({ item, index, scrollX }: Props) => {
 
 const areEqual = (prevProps: Props, nextProps: Props) => {
     return (
-        prevProps.item.title === nextProps.item.title &&
+        prevProps.item.name === nextProps.item.name &&
         prevProps.item.description === nextProps.item.description &&
         prevProps.item.tag === nextProps.item.tag &&
         prevProps.index === nextProps.index

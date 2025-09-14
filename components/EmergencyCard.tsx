@@ -70,7 +70,7 @@ const EmergencyCard: React.FC<EmergencyCardProps> = ({ item, index }) => {
                     colors={["transparent", "rgba(0,0,0,0.8)"]}
                     style={styles.imageOverlay}
                 >
-                    <Text style={styles.districtTitle}>{item.title}</Text>
+                    <Text style={styles.districtTitle}>{item.name}</Text>
                     <Text style={styles.subtitle}>Emergency Services</Text>
                 </LinearGradient>
             </View>

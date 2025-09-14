@@ -1,6 +1,6 @@
 export const cuisineData = [
     {
-        identifier: "cuisine1",
+        identifier: "cuisines1",
         name: "Assamese Thali",
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Peetha.jpg/960px-Peetha.jpg",
         short_description:
@@ -25,7 +25,7 @@ export const cuisineData = [
             "The Assamese thali is a reflection of the region's agricultural abundance and culinary traditions.",
     },
     {
-        identifier: "cuisine2",
+        identifier: "cuisines2",
         name: "Masor Tenga",
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Peetha.jpg/960px-Peetha.jpg",
         short_description: "Tangy fish curry with tomatoes and lemon",
@@ -49,7 +49,7 @@ export const cuisineData = [
             "Masor Tenga is a classic summer dish in Assam, prized for its cooling properties and delicate flavors.",
     },
     {
-        identifier: "cuisine3",
+        identifier: "cuisines3",
         name: "Pitha",
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Peetha.jpg/960px-Peetha.jpg",
         short_description: "Rice cake, sweet or savory, festive delicacy",

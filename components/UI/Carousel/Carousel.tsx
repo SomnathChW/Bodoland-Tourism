@@ -19,7 +19,7 @@ const { width } = Dimensions.get("screen");
 export type CarouselItemType = "details" | "browser" | "none";
 export interface CarouselTypes {
     identifier: string;
-    title: string;
+    name: string;
     image: any;
     description: string;
     tag?: string;
@@ -89,7 +89,7 @@ const Carousel = React.memo(
         }, [autoScroll]);
 
         const keyExtractor = React.useCallback(
-            (item: CarouselTypes, index: number) => `${item.title}-${index}`,
+            (item: CarouselTypes, index: number) => `${item.name}-${index}`,
             []
         );
 

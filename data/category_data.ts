@@ -27,7 +27,7 @@ export const categoryData = [
         identifier: "category-cuisine",
         title: "Cuisine",
         image: require("@/assets/images/icons/cuisine.png"),
-        route: "/cuisine",
+        route: "/cuisines",
     },
     {
         identifier: "category-festivals",

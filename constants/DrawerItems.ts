@@ -17,7 +17,7 @@ export const drawerItems = [
     },
     {
         label: "Cuisine",
-        key: "/(protected)/cuisine",
+        key: "/(protected)/cuisines",
         icon: "bowl-food",
     },
     {

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Redirect, Stack } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import Drawer from "@/components/UI/Drawer/Drawer";
@@ -19,7 +19,7 @@ const StackLayout = React.memo(() => {
     const screens = [
         { name: "details", title: "Details" },
         { name: "festivals", title: "Festivals" },
-        { name: "cuisine", title: "Cuisine" },
+        { name: "cuisines", title: "Cuisine" },
         { name: "transport", title: "Transport" },
         { name: "about", title: "About" },
         { name: "emergency_contacts", title: "Emergency Contacts" },
