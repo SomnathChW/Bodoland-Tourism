@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import MenuButton from "@/components/UI/MenuButton";
 import { useDataStore } from "@/store/useDataStore";
 import * as SecureStore from "expo-secure-store";
+import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -65,6 +66,14 @@ const Cart = () => {
         } catch (error) {
             console.error("Error clearing cart:", error);
         }
+    };
+
+    const handleCheckout = () => {
+        if (allCartItems.length === 0) return;
+
+        // Create identifiers string from all cart items
+        const identifiers = allCartItems.join(",");
+        router.push(`/checkout?identifiers=${identifiers}`);
     };
 
     const renderCartItem = ({
@@ -150,6 +159,21 @@ const Cart = () => {
                         />
                     )}
                 </View>
+
+                {/* Sticky Checkout Button */}
+                {allCartItems.length > 0 && (
+                    <View style={styles.checkoutButtonContainer}>
+                        <TouchableOpacity
+                            style={styles.checkoutButton}
+                            onPress={handleCheckout}
+                        >
+                            <Text style={styles.checkoutButtonText}>
+                                Proceed to Checkout ({allCartItems.length}{" "}
+                                items)
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
         </View>
     );
@@ -210,7 +234,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     listContainer: {
-        paddingBottom: 20,
+        paddingBottom: 100,
     },
     cartItem: {
         flexDirection: "row",
@@ -263,5 +287,29 @@ const styles = StyleSheet.create({
         color: "#8E8E93",
         textAlign: "center",
         lineHeight: 24,
+    },
+    checkoutButtonContainer: {
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: "#0d1116",
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        borderTopWidth: 1,
+        borderTopColor: "#333",
+    },
+    checkoutButton: {
+        backgroundColor: "#fff",
+        paddingVertical: 16,
+        borderRadius: 12,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    checkoutButtonText: {
+        color: "#000",
+        fontSize: 16,
+        fontWeight: "600",
+        fontFamily: "SF-Pro-Display-Medium",
     },
 });

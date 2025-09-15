@@ -18,6 +18,7 @@ const client = new QueryClient({
 const StackLayout = React.memo(() => {
     const screens = [
         { name: "details", title: "Details" },
+        { name: "checkout", title: "Checkout" },
         { name: "festivals", title: "Festivals" },
         { name: "cuisines", title: "Cuisine" },
         { name: "transport", title: "Transport" },
