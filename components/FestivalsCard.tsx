@@ -28,9 +28,8 @@ const MIN_CARD_HEIGHT = height * 0.25;
 // Set minimum image height to 75% of minimum card height
 const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
 
-const FestivalsCard = ({ item, index }: Props) => {
+const FestivalsCard = React.memo(({ item, index }: Props) => {
     const router = useRouter();
-    const [isFavorite, setIsFavorite] = React.useState(false);
 
     return (
         <View
@@ -88,37 +87,10 @@ const FestivalsCard = ({ item, index }: Props) => {
                         </Text>
                     </View>
                 </View>
-
-                {/* Favorite button */}
-                <Pressable
-                    style={{
-                        position: "absolute",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        height: MIN_IMAGE_HEIGHT * 0.24,
-                        width: MIN_IMAGE_HEIGHT * 0.24,
-                        top: MIN_IMAGE_HEIGHT * 0.08,
-                        right: CARD_WIDTH * 0.05,
-                        alignSelf: "flex-start",
-                        borderRadius: 10,
-                        backgroundColor: "rgba(52, 52, 52, 0.24)",
-                    }}
-                    onPress={() => setIsFavorite(!isFavorite)}
-                >
-                    <FontAwesome
-                        name={isFavorite ? "heart" : "heart-o"}
-                        size={20}
-                        color={
-                            isFavorite
-                                ? "rgba(255, 0, 0, 0.80)"
-                                : "rgba(255, 255, 255, 0.80)"
-                        }
-                    />
-                </Pressable>
             </Pressable>
         </View>
     );
-};
+});
 
 export default FestivalsCard;
 

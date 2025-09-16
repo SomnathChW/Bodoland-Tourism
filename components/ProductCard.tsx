@@ -28,9 +28,8 @@ const CARD_WIDTH =
 const MIN_CARD_HEIGHT = height * 0.25;
 const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
 
-const ProductCard = ({ item, index }: Props) => {
+const ProductCard = React.memo(({ item, index }: Props) => {
     const router = useRouter();
-    const [isBookmarked, setIsBookmarked] = React.useState(false);
 
     const renderSimpleRating = () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -155,36 +154,10 @@ const ProductCard = ({ item, index }: Props) => {
                         </View>
                     </View>
                 )}
-
-                <Pressable
-                    style={{
-                        position: "absolute",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        height: MIN_IMAGE_HEIGHT * 0.24,
-                        width: MIN_IMAGE_HEIGHT * 0.24,
-                        top: MIN_IMAGE_HEIGHT * 0.08,
-                        right: CARD_WIDTH * 0.05,
-                        alignSelf: "flex-start",
-                        borderRadius: 10,
-                        backgroundColor: "rgba(52, 52, 52, 0.24)",
-                    }}
-                    onPress={() => setIsBookmarked(!isBookmarked)}
-                >
-                    <FontAwesome
-                        name={isBookmarked ? "heart" : "heart-o"}
-                        size={20}
-                        color={
-                            isBookmarked
-                                ? "rgba(255, 0, 0, 0.80)"
-                                : "rgba(0, 0, 0, 0.40)"
-                        }
-                    />
-                </Pressable>
             </Pressable>
         </View>
     );
-};
+});
 
 export default ProductCard;
 

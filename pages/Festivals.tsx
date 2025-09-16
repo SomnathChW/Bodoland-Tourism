@@ -117,6 +117,9 @@ const Festivals = () => {
                                 />
                             );
                         }}
+                        getItemType={(item, index) => {
+                            return isLoading ? "loader" : "festival";
+                        }}
                         horizontal={false}
                         showsVerticalScrollIndicator={false}
                         numColumns={2}
@@ -125,6 +128,7 @@ const Festivals = () => {
                             isLoading ? `loader-${index}` : item.identifier
                         }
                         contentContainerStyle={{}}
+                        removeClippedSubviews={true}
                         onEndReached={isLoading ? undefined : handleLoadMore}
                         onEndReachedThreshold={0.7}
                         ListFooterComponent={

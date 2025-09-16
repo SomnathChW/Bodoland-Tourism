@@ -115,6 +115,9 @@ const VrView = () => {
                             }
                             return <VrCard item={item as any} index={index} />;
                         }}
+                        getItemType={(item, index) => {
+                            return isLoading ? "loader" : "virtual_tour";
+                        }}
                         horizontal={false}
                         showsVerticalScrollIndicator={false}
                         numColumns={2}
@@ -123,6 +126,7 @@ const VrView = () => {
                             isLoading ? `loader-${index}` : item.identifier
                         }
                         contentContainerStyle={{}}
+                        removeClippedSubviews={true}
                         onEndReached={isLoading ? undefined : handleLoadMore}
                         onEndReachedThreshold={0.7}
                         ListFooterComponent={

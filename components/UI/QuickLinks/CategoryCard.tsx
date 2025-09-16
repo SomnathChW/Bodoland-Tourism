@@ -8,7 +8,7 @@ type Props = {
     itemsPerRow?: number;
 };
 
-const CategoryCard = ({ item, itemsPerRow = 4 }: Props) => {
+const CategoryCard = React.memo(({ item, itemsPerRow = 4 }: Props) => {
     const router = useRouter();
     const { width } = Dimensions.get("screen");
 
@@ -94,7 +94,7 @@ const CategoryCard = ({ item, itemsPerRow = 4 }: Props) => {
             </Pressable>
         </View>
     );
-};
+});
 
 export default CategoryCard;
 

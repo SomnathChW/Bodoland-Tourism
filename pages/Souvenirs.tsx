@@ -197,6 +197,9 @@ const Souvenirs = () => {
                             }
                             return <ProductCard item={item} index={index} />;
                         }}
+                        getItemType={(item, index) => {
+                            return isLoading ? "loader" : "product";
+                        }}
                         horizontal={false}
                         showsVerticalScrollIndicator={false}
                         numColumns={2}
@@ -205,6 +208,7 @@ const Souvenirs = () => {
                             isLoading ? `loader-${index}` : item.identifier
                         }
                         contentContainerStyle={{}}
+                        removeClippedSubviews={true}
                         onEndReached={isLoading ? undefined : handleLoadMore}
                         onEndReachedThreshold={0.7}
                         ListFooterComponent={

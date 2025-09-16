@@ -26,9 +26,8 @@ const PADDING = 15;
 const GAP = 15;
 const NUM_CARDS_ON_SCREEN = 2;
 
-const StaysCard = ({ item, index, width, height }: Props) => {
+const StaysCard = React.memo(({ item, index, width, height }: Props) => {
     const router = useRouter();
-    const [isFavorite, setIsFavorite] = React.useState(false);
 
     const CARD_WIDTH =
         (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
@@ -171,37 +170,10 @@ const StaysCard = ({ item, index, width, height }: Props) => {
                     </View>
                     {renderAmenities()}
                 </View>
-
-                {/* Favorite button */}
-                <Pressable
-                    style={{
-                        position: "absolute",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        height: MIN_IMAGE_HEIGHT * 0.24,
-                        width: MIN_IMAGE_HEIGHT * 0.24,
-                        top: MIN_IMAGE_HEIGHT * 0.08,
-                        right: CARD_WIDTH * 0.05,
-                        alignSelf: "flex-start",
-                        borderRadius: 10,
-                        backgroundColor: "rgba(52, 52, 52, 0.24)",
-                    }}
-                    onPress={() => setIsFavorite(!isFavorite)}
-                >
-                    <FontAwesome
-                        name={isFavorite ? "heart" : "heart-o"}
-                        size={20}
-                        color={
-                            isFavorite
-                                ? "rgba(255, 0, 0, 0.80)"
-                                : "rgba(255, 255, 255, 0.80)"
-                        }
-                    />
-                </Pressable>
             </Pressable>
         </View>
     );
-};
+});
 
 export default StaysCard;
 

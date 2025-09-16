@@ -21,7 +21,7 @@ const CARD_WIDTH = Math.ceil(width * WIDTH_RATIO);
 const CARD_HEIGHT = Math.ceil(height * HEIGHT_RATIO);
 const TEXT_HEIGHT = Math.ceil(CARD_HEIGHT * 0.25); // Increased from 0.2 to 0.25
 
-const CardVertical = ({ item }: Props) => {
+const CardVertical = React.memo(({ item }: Props) => {
     const router = useRouter();
     return (
         <View style={styles.card}>
@@ -65,7 +65,7 @@ const CardVertical = ({ item }: Props) => {
             </Pressable>
         </View>
     );
-};
+});
 
 export default CardVertical;
 

@@ -7,6 +7,7 @@ import {
     ActivityIndicator,
 } from "react-native";
 import FastImage from "react-native-fast-image";
+import { useRecyclingState } from "@shopify/flash-list";
 
 interface FastImageWLoaderProps {
     source: {
@@ -26,68 +27,95 @@ interface FastImageWLoaderProps {
     onLoadEnd?: () => void;
 }
 
-const FastImageWLoader: React.FC<FastImageWLoaderProps> = ({
-    source,
-    style,
-    resizeMode = FastImage.resizeMode.cover,
-    width = "100%",
-    height = "100%",
-    borderRadius = 0,
-    indicatorSize = "small",
-    onLoad,
-    onError,
-    onLoadStart,
-    onLoadEnd,
-}) => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [hasError, setHasError] = useState(false);
+const FastImageWLoader: React.FC<FastImageWLoaderProps> = React.memo(
+    ({
+        source,
+        style,
+        resizeMode = FastImage.resizeMode.cover,
+        width = "100%",
+        height = "100%",
+        borderRadius = 0,
+        indicatorSize = "small",
+        onLoad,
+        onError,
+        onLoadStart,
+        onLoadEnd,
+    }) => {
+        // Use FlashList's useRecyclingState hook to handle state properly during recycling
+        const [isLoading, setIsLoading] = useRecyclingState(true, [source.uri]);
+        const [hasError, setHasError] = useRecyclingState(false, [source.uri]);
 
-    const handleLoadStart = () => {
-        setIsLoading(true);
-        setHasError(false);
-        onLoadStart?.();
-    };
+        const handleLoadStart = () => {
+            setIsLoading(true);
+            setHasError(false);
+            onLoadStart?.();
+        };
 
-    const handleLoad = () => {
-        setIsLoading(false);
-        onLoad?.();
-    };
+        const handleLoad = () => {
+            setIsLoading(false);
+            onLoad?.();
+        };
 
-    const handleLoadEnd = () => {
-        setIsLoading(false);
-        onLoadEnd?.();
-    };
+        const handleLoadEnd = () => {
+            setIsLoading(false);
+            onLoadEnd?.();
+        };
 
-    const handleError = () => {
-        setIsLoading(false);
-        setHasError(true);
-        onError?.();
-    };
+        const handleError = () => {
+            setIsLoading(false);
+            setHasError(true);
+            onError?.();
+        };
 
-    return (
-        <View
-            style={[styles.container, { width, height, borderRadius }, style]}
-        >
-            {/* Show loading animation while image is loading */}
-            {isLoading && !hasError && (
-                <View style={styles.loaderContainer}>
-                    <ActivityIndicator size={indicatorSize} color="#ffffff" />
-                </View>
-            )}
+        console.log("FastImageWLoader source:", source.uri);
 
-            {/* FastImage component */}
-            <FastImage
-                source={source}
-                style={[styles.image, { borderRadius }]}
-                resizeMode={resizeMode}
-                onLoadStart={handleLoadStart}
-                onLoad={handleLoad}
-                onLoadEnd={handleLoadEnd}
-                onError={handleError}
-            />
-        </View>
-    );
-};
+        return (
+            <View
+                style={[
+                    styles.container,
+                    { width, height, borderRadius },
+                    style,
+                ]}
+            >
+                {/* Show loading animation while image is loading */}
+                {isLoading && !hasError && (
+                    <View style={styles.loaderContainer}>
+                        <ActivityIndicator
+                            size={indicatorSize}
+                            color="#ffffff"
+                        />
+                    </View>
+                )}
+
+                {/* FastImage component */}
+                <FastImage
+                    source={source}
+                    style={[styles.image, { borderRadius }]}
+                    resizeMode={resizeMode}
+                    onLoadStart={handleLoadStart}
+                    onLoad={handleLoad}
+                    onLoadEnd={handleLoadEnd}
+                    onError={handleError}
+                />
+            </View>
+        );
+    },
+    (prevProps, nextProps) => {
+        // Custom comparison function for React.memo
+        return (
+            prevProps.source.uri === nextProps.source.uri &&
+            prevProps.width === nextProps.width &&
+            prevProps.height === nextProps.height &&
+            prevProps.borderRadius === nextProps.borderRadius &&
+            prevProps.resizeMode === nextProps.resizeMode &&
+            prevProps.indicatorSize === nextProps.indicatorSize &&
+            JSON.stringify(prevProps.style) === JSON.stringify(nextProps.style)
+        );
+    }
+);
+
+// Set display name for better debugging
+FastImageWLoader.displayName = "FastImageWLoader";
 
 const styles = StyleSheet.create({
     container: {

@@ -29,7 +29,7 @@ const CARD_WIDTH =
 // Use a minimum image height that ensures it's always prominent
 const MIN_IMAGE_HEIGHT = height * 0.18; // Similar to your StaysCard component
 
-const VrCard = ({ item, index }: Props) => {
+const VrCard = React.memo(({ item, index }: Props) => {
     const router = useRouter();
 
     return (
@@ -106,7 +106,7 @@ const VrCard = ({ item, index }: Props) => {
             </Pressable>
         </View>
     );
-};
+});
 
 export default VrCard;
 
