@@ -121,7 +121,6 @@ const VrView = () => {
                         horizontal={false}
                         showsVerticalScrollIndicator={false}
                         numColumns={2}
-                        estimatedItemSize={300}
                         keyExtractor={(item, index) =>
                             isLoading ? `loader-${index}` : item.identifier
                         }

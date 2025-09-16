@@ -123,7 +123,6 @@ const Stays = React.memo(() => {
                         horizontal={false}
                         showsVerticalScrollIndicator={false}
                         numColumns={2}
-                        estimatedItemSize={height * 0.25}
                         keyExtractor={(item) => item.identifier}
                         contentContainerStyle={{}}
                     />

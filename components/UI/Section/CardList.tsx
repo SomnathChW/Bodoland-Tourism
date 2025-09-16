@@ -60,7 +60,6 @@ const CardList = React.memo(
                     horizontal={horizontal}
                     showsHorizontalScrollIndicator={false}
                     removeClippedSubviews={false}
-                    estimatedItemSize={horizontal ? 300 : 100}
                 />
             </View>
         );

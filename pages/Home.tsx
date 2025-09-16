@@ -204,7 +204,6 @@ const Home = () => {
                         data={listData}
                         renderItem={renderItem}
                         keyExtractor={(item) => item.id}
-                        // estimatedItemSize={300}
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={styles.listContentContainer}
                         removeClippedSubviews={false}

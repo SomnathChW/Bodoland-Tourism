@@ -39,7 +39,6 @@ const Transport = () => {
                     horizontal={false}
                     showsVerticalScrollIndicator={false}
                     numColumns={2}
-                    estimatedItemSize={300}
                     keyExtractor={(item) => item.identifier}
                     contentContainerStyle={{}}
                 />
