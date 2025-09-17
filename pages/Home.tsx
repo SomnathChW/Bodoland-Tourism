@@ -16,7 +16,6 @@ import CardHorizontal from "@/components/UI/Section/CardHorizontal";
 import Carousel from "@/components/UI/Carousel/Carousel";
 import CategoryCard from "@/components/UI/QuickLinks/CategoryCard";
 
-import { districtData } from "@/data/district_data";
 import { categoryData } from "@/data/category_data";
 import { useDrawer } from "@/context/DrawerContext";
 import { useHomePageData } from "@/hooks/useHomePageData";
@@ -63,6 +62,7 @@ const Home = () => {
         featuredLimit: 20,
         festivalsLimit: 5,
         cuisinesLimit: 5,
+        districtsLimit: 5,
     });
 
     // Extract data from the response
@@ -72,6 +72,7 @@ const Home = () => {
     const featuredData = homePageResponse?.data?.featured?.items || [];
     const festivalsData = homePageResponse?.data?.festivals?.items || [];
     const cuisinesData = homePageResponse?.data?.cuisines?.items || [];
+    const districtData = homePageResponse?.data?.districts?.items || [];
 
     const listData: ListItem[] = [
         {

@@ -18,6 +18,7 @@ import StayDetails from "@/components/UI/Details/StayDetails/StayDetails";
 import FestivalDetails from "@/components/UI/Details/FestivalDetails/FestivalDetails";
 import CuisineDetails from "@/components/UI/Details/CuisineDetails/CuisineDetails";
 import TransportDetails from "@/components/UI/Details/TransportDetails/TransportDetails";
+import DistrictDetails from "@/components/UI/Details/DistrictDetails/DistrictDetails";
 import StickyPurchaseButtons from "@/components/UI/Details/SouvenirDetails/StickyPurchaseButtons";
 import DetailsError from "@/components/UI/Details/Common/DetailsError";
 
@@ -132,6 +133,14 @@ const Details = () => {
             case "transport":
                 return (
                     <TransportDetails
+                        identifier={identifier as string}
+                        onDataFetched={handleDataFetched}
+                        onError={handleFetchError}
+                    />
+                );
+            case "district":
+                return (
+                    <DistrictDetails
                         identifier={identifier as string}
                         onDataFetched={handleDataFetched}
                         onError={handleFetchError}
