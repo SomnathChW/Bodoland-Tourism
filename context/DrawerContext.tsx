@@ -31,28 +31,22 @@ export function _DrawerProvider({
 
     const pathname = usePathname();
 
-    // Handle Android back button to close drawer
     useEffect(() => {
         const backHandler = BackHandler.addEventListener(
             "hardwareBackPress",
             () => {
                 if (isDrawerOpen) {
                     setIsDrawerOpen(false);
-                    return true; // Prevent default back behavior
+                    return true;
                 }
-                return false; // Allow default back behavior
+                return false;
             }
         );
-
         return () => backHandler.remove();
     }, [isDrawerOpen]);
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            setCurrentPath("/(protected)" + pathname);
-        }, 200); // delay just enough to avoid blocking tab switch
-
-        return () => clearTimeout(timeout);
+        setCurrentPath("/(protected)" + pathname);
     }, [pathname]);
 
     const toggleDrawer = useCallback((): void => {
@@ -63,7 +57,6 @@ export function _DrawerProvider({
         setCurrentPath(path);
     }, []);
 
-    // Memoize the context value to prevent unnecessary re-renders
     const contextValue = useMemo(
         () => ({
             isDrawerOpen,
@@ -81,7 +74,6 @@ export function _DrawerProvider({
     );
 }
 
-// Memoized version of the DrawerProvider
 export const DrawerProvider = React.memo(_DrawerProvider);
 
 export const useDrawer = (): DrawerContextType => {

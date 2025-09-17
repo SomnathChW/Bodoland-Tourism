@@ -50,6 +50,7 @@ function DrawerComponent(): JSX.Element {
     const renderIcon = useIconRenderer();
 
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+    const [lastPress, setLastPress] = useState(0);
 
     const handleLogoutDialog = () => {
         setShowLogoutDialog(!showLogoutDialog);
@@ -90,10 +91,14 @@ function DrawerComponent(): JSX.Element {
     // Unified handler for both menu and help items
     const handleNavigationItemPress = useCallback(
         (key: string, itemType: "menu" | "help" = "menu") => {
+            const now = Date.now();
+            if (now - lastPress < 300) return; // debounce rapid taps
+            setLastPress(now);
+
             console.log("Selected item:", key);
-            // Handle external links for help items
+
             if (itemType === "help" && key === "help") {
-                const helpCenterUrl = "https://example.com/help-center"; // Replace with actual URL
+                const helpCenterUrl = "https://example.com/help-center"; // Replace
                 Linking.openURL(helpCenterUrl).catch((err) =>
                     console.error("Failed to open help center URL:", err)
                 );
@@ -101,10 +106,8 @@ function DrawerComponent(): JSX.Element {
                 return;
             }
 
-            // Get the target route using centralized mapping
             const targetRoute = getRouteByKey(key);
 
-            // Validate that we have a valid route
             if (!targetRoute) {
                 console.warn(
                     `No valid route found for ${itemType} item: ${key}`
@@ -130,6 +133,7 @@ function DrawerComponent(): JSX.Element {
                 return;
             }
 
+            // Navigate first
             if (router.canGoBack() && !isInSomeOtherTab) {
                 try {
                     router.dismissTo(targetRoute as any);
@@ -139,19 +143,21 @@ function DrawerComponent(): JSX.Element {
             } else {
                 router.push(targetRoute as any);
             }
-            drawerProgress.value = 0;
-            toggleDrawer();
+
+            // Close drawer after navigation has settled
+            setTimeout(() => {
+                drawerProgress.value = 0;
+                toggleDrawer();
+            }, 50);
         },
-        [currentPath, toggleDrawer, router, drawerProgress]
+        [currentPath, toggleDrawer, router, drawerProgress, lastPress]
     );
 
-    // Wrapper for menu items
     const handleMenuItemPress = useCallback(
         (key: string) => handleNavigationItemPress(key, "menu"),
         [handleNavigationItemPress]
     );
 
-    // Wrapper for help items
     const handleHelpItemPress = useCallback(
         (key: string) => handleNavigationItemPress(key, "help"),
         [handleNavigationItemPress]
@@ -162,8 +168,7 @@ function DrawerComponent(): JSX.Element {
             if (key === "logout") {
                 handleLogoutDialog();
             } else if (key === "privacy") {
-                // Open privacy policy link
-                const privacyPolicyUrl = "https://example.com/privacy-policy"; // Replace with actual URL
+                const privacyPolicyUrl = "https://example.com/privacy-policy"; // Replace
                 Linking.openURL(privacyPolicyUrl).catch((err) =>
                     console.error("Failed to open privacy policy URL:", err)
                 );
@@ -182,13 +187,10 @@ function DrawerComponent(): JSX.Element {
 
             if (!targetRoute) return false;
 
-            if (currentPath === targetRoute) {
-                return true;
-            }
+            if (currentPath === targetRoute) return true;
 
             if (targetRoute === DRAWER_ROUTES.home) {
                 if (currentPath.startsWith("/(protected)/")) {
-                    // Check if current path matches any other main drawer item
                     const matchesOtherMenuItem = Object.values(
                         DRAWER_ROUTES
                     ).some(
@@ -197,7 +199,6 @@ function DrawerComponent(): JSX.Element {
                             currentPath.startsWith(route)
                     );
 
-                    // Check if current path matches any help item route
                     const helpRoutes = getHelpRoutes();
                     const matchesHelpItem = helpRoutes.some(
                         (route) => currentPath === route
@@ -232,18 +233,13 @@ function DrawerComponent(): JSX.Element {
             </Animated.View>
 
             <Animated.View style={[styles.drawer, drawerAnimatedStyle]}>
-                {/* Separate status bar space */}
                 <View style={styles.statusBarSpacer} />
-
-                {/* User Profile Section */}
                 <ProfileSection />
 
-                {/* Scrollable Content */}
                 <ScrollView
                     style={styles.drawerContent}
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* Main Menu Items */}
                     {drawerItems.map((item) => (
                         <MenuItem
                             key={item.key}
@@ -254,7 +250,6 @@ function DrawerComponent(): JSX.Element {
                         />
                     ))}
 
-                    {/* Divider with horizontal padding */}
                     <View
                         style={{
                             paddingHorizontal: 20,
@@ -264,7 +259,6 @@ function DrawerComponent(): JSX.Element {
                         }}
                     />
 
-                    {/* Help Items Section with title */}
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionHeaderText}>
                             HELP & SUPPORT
@@ -281,11 +275,9 @@ function DrawerComponent(): JSX.Element {
                         />
                     ))}
 
-                    {/* Add extra padding at the bottom to prevent cutoff */}
                     <View style={styles.scrollBottomPadding} />
                 </ScrollView>
 
-                {/* Sticky Footer */}
                 <View style={styles.drawerFooter}>
                     {drawerFooterItems.map((item) => (
                         <FooterItem
@@ -298,7 +290,6 @@ function DrawerComponent(): JSX.Element {
                 </View>
             </Animated.View>
 
-            {/* Logout AlertDialog */}
             <AlertDialog
                 visible={showLogoutDialog}
                 title="Sign Out"
@@ -311,7 +302,6 @@ function DrawerComponent(): JSX.Element {
 }
 
 const Drawer = memo(DrawerComponent);
-
 export default Drawer;
 
 const styles = StyleSheet.create({
@@ -337,10 +327,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#0d1116",
         zIndex: 2,
         shadowColor: "#000",
-        shadowOffset: {
-            width: 2,
-            height: 0,
-        },
+        shadowOffset: { width: 2, height: 0 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
