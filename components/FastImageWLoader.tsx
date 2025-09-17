@@ -67,8 +67,6 @@ const FastImageWLoader: React.FC<FastImageWLoaderProps> = React.memo(
             onError?.();
         };
 
-        console.log("FastImageWLoader source:", source.uri);
-
         return (
             <View
                 style={[

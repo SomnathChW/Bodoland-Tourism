@@ -31,6 +31,9 @@ import {
     drawerItems,
     drawerFooterItems,
     helpItems,
+    DRAWER_ROUTES,
+    getRouteByKey,
+    getHelpRoutes,
 } from "@/constants/DrawerItems";
 import { useIconRenderer } from "./IconRenderer";
 
@@ -84,9 +87,28 @@ function DrawerComponent(): JSX.Element {
         };
     });
 
-    const handleMenuItemPress = useCallback(
-        (key: string) => {
-            if (!key.startsWith("/")) {
+    // Unified handler for both menu and help items
+    const handleNavigationItemPress = useCallback(
+        (key: string, itemType: "menu" | "help" = "menu") => {
+            console.log("Selected item:", key);
+            // Handle external links for help items
+            if (itemType === "help" && key === "help") {
+                const helpCenterUrl = "https://example.com/help-center"; // Replace with actual URL
+                Linking.openURL(helpCenterUrl).catch((err) =>
+                    console.error("Failed to open help center URL:", err)
+                );
+                toggleDrawer();
+                return;
+            }
+
+            // Get the target route using centralized mapping
+            const targetRoute = getRouteByKey(key);
+
+            // Validate that we have a valid route
+            if (!targetRoute) {
+                console.warn(
+                    `No valid route found for ${itemType} item: ${key}`
+                );
                 toggleDrawer();
                 return;
             }
@@ -98,29 +120,41 @@ function DrawerComponent(): JSX.Element {
                 "virtual_tours",
             ].some((path) => currentPath.includes(path));
 
-            if (key === currentPath) {
+            if (targetRoute === currentPath) {
                 toggleDrawer();
                 return;
             }
 
-            if (isInSomeOtherTab && key === "/(protected)/") {
+            if (isInSomeOtherTab && targetRoute === "/(protected)/") {
                 toggleDrawer();
                 return;
             }
 
             if (router.canGoBack() && !isInSomeOtherTab) {
                 try {
-                    router.dismissTo(key as any);
+                    router.dismissTo(targetRoute as any);
                 } catch {
-                    router.push(key as any);
+                    router.push(targetRoute as any);
                 }
             } else {
-                router.push(key as any);
+                router.push(targetRoute as any);
             }
             drawerProgress.value = 0;
             toggleDrawer();
         },
         [currentPath, toggleDrawer, router, drawerProgress]
+    );
+
+    // Wrapper for menu items
+    const handleMenuItemPress = useCallback(
+        (key: string) => handleNavigationItemPress(key, "menu"),
+        [handleNavigationItemPress]
+    );
+
+    // Wrapper for help items
+    const handleHelpItemPress = useCallback(
+        (key: string) => handleNavigationItemPress(key, "help"),
+        [handleNavigationItemPress]
     );
 
     const handleFooterItemPress = useCallback(
@@ -142,88 +176,29 @@ function DrawerComponent(): JSX.Element {
         [toggleDrawer, handleLogoutDialog]
     );
 
-    const handleHelpItemPress = useCallback(
-        (key: string) => {
-            // Handle Help Center as external link
-            if (key === "help") {
-                const helpCenterUrl = "https://example.com/help-center"; // Replace with actual URL
-                Linking.openURL(helpCenterUrl).catch((err) =>
-                    console.error("Failed to open help center URL:", err)
-                );
-                toggleDrawer();
-                return;
-            }
-
-            // Map other help item keys to actual routes
-            const helpRouteMap: { [key: string]: string } = {
-                emergency: "/(protected)/emergency_contacts",
-                about: "/(protected)/about",
-                settings: "/(protected)/settings",
-                cart: "/(protected)/cart",
-                orders: "/(protected)/orders",
-            };
-
-            const route = helpRouteMap[key];
-            if (!route) {
-                toggleDrawer();
-                return;
-            }
-
-            const isInSomeOtherTab = [
-                "attractions",
-                "stays",
-                "souvenirs",
-                "virtual_tours",
-            ].some((path) => currentPath.includes(path));
-
-            if (route === currentPath) {
-                toggleDrawer();
-                return;
-            }
-
-            if (isInSomeOtherTab && route === "/(protected)/") {
-                toggleDrawer();
-                return;
-            }
-
-            if (router.canGoBack() && !isInSomeOtherTab) {
-                try {
-                    router.dismissTo(route as any);
-                } catch {
-                    router.push(route as any);
-                }
-            } else {
-                router.push(route as any);
-            }
-            drawerProgress.value = 0;
-            toggleDrawer();
-        },
-        [toggleDrawer, router, currentPath, drawerProgress]
-    );
-
     const isMenuItemActive = useCallback(
         (itemKey: string) => {
-            if (currentPath === itemKey) {
+            const targetRoute = getRouteByKey(itemKey);
+
+            if (!targetRoute) return false;
+
+            if (currentPath === targetRoute) {
                 return true;
             }
-            if (itemKey === "/(protected)/") {
+
+            if (targetRoute === DRAWER_ROUTES.home) {
                 if (currentPath.startsWith("/(protected)/")) {
                     // Check if current path matches any other main drawer item
-                    const matchesOtherMenuItem = drawerItems.some(
-                        (item) =>
-                            item.key !== "/(protected)/" &&
-                            currentPath.startsWith(item.key)
+                    const matchesOtherMenuItem = Object.values(
+                        DRAWER_ROUTES
+                    ).some(
+                        (route) =>
+                            route !== DRAWER_ROUTES.home &&
+                            currentPath.startsWith(route)
                     );
 
                     // Check if current path matches any help item route
-                    const helpRoutes = [
-                        "/(protected)/emergency_contacts",
-                        "/(protected)/about",
-                        "/(protected)/settings",
-                        "/(protected)/help",
-                        "/(protected)/cart",
-                        "/(protected)/orders",
-                    ];
+                    const helpRoutes = getHelpRoutes();
                     const matchesHelpItem = helpRoutes.some(
                         (route) => currentPath === route
                     );
@@ -238,17 +213,7 @@ function DrawerComponent(): JSX.Element {
 
     const isHelpItemActive = useCallback(
         (itemKey: string) => {
-            // Map help item keys to actual routes for active state checking
-            const helpRouteMap: { [key: string]: string } = {
-                emergency: "/(protected)/emergency_contacts",
-                about: "/(protected)/about",
-                settings: "/(protected)/settings",
-                help: "/(protected)/help",
-                cart: "/(protected)/cart",
-                orders: "/(protected)/orders",
-            };
-
-            const route = helpRouteMap[itemKey];
+            const route = getRouteByKey(itemKey);
             return route ? currentPath === route : false;
         },
         [currentPath]

@@ -6,8 +6,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router/stack";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet } from "react-native";
+import { StyleSheet, StatusBar } from "react-native";
 
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { Toaster } from "sonner-native";
@@ -46,7 +45,7 @@ const RootLayoutContent = React.memo(() => {
 
     return (
         <ThemeProvider value={DarkTheme}>
-            <StatusBar style="light" />
+            <StatusBar barStyle="light-content" />
             <Stack
                 initialRouteName="signin"
                 screenOptions={{

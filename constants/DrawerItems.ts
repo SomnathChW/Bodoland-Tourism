@@ -7,22 +7,22 @@ type DrawerItemType = {
 export const drawerItems = [
     {
         label: "Home",
-        key: "/(protected)/",
+        key: "home",
         icon: "home",
     },
     {
         label: "Festivals",
-        key: "/(protected)/festivals",
+        key: "festivals",
         icon: "festival",
     },
     {
         label: "Cuisine",
-        key: "/(protected)/cuisines",
+        key: "cuisines",
         icon: "bowl-food",
     },
     {
         label: "Transport",
-        key: "/(protected)/transport",
+        key: "transport",
         icon: "transport",
     },
 ];
@@ -77,3 +77,39 @@ export const drawerFooterItems = [
         icon: "log-out",
     },
 ];
+
+export const DRAWER_ROUTES = {
+    // Main menu items
+    home: "/(protected)/",
+    festivals: "/(protected)/festivals",
+    cuisines: "/(protected)/cuisines",
+    transport: "/(protected)/transport",
+
+    // Help & support items
+    emergency: "/(protected)/emergency_contacts",
+    about: "/(protected)/about",
+    settings: "/(protected)/settings",
+    cart: "/(protected)/cart",
+    orders: "/(protected)/orders",
+} as const;
+
+// Helper function to get route by key
+export const getRouteByKey = (key: string): string | undefined => {
+    return DRAWER_ROUTES[key as keyof typeof DRAWER_ROUTES];
+};
+
+// Helper function to get all menu routes
+export const getMenuRoutes = (): string[] => {
+    const menuKeys = ["home", "festivals", "cuisines", "transport"];
+    return menuKeys.map(
+        (key) => DRAWER_ROUTES[key as keyof typeof DRAWER_ROUTES]
+    );
+};
+
+// Helper function to get all help routes
+export const getHelpRoutes = (): string[] => {
+    const helpKeys = ["emergency", "about", "settings", "cart", "orders"];
+    return helpKeys.map(
+        (key) => DRAWER_ROUTES[key as keyof typeof DRAWER_ROUTES]
+    );
+};
