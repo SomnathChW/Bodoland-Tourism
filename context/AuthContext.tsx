@@ -95,16 +95,45 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         clearCart();
         await SecureStore.deleteItemAsync("cart");
+        await SecureStore.deleteItemAsync("lastVersionCheck");
     };
 
-    const checkAppVersion = async () => {
+    const checkAppVersion = async (retryCount = 0) => {
+        const maxRetries = 3;
+        const retryDelay = 2000; // 2 seconds
+        const requestTimeout = 10000; // 10 seconds timeout for each request
+        const cacheKey = "lastVersionCheck";
+        const cacheExpiryMs = 24 * 60 * 60 * 1000; // 24 hours
+
         try {
-            const appwriteVersionDoc = await database.getDocument(
-                process.env.EXPO_PUBLIC_DATABASE_APP_CHECK || "",
-                "version",
-                "version_id"
+            // Create a timeout promise
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(
+                    () => reject(new Error("Request timeout")),
+                    requestTimeout
+                )
             );
-            const appwriteVersion = appwriteVersionDoc.key;
+
+            // Race between the database request and timeout
+            const appwriteVersionDoc = await Promise.race([
+                database.getDocument(
+                    process.env.EXPO_PUBLIC_DATABASE_APP_CHECK || "",
+                    "version",
+                    "version_id"
+                ),
+                timeoutPromise,
+            ]);
+
+            const appwriteVersion = (appwriteVersionDoc as any).key;
+
+            // Cache the successful version check
+            const cacheData = {
+                timestamp: Date.now(),
+                serverVersion: appwriteVersion,
+                appVersion: nativeApplicationVersion,
+                isCurrentVersion: appwriteVersion === nativeApplicationVersion,
+            };
+            await SecureStore.setItemAsync(cacheKey, JSON.stringify(cacheData));
 
             if (appwriteVersion === nativeApplicationVersion) {
                 setIsAppCurrentVersion(true);
@@ -114,10 +143,52 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             setIsAppCurrentVersion(false);
             return false;
         } catch (error) {
-            // If we can’t reach backend, just return false
-            console.error("Error checking app version:", error);
-            setIsAppCurrentVersion(false);
-            return false;
+            console.error(
+                `Error checking app version (attempt ${retryCount + 1}):`,
+                error
+            );
+
+            // If network error and we haven't exceeded max retries, try again
+            if (retryCount < maxRetries) {
+                console.log(
+                    `Retrying version check in ${retryDelay}ms... (${
+                        retryCount + 1
+                    }/${maxRetries})`
+                );
+                await new Promise((resolve) => setTimeout(resolve, retryDelay));
+                return checkAppVersion(retryCount + 1);
+            }
+
+            // If all retries failed, check cache
+            try {
+                const cachedDataStr = await SecureStore.getItemAsync(cacheKey);
+                if (cachedDataStr) {
+                    const cachedData = JSON.parse(cachedDataStr);
+                    const isExpired =
+                        Date.now() - cachedData.timestamp > cacheExpiryMs;
+
+                    if (
+                        !isExpired &&
+                        cachedData.appVersion === nativeApplicationVersion
+                    ) {
+                        console.log(
+                            "Using cached version check result due to network issues."
+                        );
+                        setIsAppCurrentVersion(cachedData.isCurrentVersion);
+                        return cachedData.isCurrentVersion;
+                    }
+                }
+            } catch (cacheError) {
+                console.error("Error reading version cache:", cacheError);
+            }
+
+            // If all retries failed and no valid cache, assume app is current version (network issue)
+            // This prevents showing update screen due to network problems
+            console.log(
+                "Version check failed after all retries and no valid cache. Assuming current version due to network issues."
+            );
+            setIsAppCurrentVersion(true);
+            return true;
         }
     };
 
@@ -198,14 +269,24 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             setisAppReady(true);
             return;
         }
-        // Step 2: check app version
-        const currentVersion = await checkAppVersion();
-        if (!currentVersion) {
-            toast.error("Please update the app to the latest version");
-            setLoading(false);
-            setisAppReady(true);
-            return;
+
+        // Step 2: check app version (with improved error handling)
+        try {
+            const currentVersion = await checkAppVersion();
+            if (!currentVersion) {
+                toast.error("Please update the app to the latest version");
+                setLoading(false);
+                setisAppReady(true);
+                return;
+            }
+        } catch (error) {
+            console.error("Unexpected error during version check:", error);
+            // Don't block the app if version check fails unexpectedly
+            toast.warning(
+                "Unable to verify app version due to network issues. Continuing..."
+            );
         }
+
         // Step 3: if internet + version ok → verify user
         await checkUserFromBackend();
         setisAppReady(true);
