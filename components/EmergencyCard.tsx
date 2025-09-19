@@ -17,6 +17,8 @@ import { LinearGradient } from "expo-linear-gradient";
 interface EmergencyCardProps {
     item: EmergencyContact;
     index: number;
+    width: number;
+    height: number;
 }
 
 // Define colors for emergency services
@@ -26,7 +28,6 @@ const EMERGENCY_COLORS = {
     ambulance: "#4ade80", // Green
 };
 
-const { width } = Dimensions.get("window");
 
 // Calculate base dimensions
 const PADDING = 15;
@@ -34,7 +35,7 @@ const GAP = 15;
 const NUM_CARDS_ON_SCREEN = 2;
 
 const EmergencyCard: React.FC<EmergencyCardProps> = React.memo(
-    ({ item, index }) => {
+    ({ item, index, width, height }) => {
         // Helper to open phone dialer
         const handlePress = (number: string) => {
             Linking.openURL(`tel:${number}`);

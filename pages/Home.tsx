@@ -169,6 +169,11 @@ const Home = () => {
                         viewAll={item.viewAll}
                         isLoading={homePageLoading}
                         loadingCardCount={3}
+                        cardType={
+                            item.cardComponent === CardHorizontal
+                                ? "horizontal"
+                                : "vertical"
+                        }
                     />
                 );
             default:

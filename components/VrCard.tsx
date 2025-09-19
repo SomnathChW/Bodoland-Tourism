@@ -3,7 +3,7 @@ import React from "react";
 import { useRouter } from "expo-router";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import FastImageWLoader from "@/components/FastImageWLoader";
-import FastImage from "react-native-fast-image";
+import FastImage from "@d11/react-native-fast-image";
 
 type Props = {
     item: {
@@ -15,27 +15,32 @@ type Props = {
         linked_attraction?: string;
     };
     index: number;
+    width: number;
+    height: number;
 };
 
-const { width, height } = Dimensions.get("screen");
 // Calculate base dimensions
 const PADDING = 15;
 const GAP = 15;
 const NUM_CARDS_ON_SCREEN = 2;
-const CARD_WIDTH =
-    (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
-    NUM_CARDS_ON_SCREEN;
 
-// Use a minimum image height that ensures it's always prominent
-const MIN_IMAGE_HEIGHT = height * 0.18; // Similar to your StaysCard component
-
-const VrCard = React.memo(({ item, index }: Props) => {
+const VrCard = React.memo(({ item, index, width, height }: Props) => {
     const router = useRouter();
+
+    const CARD_WIDTH =
+        (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
+        NUM_CARDS_ON_SCREEN;
+
+    // Set minimum card height to 25% of screen height
+    const MIN_CARD_HEIGHT = height * 0.25;
+    // Set minimum image height to 75% of minimum card height
+    const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
 
     return (
         <View
             style={{
                 width: CARD_WIDTH,
+                minHeight: MIN_CARD_HEIGHT,
                 backgroundColor: "rgba(52, 52, 52, 0.35)",
                 borderRadius: 10,
                 shadowOffset: { width: 10, height: 0 },
@@ -65,13 +70,24 @@ const VrCard = React.memo(({ item, index }: Props) => {
                     style={{
                         width: CARD_WIDTH,
                         height: MIN_IMAGE_HEIGHT,
+                        flex: 1.5, // This makes the image section always 1.5 times larger than info section
                     }}
                     resizeMode={FastImage.resizeMode.cover}
                 />
 
                 {/* Info section that grows based on content */}
                 {item.name && (
-                    <View style={styles.infoView}>
+                    <View
+                        style={{
+                            width: CARD_WIDTH,
+                            flex: 1,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            paddingHorizontal: 10,
+                            paddingVertical: 8,
+                        }}
+                    >
                         <View style={styles.textView}>
                             <Text
                                 style={styles.title}
@@ -111,15 +127,6 @@ const VrCard = React.memo(({ item, index }: Props) => {
 export default VrCard;
 
 const styles = StyleSheet.create({
-    infoView: {
-        width: CARD_WIDTH,
-        minHeight: 60, // Minimum height for the info section
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-    },
     textView: {
         flex: 1,
         justifyContent: "center",

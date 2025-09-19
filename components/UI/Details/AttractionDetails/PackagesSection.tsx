@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import FastImageWLoader from "@/components/FastImageWLoader";
-import FastImage from "react-native-fast-image";
+import FastImage from "@d11/react-native-fast-image";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 

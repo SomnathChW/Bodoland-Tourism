@@ -6,8 +6,8 @@ import {
     DimensionValue,
     ActivityIndicator,
 } from "react-native";
-import FastImage from "react-native-fast-image";
-import { useRecyclingState } from "@shopify/flash-list";
+import FastImage from "@d11/react-native-fast-image";
+// import { useRecyclingState } from "@shopify/flash-list";
 
 interface FastImageWLoaderProps {
     source: {
@@ -42,8 +42,10 @@ const FastImageWLoader: React.FC<FastImageWLoaderProps> = React.memo(
         onLoadEnd,
     }) => {
         // Use FlashList's useRecyclingState hook to handle state properly during recycling
-        const [isLoading, setIsLoading] = useRecyclingState(true, [source.uri]);
-        const [hasError, setHasError] = useRecyclingState(false, [source.uri]);
+        // const [isLoading, setIsLoading] = useRecyclingState(true, [source.uri]);
+        // const [hasError, setHasError] = useRecyclingState(false, [source.uri]);
+        const [isLoading, setIsLoading] = useState(true);
+        const [hasError, setHasError] = useState(false);
 
         const handleLoadStart = () => {
             setIsLoading(true);

@@ -15,21 +15,23 @@ type Props = {
         rating?: number;
     };
     index: number;
+    width: number;
+    height: number;
 };
 
-const { width, height } = Dimensions.get("screen");
 const PADDING = 15;
 const GAP = 15;
 const NUM_CARDS_ON_SCREEN = 2;
-const CARD_WIDTH =
-    (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
-    NUM_CARDS_ON_SCREEN;
 
-const MIN_CARD_HEIGHT = height * 0.25;
-const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
-
-const ProductCard = React.memo(({ item, index }: Props) => {
+const ProductCard = React.memo(({ item, index, width, height }: Props) => {
     const router = useRouter();
+
+    const CARD_WIDTH =
+        (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
+        NUM_CARDS_ON_SCREEN;
+
+    const MIN_CARD_HEIGHT = height * 0.25;
+    const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
 
     const renderSimpleRating = () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>

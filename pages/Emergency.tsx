@@ -22,7 +22,7 @@ import UniversalEmergencyCard from "@/components/UniversalEmergencyCard";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
 import CardLoader from "@/components/CardLoader";
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("screen");
 
 const Emergency = () => {
     const { toggleDrawer } = useDrawer();
@@ -74,7 +74,14 @@ const Emergency = () => {
     }: {
         item: EmergencyContact;
         index: number;
-    }) => <EmergencyCard item={item} index={index} />;
+    }) => (
+        <EmergencyCard
+            item={item}
+            index={index}
+            width={width}
+            height={height}
+        />
+    );
 
     const renderCardLoader = ({ index }: { index: number }) => (
         <CardLoader index={index} width={width} height={height} />

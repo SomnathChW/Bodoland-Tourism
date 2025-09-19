@@ -11,7 +11,7 @@ import React from "react";
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import FastImageWLoader from "@/components/FastImageWLoader";
-import FastImage from "react-native-fast-image";
+import FastImage from "@d11/react-native-fast-image";
 import Animated, { FadeIn, SlideInRight } from "react-native-reanimated";
 
 // Define the structure of a place item

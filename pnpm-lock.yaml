@@ -93,8 +93,8 @@ importers:
         specifier: ~2.24.0
         version: 2.24.0(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
       react-native-pager-view:
-        specifier: 6.7.1
-        version: 6.7.1(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
+        specifier: 6.9.1
+        version: 6.9.1(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
       react-native-reanimated:
         specifier: ~3.17.5
         version: 3.17.5(@babel/core@7.28.4)(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
@@ -3067,8 +3067,8 @@ packages:
       react: '*'
       react-native: '*'
 
-  react-native-pager-view@6.7.1:
-    resolution: {integrity: sha512-cBSr6xw4g5N7Kd3VGWcf+kmaH7iBWb0DXAf2bVo3bXkzBcBbTOmYSvc0LVLHhUPW8nEq5WjT9LCIYAzgF++EXw==}
+  react-native-pager-view@6.9.1:
+    resolution: {integrity: sha512-uUT0MMMbNtoSbxe9pRvdJJKEi9snjuJ3fXlZhG8F2vVMOBJVt/AFtqMPUHu9yMflmqOr08PewKzj9EPl/Yj+Gw==}
     peerDependencies:
       react: '*'
       react-native: '*'
@@ -7582,7 +7582,7 @@ snapshots:
       react: 19.0.0
       react-native: 0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0)
 
-  react-native-pager-view@6.7.1(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0):
+  react-native-pager-view@6.9.1(react-native@0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0):
     dependencies:
       react: 19.0.0
       react-native: 0.79.6(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0)

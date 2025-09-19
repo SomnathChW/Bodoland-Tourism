@@ -13,7 +13,7 @@ import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 // import { isARSupportedOnDevice } from "@reactvision/react-viro";
 import FastImageWLoader from "@/components/FastImageWLoader";
-import FastImage from "react-native-fast-image";
+import FastImage from "@d11/react-native-fast-image";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 const modelPath =
