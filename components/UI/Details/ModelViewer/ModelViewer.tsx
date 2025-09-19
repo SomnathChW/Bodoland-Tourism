@@ -11,7 +11,7 @@ import React, { useEffect } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { isARSupportedOnDevice } from "@reactvision/react-viro";
+// import { isARSupportedOnDevice } from "@reactvision/react-viro";
 import FastImageWLoader from "@/components/FastImageWLoader";
 import FastImage from "react-native-fast-image";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -75,12 +75,13 @@ interface ModelViewerProps {
 }
 
 const checkARSupport = async () => {
-    try {
-        const result = await isARSupportedOnDevice();
-        return result.isARSupported;
-    } catch (error) {
-        return false;
-    }
+    // try {
+    //     const result = await isARSupportedOnDevice();
+    //     return result.isARSupported;
+    // } catch (error) {
+    //     return false;
+    // }
+    return false; // Temporarily disable AR check due to library issues
 };
 
 export function ModelViewer({
