@@ -136,6 +136,7 @@ const Cuisines = () => {
                         ListFooterComponent={
                             isLoading ? undefined : renderFooter
                         }
+                        estimatedItemSize={221}
                     />
                 )}
             </View>

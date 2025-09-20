@@ -138,6 +138,7 @@ const VrView = () => {
                         ListFooterComponent={
                             isLoading ? undefined : renderFooter
                         }
+                        estimatedItemSize={209}
                     />
                 )}
             </View>

@@ -177,6 +177,7 @@ const Attractions = () => {
                         ListFooterComponent={
                             isLoading ? undefined : renderFooter
                         }
+                        estimatedItemSize={226}
                     />
                 )}
             </View>

@@ -48,6 +48,7 @@ const Transport = () => {
                     numColumns={2}
                     keyExtractor={(item) => item.identifier}
                     contentContainerStyle={{}}
+                    estimatedItemSize={219}
                 />
             </View>
         </View>
