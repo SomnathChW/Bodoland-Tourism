@@ -130,7 +130,7 @@ const ProductCard = React.memo(({ item, index, width, height }: Props) => {
                                 {item.discount_percentage && (
                                     <View style={styles.offerView}>
                                         <AntDesign
-                                            name="arrowdown"
+                                            name="arrow-down"
                                             size={10}
                                             color="lime"
                                             style={{ marginRight: 2 }}

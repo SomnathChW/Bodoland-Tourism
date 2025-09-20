@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
     View,
     StyleSheet,
@@ -47,26 +47,33 @@ const FastImageWLoader: React.FC<FastImageWLoaderProps> = React.memo(
         const [isLoading, setIsLoading] = useState(true);
         const [hasError, setHasError] = useState(false);
 
-        const handleLoadStart = () => {
+        const handleLoadStart = useCallback(() => {
             setIsLoading(true);
             setHasError(false);
             onLoadStart?.();
-        };
+        }, [onLoadStart]);
 
-        const handleLoad = () => {
+        const handleLoad = useCallback(() => {
             setIsLoading(false);
             onLoad?.();
-        };
+        }, [onLoad]);
 
-        const handleLoadEnd = () => {
+        const handleLoadEnd = useCallback(() => {
             setIsLoading(false);
             onLoadEnd?.();
-        };
+        }, [onLoadEnd]);
 
-        const handleError = () => {
+        const handleError = useCallback(() => {
             setIsLoading(false);
             setHasError(true);
             onError?.();
+        }, [onError]);
+
+        // Enhanced source with better caching
+        const enhancedSource = {
+            ...source,
+            priority: source.priority || FastImage.priority.normal,
+            cache: source.cache || FastImage.cacheControl.immutable,
         };
 
         return (
@@ -89,7 +96,7 @@ const FastImageWLoader: React.FC<FastImageWLoaderProps> = React.memo(
 
                 {/* FastImage component */}
                 <FastImage
-                    source={source}
+                    source={enhancedSource}
                     style={[styles.image, { borderRadius }]}
                     resizeMode={resizeMode}
                     onLoadStart={handleLoadStart}
