@@ -122,7 +122,6 @@ const Stays = React.memo(() => {
                     }
                     contentContainerStyle={{}}
                     removeClippedSubviews={true}
-                    estimatedItemSize={209}
                 />
             </View>
         </View>

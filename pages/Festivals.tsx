@@ -135,7 +135,6 @@ const Festivals = () => {
                         ListFooterComponent={
                             isLoading ? undefined : renderFooter
                         }
-                        estimatedItemSize={223}
                     />
                 )}
             </View>

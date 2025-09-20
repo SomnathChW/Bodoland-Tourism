@@ -220,7 +220,6 @@ const Souvenirs = () => {
                         ListFooterComponent={
                             isLoading ? undefined : renderFooter
                         }
-                        estimatedItemSize={229}
                     />
                 )}
             </View>
