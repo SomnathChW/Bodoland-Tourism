@@ -6,7 +6,7 @@ import {
     useEffect,
     useRef,
 } from "react";
-import * as SystemUI from "expo-system-ui";
+// import * as SystemUI from "expo-system-ui";
 import * as SecureStore from "expo-secure-store";
 import * as WebBrowser from "expo-web-browser";
 import { makeRedirectUri } from "expo-auth-session";
@@ -17,7 +17,7 @@ import { account, ID, database, OAuthProvider } from "@/lib/appwrite";
 import { useDataStore } from "@/store/useDataStore";
 
 import { mockAccount } from "@/dev_helpers/mockAccount";
-import { Platform } from "react-native";
+// import { Platform } from "react-native";
 import * as Application from "expo-application";
 import * as Network from "expo-network";
 
@@ -248,9 +248,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        if (Platform.OS === "android") {
-            SystemUI.setBackgroundColorAsync("#0d1116");
-        }
+        // if (Platform.OS === "android") {
+        //     SystemUI.setBackgroundColorAsync("#0d1116");
+        // }
 
         if (!hasInitialized.current) {
             init();

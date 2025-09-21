@@ -21,6 +21,7 @@ import TransportDetails from "@/components/UI/Details/TransportDetails/Transport
 import DistrictDetails from "@/components/UI/Details/DistrictDetails/DistrictDetails";
 import StickyPurchaseButtons from "@/components/UI/Details/SouvenirDetails/StickyPurchaseButtons";
 import DetailsError from "@/components/UI/Details/Common/DetailsError";
+import { toast } from "sonner-native";
 
 const { height } = Dimensions.get("screen");
 const HEADER_MAX_HEIGHT = height * 0.45;
@@ -166,6 +167,16 @@ const Details = () => {
         return <DetailsError />;
     }
 
+    const handleGoBack = () => {
+        if (router.canGoBack()) {
+            router.back();
+        } else {
+            router.replace({
+                pathname: "/(protected)/(tabs)",
+            });
+        }
+    };
+
     return (
         <View style={staticStyles.container}>
             {/* Loading header */}
@@ -177,7 +188,7 @@ const Details = () => {
                     scrollY={scrollY}
                     minimizedHeaderHeight={minimizedHeaderHeight}
                     scrollDistance={scrollDistance}
-                    onBack={() => router.back()}
+                    onBack={handleGoBack}
                     insets={insets}
                     data={fetchedData}
                     isInsideScrollView={false}
@@ -200,7 +211,7 @@ const Details = () => {
                         scrollY={scrollY}
                         minimizedHeaderHeight={minimizedHeaderHeight}
                         scrollDistance={scrollDistance}
-                        onBack={() => router.back()}
+                        onBack={handleGoBack}
                         insets={insets}
                         data={fetchedData}
                         showOnlyMinimized={false}

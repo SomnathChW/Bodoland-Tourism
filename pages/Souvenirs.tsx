@@ -195,7 +195,14 @@ const Souvenirs = () => {
                                     />
                                 );
                             }
-                            return <ProductCard item={item} index={index} />;
+                            return (
+                                <ProductCard
+                                    item={item}
+                                    index={index}
+                                    width={width}
+                                    height={height}
+                                />
+                            );
                         }}
                         getItemType={(item, index) => {
                             return isLoading ? "loader" : "product";

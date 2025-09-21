@@ -16,7 +16,7 @@ import MenuButton from "@/components/UI/MenuButton";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
 import CardLoader from "@/components/CardLoader";
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("screen");
 
 const Cuisines = () => {
     const { toggleDrawer } = useDrawer();
@@ -112,7 +112,12 @@ const Cuisines = () => {
                             }
                             //We are sure it will have it everytime as we are ensuring the fields in the query itself thats why we have any
                             return (
-                                <CuisineCard item={item as any} index={index} />
+                                <CuisineCard
+                                    item={item as any}
+                                    index={index}
+                                    width={width}
+                                    height={height}
+                                />
                             );
                         }}
                         getItemType={(item, index) => {

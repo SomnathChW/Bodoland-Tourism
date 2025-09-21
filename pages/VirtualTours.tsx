@@ -16,7 +16,7 @@ import { useDrawer } from "@/context/DrawerContext";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
 import CardLoader from "@/components/CardLoader";
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("screen");
 
 const VrView = () => {
     const { toggleDrawer } = useDrawer();
@@ -113,7 +113,14 @@ const VrView = () => {
                                     </View>
                                 );
                             }
-                            return <VrCard item={item as any} index={index} />;
+                            return (
+                                <VrCard
+                                    item={item as any}
+                                    index={index}
+                                    width={width}
+                                    height={height}
+                                />
+                            );
                         }}
                         getItemType={(item, index) => {
                             return isLoading ? "loader" : "virtual_tour";

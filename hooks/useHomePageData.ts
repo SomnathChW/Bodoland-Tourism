@@ -82,5 +82,8 @@ export const useHomePageData = ({
         staleTime,
         retry: (failureCount) => failureCount < 2,
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+        refetchOnMount: false, // Don't refetch on mount if data is fresh
+        refetchOnWindowFocus: false, // Don't refetch on window focus
+        refetchOnReconnect: true, // Refetch on network reconnect
     });
 };

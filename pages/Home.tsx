@@ -6,7 +6,8 @@ import {
     Platform,
     FlatList,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
+import React, { useCallback } from "react";
 
 import Section from "@/components/UI/Section/Section";
 import QuickLinks from "@/components/UI/QuickLinks/QuickLinksSection";
@@ -55,6 +56,7 @@ const Home = () => {
         data: homePageResponse,
         isLoading: homePageLoading,
         error: homePageError,
+        refetch,
     } = useHomePageData({
         attractionsLimit: 5,
         souvenirsLimit: 5,
@@ -64,6 +66,16 @@ const Home = () => {
         cuisinesLimit: 5,
         districtsLimit: 5,
     });
+
+    // Refetch data when screen comes into focus
+    useFocusEffect(
+        useCallback(() => {
+            // Only refetch if data is stale or missing
+            if (!homePageResponse && !homePageLoading) {
+                refetch();
+            }
+        }, [homePageResponse, homePageLoading, refetch])
+    );
 
     // Extract data from the response
     const attractionsData = homePageResponse?.data?.attractions?.items || [];
@@ -140,41 +152,49 @@ const Home = () => {
         },
     ];
 
-    const renderItem = ({ item }: { item: ListItem }) => {
-        switch (item.type) {
-            case "carousel":
-                return (
-                    <View style={{ paddingBottom: 10 }}>
-                        <Carousel
-                            data={homePageLoading ? [] : item.data}
-                            isLoading={homePageLoading}
+    const renderItem = useCallback(
+        ({ item }: { item: ListItem }) => {
+            switch (item.type) {
+                case "carousel":
+                    return (
+                        <View style={{ paddingBottom: 10 }}>
+                            <Carousel
+                                data={homePageLoading ? [] : item.data}
+                                isLoading={homePageLoading}
+                            />
+                        </View>
+                    );
+                case "quicklinks":
+                    return (
+                        <QuickLinks
+                            data={item.data}
+                            cardComponent={item.cardComponent}
+                            itemsPerRow={item.itemsPerRow}
                         />
-                    </View>
-                );
-            case "quicklinks":
-                return (
-                    <QuickLinks
-                        data={item.data}
-                        cardComponent={item.cardComponent}
-                        itemsPerRow={item.itemsPerRow}
-                    />
-                );
-            case "section":
-                // Handle all sections with consistent loading state
-                return (
-                    <Section
-                        subHeading={item.subHeading}
-                        data={homePageLoading ? [] : item.data}
-                        cardComponent={item.cardComponent}
-                        viewAll={item.viewAll}
-                        isLoading={homePageLoading}
-                        loadingCardCount={3}
-                    />
-                );
-            default:
-                return null;
-        }
-    };
+                    );
+                case "section":
+                    // Handle all sections with consistent loading state
+                    return (
+                        <Section
+                            subHeading={item.subHeading}
+                            data={homePageLoading ? [] : item.data}
+                            cardComponent={item.cardComponent}
+                            viewAll={item.viewAll}
+                            isLoading={homePageLoading}
+                            loadingCardCount={3}
+                            cardType={
+                                item.cardComponent === CardHorizontal
+                                    ? "horizontal"
+                                    : "vertical"
+                            }
+                        />
+                    );
+                default:
+                    return null;
+            }
+        },
+        [homePageLoading]
+    );
     // --- End Render Item Function ---
 
     return (
@@ -207,7 +227,16 @@ const Home = () => {
                         keyExtractor={(item) => item.id}
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={styles.listContentContainer}
-                        removeClippedSubviews={false}
+                        removeClippedSubviews={true}
+                        windowSize={10}
+                        maxToRenderPerBatch={3}
+                        updateCellsBatchingPeriod={100}
+                        initialNumToRender={3}
+                        getItemLayout={(data, index) => ({
+                            length: 300, // Approximate item height
+                            offset: 300 * index,
+                            index,
+                        })}
                     />
                 </View>
             </View>

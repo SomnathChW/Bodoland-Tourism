@@ -19,7 +19,7 @@ import { attractionsSortAndFilter } from "@/utils/sortFilterConfigs";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
 import CardLoader from "@/components/CardLoader";
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("screen");
 
 const Attractions = () => {
     const { toggleDrawer } = useDrawer();
@@ -153,7 +153,12 @@ const Attractions = () => {
                                 );
                             }
                             return (
-                                <AttractionsCard item={item} index={index} />
+                                <AttractionsCard
+                                    item={item}
+                                    index={index}
+                                    width={width}
+                                    height={height}
+                                />
                             );
                         }}
                         getItemType={(item, index) => {

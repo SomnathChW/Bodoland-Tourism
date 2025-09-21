@@ -3,13 +3,10 @@ import {
     View,
     Text,
     StyleSheet,
-    Pressable,
-    Dimensions,
-    Alert,
     Linking,
     TouchableOpacity,
 } from "react-native";
-import { MaterialIcons, Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import FastImageWLoader from "@/components/FastImageWLoader";
 import { EmergencyContact } from "@/data/emergency_data";
 import { LinearGradient } from "expo-linear-gradient";
@@ -17,6 +14,8 @@ import { LinearGradient } from "expo-linear-gradient";
 interface EmergencyCardProps {
     item: EmergencyContact;
     index: number;
+    width: number;
+    height: number;
 }
 
 // Define colors for emergency services
@@ -26,7 +25,6 @@ const EMERGENCY_COLORS = {
     ambulance: "#4ade80", // Green
 };
 
-const { width } = Dimensions.get("window");
 
 // Calculate base dimensions
 const PADDING = 15;
@@ -34,7 +32,7 @@ const GAP = 15;
 const NUM_CARDS_ON_SCREEN = 2;
 
 const EmergencyCard: React.FC<EmergencyCardProps> = React.memo(
-    ({ item, index }) => {
+    ({ item, index, width, height }) => {
         // Helper to open phone dialer
         const handlePress = (number: string) => {
             Linking.openURL(`tel:${number}`);

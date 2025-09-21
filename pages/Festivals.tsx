@@ -114,6 +114,8 @@ const Festivals = () => {
                                 <FestivalsCard
                                     item={item as any}
                                     index={index}
+                                    width={width}
+                                    height={height}
                                 />
                             );
                         }}

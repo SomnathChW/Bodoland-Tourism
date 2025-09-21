@@ -4,7 +4,8 @@ import {
     StyleSheet,
     StatusBar,
     Dimensions,
-    FlatList,
+    ActivityIndicator,
+    TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useDrawer } from "@/context/DrawerContext";
@@ -18,7 +19,7 @@ import { staysData } from "@/data/stays_data";
 import { useSortFilter } from "@/hooks/useSortFilter";
 import { staysSortAndFilter } from "@/utils/sortFilterConfigs";
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("screen");
 
 const Stays = React.memo(() => {
     const { toggleDrawer } = useDrawer();
@@ -43,13 +44,8 @@ const Stays = React.memo(() => {
         filterOptions: staysSortAndFilter.filterOptions,
     });
 
-    // Create array of 6 placeholder items
-    const loaderItems = Array(10)
-        .fill(null)
-        .map((_, i) => ({ id: `loader-${i}` }));
-
     useEffect(() => {
-        // Simulate loading for 1000ms
+        // Simulate loading for 1500ms
         const timer = setTimeout(() => {
             setLoading(false);
         }, 1500);
@@ -93,40 +89,40 @@ const Stays = React.memo(() => {
                     />
                 )}
 
-                {loading ? (
-                    <FlatList
-                        key="loader"
-                        data={loaderItems}
-                        renderItem={({ index }) => (
-                            <CardLoader
-                                index={index}
-                                width={width}
-                                height={height}
-                            />
-                        )}
-                        horizontal={false}
-                        showsVerticalScrollIndicator={false}
-                        numColumns={2}
-                        keyExtractor={(item) => item.id}
-                    />
-                ) : (
-                    <FlashList
-                        data={sortedAndFilteredData}
-                        renderItem={({ item, index }) => (
+                {/* Single FlashList for both loading and data states */}
+                <FlashList
+                    data={loading ? Array(6).fill(0) : sortedAndFilteredData}
+                    renderItem={({ item, index }) => {
+                        if (loading) {
+                            return (
+                                <CardLoader
+                                    index={index}
+                                    width={width}
+                                    height={height}
+                                />
+                            );
+                        }
+                        return (
                             <StaysCard
                                 item={item}
                                 index={index}
                                 width={width}
                                 height={height}
                             />
-                        )}
-                        horizontal={false}
-                        showsVerticalScrollIndicator={false}
-                        numColumns={2}
-                        keyExtractor={(item) => item.identifier}
-                        contentContainerStyle={{}}
-                    />
-                )}
+                        );
+                    }}
+                    getItemType={(item, index) => {
+                        return loading ? "loader" : "stay";
+                    }}
+                    horizontal={false}
+                    showsVerticalScrollIndicator={false}
+                    numColumns={2}
+                    keyExtractor={(item, index) =>
+                        loading ? `loader-${index}` : item.identifier
+                    }
+                    contentContainerStyle={{}}
+                    removeClippedSubviews={true}
+                />
             </View>
         </View>
     );

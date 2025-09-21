@@ -1,7 +1,6 @@
-import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
-import { FontAwesome } from "@expo/vector-icons";
 import FastImageWLoader from "@/components/FastImageWLoader";
 
 type Props = {
@@ -12,24 +11,26 @@ type Props = {
         short_description: string;
     };
     index: number;
+    width: number;
+    height: number;
 };
 
-const { width, height } = Dimensions.get("screen");
 // Calculate base dimensions
 const PADDING = 15;
 const GAP = 15;
 const NUM_CARDS_ON_SCREEN = 2;
-const CARD_WIDTH =
-    (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
-    NUM_CARDS_ON_SCREEN;
 
-// Set minimum card height to 25% of screen height
-const MIN_CARD_HEIGHT = height * 0.25;
-// Set minimum image height to 75% of minimum card height
-const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
-
-const FestivalsCard = React.memo(({ item, index }: Props) => {
+const FestivalsCard = React.memo(({ item, index, width, height }: Props) => {
     const router = useRouter();
+
+    const CARD_WIDTH =
+        (width - PADDING * 2 - GAP * (NUM_CARDS_ON_SCREEN - 1)) /
+        NUM_CARDS_ON_SCREEN;
+
+    // Set minimum card height to 25% of screen height
+    const MIN_CARD_HEIGHT = height * 0.25;
+    // Set minimum image height to 75% of minimum card height
+    const MIN_IMAGE_HEIGHT = MIN_CARD_HEIGHT * 0.75;
 
     return (
         <View
