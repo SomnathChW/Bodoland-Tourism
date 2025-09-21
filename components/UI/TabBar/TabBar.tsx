@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#000",
         paddingVertical: 10,
-        paddingBottom: 20,
         elevation: 3,
         boxShadow: "0px 0px 12px rgba(70, 70, 70, 0.25)",
     },
