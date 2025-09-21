@@ -1,7 +1,6 @@
-import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
-import { FontAwesome } from "@expo/vector-icons";
 import FastImageWLoader from "@/components/FastImageWLoader";
 
 type Props = {

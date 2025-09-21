@@ -185,7 +185,7 @@ export function ModelViewer({
                         disabled
                     >
                         <AntDesign
-                            name="closecircleo"
+                            name="frown"
                             size={14}
                             color="white"
                         />

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
 import { Entypo, FontAwesome } from "@expo/vector-icons";

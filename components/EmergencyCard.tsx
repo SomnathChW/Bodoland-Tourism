@@ -3,13 +3,10 @@ import {
     View,
     Text,
     StyleSheet,
-    Pressable,
-    Dimensions,
-    Alert,
     Linking,
     TouchableOpacity,
 } from "react-native";
-import { MaterialIcons, Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import FastImageWLoader from "@/components/FastImageWLoader";
 import { EmergencyContact } from "@/data/emergency_data";
 import { LinearGradient } from "expo-linear-gradient";
