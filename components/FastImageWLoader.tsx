@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import FastImage from "@d11/react-native-fast-image";
 import { useRecyclingState } from "@shopify/flash-list";
+import LottieView from "lottie-react-native";
 
 interface FastImageWLoaderProps {
     source: {
@@ -67,11 +68,6 @@ const FastImageWLoader: React.FC<FastImageWLoaderProps> = React.memo(
             onError?.();
         }, [onError]);
 
-        // Enhanced source with better caching
-        const enhancedSource = {
-            ...source,
-        };
-
         return (
             <View
                 style={[
@@ -83,16 +79,22 @@ const FastImageWLoader: React.FC<FastImageWLoaderProps> = React.memo(
                 {/* Show loading animation while image is loading */}
                 {isLoading && !hasError && (
                     <View style={styles.loaderContainer}>
-                        <ActivityIndicator
-                            size={indicatorSize}
-                            color="#ffffff"
+                        <LottieView
+                            source={require("../assets/lottie/loading-spinner.json")}
+                            autoPlay
+                            loop
+                            style={
+                                indicatorSize === "small"
+                                    ? styles.lottieSmall
+                                    : styles.lottie
+                            }
                         />
                     </View>
                 )}
 
                 {/* FastImage component */}
                 <FastImage
-                    source={enhancedSource}
+                    source={source}
                     style={[styles.image, { borderRadius }]}
                     resizeMode={resizeMode}
                     onLoadStart={handleLoadStart}
@@ -139,6 +141,11 @@ const styles = StyleSheet.create({
     lottie: {
         width: 120,
         height: 120,
+        opacity: 0.7,
+    },
+    lottieSmall: {
+        width: 60,
+        height: 60,
         opacity: 0.7,
     },
     image: {
