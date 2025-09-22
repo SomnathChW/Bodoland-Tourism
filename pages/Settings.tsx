@@ -1,14 +1,16 @@
 import { StyleSheet, Text, View, StatusBar } from "react-native";
 import React from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDrawer } from "@/context/DrawerContext";
 import { Ionicons } from "@expo/vector-icons";
 import MenuButton from "@/components/UI/MenuButton";
 
 const Settings = () => {
     const { toggleDrawer } = useDrawer();
+    const insets = useSafeAreaInsets();
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logo}>
@@ -43,7 +45,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        paddingTop: StatusBar.currentHeight,
     },
     content: {
         flex: 1,

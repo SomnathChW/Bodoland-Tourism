@@ -2,10 +2,12 @@ import { View, StyleSheet, LayoutChangeEvent } from "react-native";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import TabBarButton from "./TabBarButton";
 import { memo, useCallback, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export const TabBar = memo(
     ({ state, descriptors, navigation }: BottomTabBarProps) => {
         const [dimensions, setDimensions] = useState({ height: 0, width: 0 });
+        const insets = useSafeAreaInsets();
 
         const onTabBarLayout = useCallback((e: LayoutChangeEvent) => {
             setDimensions({
@@ -15,7 +17,10 @@ export const TabBar = memo(
         }, []);
 
         return (
-            <View onLayout={onTabBarLayout} style={styles.tabBar}>
+            <View
+                onLayout={onTabBarLayout}
+                style={[styles.tabBar, { paddingBottom: insets.bottom }]}
+            >
                 {state.routes.map((route, index) => {
                     const { options } = descriptors[route.key];
                     const label = options.title || route.name;

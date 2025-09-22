@@ -6,14 +6,16 @@ import { FlashList } from "@shopify/flash-list";
 import CuisineCard from "@/components/CuisineCard";
 import MenuButton from "@/components/UI/MenuButton";
 import { cuisineData } from "@/data/cuisine_data";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("screen");
 
 const Transport = () => {
     const { toggleDrawer } = useDrawer();
+    const insets = useSafeAreaInsets();
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logo}>
@@ -60,7 +62,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        paddingTop: StatusBar.currentHeight,
     },
     content: {
         flex: 1,

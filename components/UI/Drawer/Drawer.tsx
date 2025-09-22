@@ -39,8 +39,6 @@ import { useIconRenderer } from "./IconRenderer";
 
 const { width } = Dimensions.get("window");
 const DRAWER_WIDTH: number = width * 0.65;
-const STATUS_BAR_HEIGHT =
-    Platform.OS === "ios" ? 44 : StatusBar.currentHeight || 24;
 
 function DrawerComponent(): JSX.Element {
     const { isDrawerOpen, toggleDrawer, currentPath } = useDrawer();
@@ -222,8 +220,6 @@ function DrawerComponent(): JSX.Element {
 
     return (
         <>
-            <StatusBar translucent backgroundColor="transparent" />
-
             <Animated.View style={[styles.overlay, overlayAnimatedStyle]}>
                 <TouchableOpacity
                     style={styles.overlayTouch}
@@ -232,8 +228,12 @@ function DrawerComponent(): JSX.Element {
                 />
             </Animated.View>
 
-            <Animated.View style={[styles.drawer, drawerAnimatedStyle]}>
-                <View style={styles.statusBarSpacer} />
+            <Animated.View
+                style={[
+                    styles.drawer,
+                    drawerAnimatedStyle,
+                ]}
+            >
                 <ProfileSection />
 
                 <ScrollView
@@ -331,10 +331,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
-    },
-    statusBarSpacer: {
-        height: STATUS_BAR_HEIGHT,
-        backgroundColor: "#1c2026",
     },
     drawerContent: {
         flex: 1,

@@ -68,7 +68,7 @@ const _layout = React.memo(() => {
             backBehavior="initialRoute"
             initialRouteName="index"
             tabBar={(props) => <TabBar {...props} />}
-            detachInactiveScreens={false}
+            detachInactiveScreens={true}
         >
             {screens.map((items) => (
                 <Tabs.Screen

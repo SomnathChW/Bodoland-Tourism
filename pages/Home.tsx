@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import React, { useCallback } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Section from "@/components/UI/Section/Section";
 import QuickLinks from "@/components/UI/QuickLinks/QuickLinksSection";
@@ -48,8 +49,9 @@ type ListItem =
       };
 
 const Home = () => {
-    const router = useRouter();
     const { toggleDrawer } = useDrawer();
+    const router = useRouter();
+    const insets = useSafeAreaInsets();
 
     // Fetch all home page data from a single endpoint
     const {
@@ -198,7 +200,7 @@ const Home = () => {
     // --- End Render Item Function ---
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
             <View style={styles.content}>
                 {/* Header remains the same */}
                 <View style={styles.header}>
@@ -250,7 +252,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     },
     content: {
         flex: 1,

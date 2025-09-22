@@ -19,11 +19,13 @@ import { useSortFilter } from "@/hooks/useSortFilter";
 import { souvenirsSortAndFilter } from "@/utils/sortFilterConfigs";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
 import CardLoader from "@/components/CardLoader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
 
 const Souvenirs = () => {
     const { toggleDrawer } = useDrawer();
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const showSortFilter = false; // Set to true if you want to show sort/filter options
 
@@ -105,7 +107,7 @@ const Souvenirs = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logo}>
@@ -233,7 +235,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        paddingTop: StatusBar.currentHeight,
     },
     content: {
         flex: 1,

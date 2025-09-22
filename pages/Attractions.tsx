@@ -8,6 +8,7 @@ import {
     Dimensions,
 } from "react-native";
 import React, { useMemo } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDrawer } from "@/context/DrawerContext";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
@@ -23,6 +24,7 @@ const { width, height } = Dimensions.get("screen");
 
 const Attractions = () => {
     const { toggleDrawer } = useDrawer();
+    const insets = useSafeAreaInsets();
     const showSortFilter = false; // Set to true if you want to show sort/filter options
 
     const {
@@ -88,7 +90,7 @@ const Attractions = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logo}>
@@ -190,7 +192,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        paddingTop: StatusBar.currentHeight,
     },
     content: {
         flex: 1,

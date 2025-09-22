@@ -18,11 +18,13 @@ import MenuButton from "@/components/UI/MenuButton";
 import { staysData } from "@/data/stays_data";
 import { useSortFilter } from "@/hooks/useSortFilter";
 import { staysSortAndFilter } from "@/utils/sortFilterConfigs";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("screen");
 
 const Stays = React.memo(() => {
     const { toggleDrawer } = useDrawer();
+    const insets = useSafeAreaInsets();
     const [loading, setLoading] = useState(true);
 
     const showSortFilter = false;
@@ -54,7 +56,7 @@ const Stays = React.memo(() => {
     }, []);
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logo}>
@@ -134,7 +136,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        paddingTop: StatusBar.currentHeight,
     },
     content: {
         flex: 1,

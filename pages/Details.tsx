@@ -77,6 +77,7 @@ const Details = () => {
             container: {
                 flex: 1,
                 backgroundColor: "#0d1116",
+                paddingTop: insets.top,
             },
             scrollViewContent: {
                 paddingHorizontal: 20,
