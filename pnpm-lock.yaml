@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  expo-file-system: 19.0.14
-
 importers:
 
   .:
@@ -56,9 +53,6 @@ importers:
       expo-linking:
         specifier: ~8.0.8
         version: 8.0.8(expo@54.0.9)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
-      expo-navigation-bar:
-        specifier: ^5.0.8
-        version: 5.0.8(expo@54.0.9)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
       expo-network:
         specifier: ~8.0.7
         version: 8.0.7(expo@54.0.9)(react@19.1.0)
@@ -95,6 +89,9 @@ importers:
       react-native-appwrite:
         specifier: ^0.13.0
         version: 0.13.0(expo@54.0.9)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))
+      react-native-edge-to-edge:
+        specifier: ^1.7.0
+        version: 1.7.0(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
       react-native-filament:
         specifier: ^1.8.0
         version: 1.8.0(react-native-worklets-core@1.6.2(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
@@ -2148,6 +2145,12 @@ packages:
     peerDependencies:
       expo: '*'
 
+  expo-file-system@18.1.11:
+    resolution: {integrity: sha512-HJw/m0nVOKeqeRjPjGdvm+zBi5/NxcdPf8M8P3G2JFvH5Z8vBWqVDic2O58jnT1OFEy0XXzoH9UqFu7cHg9DTQ==}
+    peerDependencies:
+      expo: '*'
+      react-native: '*'
+
   expo-file-system@19.0.14:
     resolution: {integrity: sha512-0CA7O5IYhab11TlxQlJAx0Xm9pdkk/zEHNiW+Hh/T4atWi9U/J38CIp7iNYSrBvy9dC3rJbze5D1ANcKKr4mSQ==}
     peerDependencies:
@@ -2187,13 +2190,6 @@ packages:
   expo-modules-core@3.0.17:
     resolution: {integrity: sha512-P1jZn8yjWi4jSCH+r9A1NykLR+0JtFYprJgYwnZ1EVFRtw+DoMjir0OexM9ehCuBg8sKDCbzCUAgm/JFnpjQww==}
     peerDependencies:
-      react: '*'
-      react-native: '*'
-
-  expo-navigation-bar@5.0.8:
-    resolution: {integrity: sha512-vaUkedxWscne24NIoADncgjP4WYKNdy69mSO9UWNRlOGdmzyswI4h16xuiNjlbTOxzHMVPotGWyMNxo5gxkxpg==}
-    peerDependencies:
-      expo: '*'
       react: '*'
       react-native: '*'
 
@@ -3343,6 +3339,12 @@ packages:
     resolution: {integrity: sha512-azglur0tFgtar4x14ZJPMVZ8nyygWdzYEYQRnHE/4xvq3TsvH7D4gJeq5HQXQ6ANg896TSDihdkUo6u3yLenCw==}
     peerDependencies:
       expo: '*'
+      react-native: '*'
+
+  react-native-edge-to-edge@1.7.0:
+    resolution: {integrity: sha512-ERegbsq28yoMndn/Uq49i4h6aAhMvTEjOfkFh50yX9H/dMjjCr/Tix/es/9JcPRvC+q7VzCMWfxWDUb6Jrq1OQ==}
+    peerDependencies:
+      react: '*'
       react-native: '*'
 
   react-native-filament@1.8.0:
@@ -6678,6 +6680,11 @@ snapshots:
       base64-js: 1.5.1
       expo: 54.0.9(@babel/core@7.28.4)(@expo/metro-runtime@6.1.2)(expo-router@6.0.7)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
 
+  expo-file-system@18.1.11(expo@54.0.9)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0)):
+    dependencies:
+      expo: 54.0.9(@babel/core@7.28.4)(@expo/metro-runtime@6.1.2)(expo-router@6.0.7)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
+      react-native: 0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0)
+
   expo-file-system@19.0.14(expo@54.0.9)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0)):
     dependencies:
       expo: 54.0.9(@babel/core@7.28.4)(@expo/metro-runtime@6.1.2)(expo-router@6.0.7)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
@@ -6725,17 +6732,6 @@ snapshots:
       invariant: 2.2.4
       react: 19.1.0
       react-native: 0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0)
-
-  expo-navigation-bar@5.0.8(expo@54.0.9)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0):
-    dependencies:
-      '@react-native/normalize-colors': 0.81.4
-      debug: 4.4.3
-      expo: 54.0.9(@babel/core@7.28.4)(@expo/metro-runtime@6.1.2)(expo-router@6.0.7)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
-      react: 19.1.0
-      react-native: 0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0)
-      react-native-is-edge-to-edge: 1.2.1(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
-    transitivePeerDependencies:
-      - supports-color
 
   expo-network@8.0.7(expo@54.0.9)(react@19.1.0):
     dependencies:
@@ -8180,7 +8176,12 @@ snapshots:
   react-native-appwrite@0.13.0(expo@54.0.9)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0)):
     dependencies:
       expo: 54.0.9(@babel/core@7.28.4)(@expo/metro-runtime@6.1.2)(expo-router@6.0.7)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
-      expo-file-system: 19.0.14(expo@54.0.9)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))
+      expo-file-system: 18.1.11(expo@54.0.9)(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))
+      react-native: 0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0)
+
+  react-native-edge-to-edge@1.7.0(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
       react-native: 0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0)
 
   react-native-filament@1.8.0(react-native-worklets-core@1.6.2(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.4(@babel/core@7.28.4)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0):

@@ -65,6 +65,14 @@
                     }
                 }
             ],
+            [
+                "react-native-edge-to-edge",
+                {
+                    "android": {
+                        "enforceNavigationBarContrast": false
+                    }
+                }
+            ],
             "expo-font",
             "expo-web-browser"
         ],

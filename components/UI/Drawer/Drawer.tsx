@@ -36,6 +36,7 @@ import {
     getHelpRoutes,
 } from "@/constants/DrawerItems";
 import { useIconRenderer } from "./IconRenderer";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 const DRAWER_WIDTH: number = width * 0.65;
@@ -46,6 +47,7 @@ function DrawerComponent(): JSX.Element {
     const drawerProgress = useSharedValue(0);
     const router = useRouter();
     const renderIcon = useIconRenderer();
+    const insets = useSafeAreaInsets();
 
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
     const [lastPress, setLastPress] = useState(0);
@@ -232,6 +234,7 @@ function DrawerComponent(): JSX.Element {
                 style={[
                     styles.drawer,
                     drawerAnimatedStyle,
+                    {paddingBottom: insets.bottom}
                 ]}
             >
                 <ProfileSection />
