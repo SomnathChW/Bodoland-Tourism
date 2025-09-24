@@ -10,12 +10,12 @@
 // } from "react-native";
 // import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 // import { useSafeAreaInsets } from "react-native-safe-area-context";
-// import { Ionicons } from "@expo/vector-icons";
+// import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 // import { ViroVRSceneNavigator } from "@reactvision/react-viro";
 
 // import VRPhotoScene from "@/components/UI/VRScenes/VRPhotoScene";
 
-// const VRViewCardboard = () => {
+// const VRViewFullScreen = () => {
 //     const router = useRouter();
 //     const params = useLocalSearchParams();
 //     const insets = useSafeAreaInsets();
@@ -30,32 +30,16 @@
 
 //     // Check if tour_resource is provided
 //     useEffect(() => {
-//         console.log("VR Cardboard: tour_resource received:", tour_resource);
 //         if (!tour_resource) {
-//             console.log(
-//                 "VR Cardboard: No tour_resource provided, setting error state"
-//             );
 //             setIsLoading(false);
 //             setHasError(true);
-//         } else {
-//             console.log(
-//                 "VR Cardboard: Valid tour_resource, proceeding with VR setup"
-//             );
 //         }
 //     }, [tour_resource]);
 
-//     // Handle screen focus - reload scene when returning from fullscreen mode
+//     // Handle screen focus - reload scene when returning from cardboard mode
 //     useFocusEffect(
 //         React.useCallback(() => {
-//             console.log(
-//                 "VR Cardboard: Screen focused, tour_resource:",
-//                 tour_resource
-//             );
 //             if (tour_resource) {
-//                 console.log(
-//                     "VR Cardboard: Reloading scene with key:",
-//                     sceneKey + 1
-//                 );
 //                 // Force scene reload by updating the key
 //                 setSceneKey((prev) => prev + 1);
 //                 setIsLoading(true);
@@ -66,6 +50,13 @@
 
 //     const handleBack = () => {
 //         router.back();
+//     };
+
+//     const handleCardboardMode = () => {
+//         router.push({
+//             pathname: "/vr_view_cardboard",
+//             params: { tour_resource },
+//         });
 //     };
 
 //     const handleLoadStart = () => {
@@ -86,31 +77,30 @@
 //         <View style={styles.container}>
 //             <StatusBar hidden />
 
-//             {/* Only render VR Navigator if we have a valid tour_resource */}
-//             {tour_resource && !hasError && (
-//                 <ViroVRSceneNavigator
-//                     key={`cardboard-${sceneKey}`} // Force re-render with scene key
-//                     ref={sceneNavigatorRef}
-//                     initialScene={{
-//                         scene: () => (
-//                             <VRPhotoScene
-//                                 handleLoadStart={handleLoadStart}
-//                                 handleLoadEnd={handleLoadEnd}
-//                                 handleError={handleError}
-//                                 tour_resource={tour_resource}
-//                             />
-//                         ),
-//                     }}
-//                     style={styles.vrContainer}
-//                     vrModeEnabled={true}
-//                     autofocus={true}
-//                     viroAppProps={{
-//                         tour_resource: tour_resource,
-//                     }}
-//                 />
-//             )}
+//             {/* VR Scene Navigator */}
+//             <ViroVRSceneNavigator
+//                 key={sceneKey} // Force re-render with scene key
+//                 ref={sceneNavigatorRef}
+//                 initialScene={{
+//                     scene: () => (
+//                         <VRPhotoScene
+//                             handleLoadStart={handleLoadStart}
+//                             handleLoadEnd={handleLoadEnd}
+//                             handleError={handleError}
+//                             tour_resource={tour_resource}
+//                         />
+//                     ),
+//                 }}
+//                 style={styles.vrContainer}
+//                 vrModeEnabled={false}
+//                 hdrEnabled={true}
+//                 shadowsEnabled={true}
+//                 viroAppProps={{
+//                     tour_resource: tour_resource,
+//                 }}
+//             />
 
-//             {/* Floating Back Button - Only visible, no cardboard button */}
+//             {/* Floating Action Buttons */}
 //             <View
 //                 style={[
 //                     styles.floatingButtonsContainer,
@@ -125,6 +115,16 @@
 //                 >
 //                     <Ionicons name="arrow-back" size={24} color="#fff" />
 //                 </TouchableOpacity>
+
+//                 {/* Cardboard Mode Button */}
+//                 {/* DISABLED FOR NOW */}
+//                 {/* <TouchableOpacity
+//                     style={[styles.cardboardButton]}
+//                     onPress={handleCardboardMode}
+//                     activeOpacity={0.8}
+//                 >
+//                     <FontAwesome6 name="vr-cardboard" size={20} color="#fff" />
+//                 </TouchableOpacity> */}
 //             </View>
 
 //             {/* Loading Overlay */}
@@ -186,7 +186,7 @@
 //     );
 // };
 
-// export default VRViewCardboard;
+// export default VRViewFullScreen;
 
 // const { width, height } = Dimensions.get("window");
 
@@ -210,6 +210,15 @@
 //         height: 44,
 //         borderRadius: 22,
 //         backgroundColor: "rgba(0, 0, 0, 0.3)",
+//         justifyContent: "center",
+//         alignItems: "center",
+//     },
+
+//     cardboardButton: {
+//         width: 44,
+//         height: 44,
+//         borderRadius: 22,
+//         backgroundColor: "rgba(0,0,0, 0.3)",
 //         justifyContent: "center",
 //         alignItems: "center",
 //     },
@@ -305,18 +314,115 @@
 //         textAlign: "center",
 //     },
 // });
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { WebView } from "react-native-webview";
+import { useLocalSearchParams } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { Linking } from "react-native";
 
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+const VRViewFullScreen = () => {
+    const params = useLocalSearchParams();
+    // Get tour_resource from route parameters
+    const tour_resource = params?.tour_resource as string;
 
-const VRViewCardboard = () => {
-  return (
-    <View>
-      <Text>VRViewCardboard</Text>
-    </View>
-  )
-}
+    const insets = useSafeAreaInsets();
+    const router = useRouter();
 
-export default VRViewCardboard
+    const handleBack = () => {
+        router.back();
+    };
 
-const styles = StyleSheet.create({})
+    const handleCardboardMode = () => {
+        Linking.openURL(
+            `https://coolidance.appwrite.network/?img=${tour_resource}`
+        );
+    };
+
+    const [loading, setLoading] = React.useState(true);
+
+    return (
+        <>
+            <WebView
+                source={
+                    loading
+                        ? {
+                              html: `<html><body style="background:black;display:flex;justify-content:center;align-items:center;height:100vh;"><h1 style="color:white;font-size:18px;">Loading VR Experience...</h1></body></html>`,
+                          }
+                        : {
+                              uri: `https://coolidance.appwrite.network/?img=${tour_resource}`,
+                          }
+                }
+                style={styles.webView}
+                allowsFullscreenVideo={true}
+                javaScriptEnabled={true}
+                incognito={true}
+                onLoadEnd={() => {
+                    setLoading(false);
+                }}
+                onError={() => {
+                    setLoading(false);
+                }}
+            />
+            <View
+                style={[
+                    styles.floatingButtonsContainer,
+                    { top: insets.top + 10 },
+                ]}
+            >
+                {/* Back Button */}
+                <TouchableOpacity
+                    style={styles.floatingBackButton}
+                    onPress={handleBack}
+                    activeOpacity={0.8}
+                >
+                    <Ionicons name="arrow-back" size={24} color="#fff" />
+                </TouchableOpacity>
+
+                {/* Cardboard Mode Button */}
+                <TouchableOpacity
+                    style={[styles.cardboardButton]}
+                    onPress={handleCardboardMode}
+                    activeOpacity={0.8}
+                >
+                    <FontAwesome6 name="vr-cardboard" size={20} color="#fff" />
+                </TouchableOpacity>
+            </View>
+        </>
+    );
+};
+
+export default VRViewFullScreen;
+
+const styles = StyleSheet.create({
+    webView: {
+        flex: 1,
+        backgroundColor: "black",
+    },
+    floatingButtonsContainer: {
+        position: "absolute",
+        left: 20,
+        flexDirection: "row",
+        gap: 12,
+        zIndex: 10,
+    },
+    floatingBackButton: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: "rgba(0, 0, 0, 0.3)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    cardboardButton: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: "rgba(0,0,0, 0.3)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+});

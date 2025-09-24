@@ -34,7 +34,7 @@ const CardVertical = React.memo(({ item }: Props) => {
                     ) {
                         if (item?.tour_resource) {
                             router.navigate({
-                                pathname: "/vr_view_fullscreen",
+                                pathname: "/vr_view",
                                 params: { tour_resource: item.tour_resource },
                             });
                         }

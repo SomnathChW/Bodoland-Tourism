@@ -116,11 +116,13 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             // Race between the database request and timeout
             const appwriteVersionDoc = await Promise.race([
-                database.getDocument(
-                    process.env.EXPO_PUBLIC_DATABASE_APP_CHECK || "",
-                    "version",
-                    "version_id"
-                ),
+                database.getDocument({
+                    databaseId:
+                        process.env.EXPO_PUBLIC_DATABASE_APP_CHECK || "",
+                    collectionId: "version",
+                    documentId: "version_id",
+                    queries: [],
+                }),
                 timeoutPromise,
             ]);
 
@@ -194,7 +196,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const checkUserFromBackend = async () => {
         try {
-            let responseSession = await account.getSession("current");
+            let responseSession = await account.getSession({
+                sessionId: "current",
+            });
 
             // Refresh OAuth tokens on every visit to ensure fresh tokens
             if (
@@ -202,7 +206,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 responseSession.provider !== "email"
             ) {
                 try {
-                    responseSession = await account.updateSession("current");
+                    responseSession = await account.updateSession({
+                        sessionId: "current",
+                    });
                 } catch (refreshError) {
                     console.error(
                         "Failed to refresh OAuth token:",
@@ -229,7 +235,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             //     JSON.stringify(responseSession, null, 2)
             // );
         } catch (error) {
-            await clearLocalData();
             if (
                 error instanceof Error &&
                 "type" in error &&
@@ -237,6 +242,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             ) {
                 // TODO: Check if user was previously logged in and show message accordingly
                 // toast.info("Please SignIn to continue");
+                await clearLocalData();
             } else {
                 toast.error(
                     "Unable to verify session. Please try again later."
@@ -312,10 +318,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(true);
 
         try {
-            const responseSession = await account.createEmailPasswordSession(
-                email,
-                password
-            );
+            const responseSession = await account.createEmailPasswordSession({
+                email: email,
+                password: password,
+            });
             // const responseSession =
             //     await mockAccount.createEmailPasswordSession(email, password);
             const responseUser = await account.get();
@@ -354,7 +360,12 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         const toast_id = toast.loading("Signing up...");
         setLoading(true);
         try {
-            await account.create(ID.unique(), email, password, name);
+            await account.create({
+                userId: ID.unique(),
+                email: email,
+                password: password,
+                name: name,
+            });
             // await mockAccount.create(ID.unique(), email, password, name);
             toast.success("Signed up", { id: toast_id });
         } catch (error) {
@@ -381,11 +392,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             const scheme = `${deepLink.protocol}//`;
 
             // Start OAuth flow - get the login URL
-            const loginUrl = await account.createOAuth2Token(
-                OAuthProvider.Google,
-                `${deepLink}`,
-                `${deepLink}`
-            );
+            const loginUrl = await account.createOAuth2Token({
+                provider: OAuthProvider.Google,
+                success: `${deepLink}`,
+                failure: `${deepLink}`,
+            });
 
             // Open loginUrl and listen for the scheme redirect
             const result = await WebBrowser.openAuthSessionAsync(
@@ -401,10 +412,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
                 if (secret && userId) {
                     // Create session with OAuth credentials
-                    const responseSession = await account.createSession(
-                        userId,
-                        secret
-                    );
+                    const responseSession = await account.createSession({
+                        userId: userId,
+                        secret: secret,
+                    });
                     const responseUser = await account.get();
 
                     // Set user and session BEFORE setting loading to false
@@ -437,7 +448,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         const toast_id = toast.loading("Signing out...");
         setLoading(true);
         try {
-            await account.deleteSession("current");
+            await account.deleteSession({ sessionId: "current" });
             // await mockAccount.deleteSession();
             await clearLocalData();
 

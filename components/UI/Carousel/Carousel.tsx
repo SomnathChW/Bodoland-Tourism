@@ -260,7 +260,7 @@ const DotIndicator = React.memo(
 
         const containerStyle = useAnimatedStyle(() => {
             return {
-                width: isCurrentActive.value ? 20 : 4,
+                width: isCurrentActive.value ? 60 : 4,
                 backgroundColor: isCurrentActive.value
                     ? "rgba(255, 255, 255, 0.3)"
                     : "rgba(255, 255, 255, 0.5)",
