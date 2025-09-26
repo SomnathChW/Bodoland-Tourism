@@ -2,22 +2,15 @@ import {
     Text,
     View,
     StyleSheet,
-    StatusBar,
     Dimensions,
-    ActivityIndicator,
-    TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useDrawer } from "@/context/DrawerContext";
-import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import StaysCard from "@/components/StaysCard";
 import CardLoader from "@/components/CardLoader";
-import DynamicSortFilterComponent from "@/components/UI/Header/DynamicSortFilterComponent";
 import MenuButton from "@/components/UI/MenuButton";
 import { staysData } from "@/data/stays_data";
-import { useSortFilter } from "@/hooks/useSortFilter";
-import { staysSortAndFilter } from "@/utils/sortFilterConfigs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("screen");
@@ -26,25 +19,6 @@ const Stays = React.memo(() => {
     const { toggleDrawer } = useDrawer();
     const insets = useSafeAreaInsets();
     const [loading, setLoading] = useState(true);
-
-    const showSortFilter = false;
-
-    const {
-        sortedAndFilteredData,
-        activeSortId,
-        setActiveSortId,
-        activeFilters,
-        setActiveFilters,
-        sortModalVisible,
-        setSortModalVisible,
-        filterModalVisible,
-        setFilterModalVisible,
-        resetFilters,
-    } = useSortFilter({
-        data: staysData,
-        sortOptions: staysSortAndFilter.sortOptions,
-        filterOptions: staysSortAndFilter.filterOptions,
-    });
 
     useEffect(() => {
         // Simulate loading for 1500ms
@@ -74,26 +48,9 @@ const Stays = React.memo(() => {
                     </View>
                 </View>
 
-                {/* Sorting and Filtering Component */}
-                {!loading && showSortFilter && (
-                    <DynamicSortFilterComponent
-                        sortOptions={staysSortAndFilter.sortOptions}
-                        filterOptions={staysSortAndFilter.filterOptions}
-                        activeSortId={activeSortId}
-                        setActiveSortId={setActiveSortId}
-                        activeFilters={activeFilters}
-                        setActiveFilters={setActiveFilters}
-                        sortModalVisible={sortModalVisible}
-                        setSortModalVisible={setSortModalVisible}
-                        filterModalVisible={filterModalVisible}
-                        setFilterModalVisible={setFilterModalVisible}
-                        resetFilters={resetFilters}
-                    />
-                )}
-
                 {/* Single FlashList for both loading and data states */}
                 <FlashList
-                    data={loading ? Array(6).fill(0) : sortedAndFilteredData}
+                    data={loading ? Array(6).fill(0) : staysData}
                     renderItem={({ item, index }) => {
                         if (loading) {
                             return (

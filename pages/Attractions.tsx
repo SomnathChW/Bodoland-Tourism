@@ -10,13 +10,9 @@ import {
 import React, { useMemo } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDrawer } from "@/context/DrawerContext";
-import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import AttractionsCard from "@/components/AttractionsCard";
-import DynamicSortFilterComponent from "@/components/UI/Header/DynamicSortFilterComponent";
 import MenuButton from "@/components/UI/MenuButton";
-import { useSortFilter } from "@/hooks/useSortFilter";
-import { attractionsSortAndFilter } from "@/utils/sortFilterConfigs";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
 import CardLoader from "@/components/CardLoader";
 
@@ -25,7 +21,6 @@ const { width, height } = Dimensions.get("screen");
 const Attractions = () => {
     const { toggleDrawer } = useDrawer();
     const insets = useSafeAreaInsets();
-    const showSortFilter = false; // Set to true if you want to show sort/filter options
 
     const {
         data,
@@ -56,23 +51,6 @@ const Attractions = () => {
     const attractionsData = useMemo(() => {
         return data?.pages.flatMap((page) => page.data) || [];
     }, [data]);
-
-    const {
-        sortedAndFilteredData,
-        activeSortId,
-        setActiveSortId,
-        activeFilters,
-        setActiveFilters,
-        sortModalVisible,
-        setSortModalVisible,
-        filterModalVisible,
-        setFilterModalVisible,
-        resetFilters,
-    } = useSortFilter({
-        data: attractionsData,
-        sortOptions: attractionsSortAndFilter.sortOptions,
-        filterOptions: attractionsSortAndFilter.filterOptions,
-    });
 
     const renderFooter = () => {
         if (!isFetchingNextPage) return null;
@@ -108,23 +86,6 @@ const Attractions = () => {
                     </View>
                 </View>
 
-                {/* Sorting and Filtering Component */}
-                {showSortFilter && (
-                    <DynamicSortFilterComponent
-                        sortOptions={attractionsSortAndFilter.sortOptions}
-                        filterOptions={attractionsSortAndFilter.filterOptions}
-                        activeSortId={activeSortId}
-                        setActiveSortId={setActiveSortId}
-                        activeFilters={activeFilters}
-                        setActiveFilters={setActiveFilters}
-                        sortModalVisible={sortModalVisible}
-                        setSortModalVisible={setSortModalVisible}
-                        filterModalVisible={filterModalVisible}
-                        setFilterModalVisible={setFilterModalVisible}
-                        resetFilters={resetFilters}
-                    />
-                )}
-
                 {error ? (
                     // Display error state
                     <View style={styles.errorContainer}>
@@ -142,7 +103,7 @@ const Attractions = () => {
                     // Single FlashList for both loading and data states
                     <FlashList
                         data={
-                            isLoading ? Array(6).fill(0) : sortedAndFilteredData
+                            isLoading ? Array(6).fill(0) : attractionsData
                         }
                         renderItem={({ item, index }) => {
                             if (isLoading) {

@@ -13,10 +13,7 @@ import { useRouter } from "expo-router";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import ProductCard from "@/components/ProductCard";
-import DynamicSortFilterComponent from "@/components/UI/Header/DynamicSortFilterComponent";
 import MenuButton from "@/components/UI/MenuButton";
-import { useSortFilter } from "@/hooks/useSortFilter";
-import { souvenirsSortAndFilter } from "@/utils/sortFilterConfigs";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
 import CardLoader from "@/components/CardLoader";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -27,7 +24,6 @@ const Souvenirs = () => {
     const { toggleDrawer } = useDrawer();
     const insets = useSafeAreaInsets();
     const router = useRouter();
-    const showSortFilter = false; // Set to true if you want to show sort/filter options
 
     const {
         data,
@@ -61,23 +57,6 @@ const Souvenirs = () => {
     const souvenirData = useMemo(() => {
         return data?.pages.flatMap((page) => page.data) || [];
     }, [data]);
-
-    const {
-        sortedAndFilteredData,
-        activeSortId,
-        setActiveSortId,
-        activeFilters,
-        setActiveFilters,
-        sortModalVisible,
-        setSortModalVisible,
-        filterModalVisible,
-        setFilterModalVisible,
-        resetFilters,
-    } = useSortFilter({
-        data: souvenirData,
-        sortOptions: souvenirsSortAndFilter.sortOptions,
-        filterOptions: souvenirsSortAndFilter.filterOptions,
-    });
 
     const renderFooter = () => {
         if (!isFetchingNextPage) return null;
@@ -151,23 +130,6 @@ const Souvenirs = () => {
                     </View>
                 </View>
 
-                {/* Sorting and Filtering Component */}
-                {showSortFilter && (
-                    <DynamicSortFilterComponent
-                        sortOptions={souvenirsSortAndFilter.sortOptions}
-                        filterOptions={souvenirsSortAndFilter.filterOptions}
-                        activeSortId={activeSortId}
-                        setActiveSortId={setActiveSortId}
-                        activeFilters={activeFilters}
-                        setActiveFilters={setActiveFilters}
-                        sortModalVisible={sortModalVisible}
-                        setSortModalVisible={setSortModalVisible}
-                        filterModalVisible={filterModalVisible}
-                        setFilterModalVisible={setFilterModalVisible}
-                        resetFilters={resetFilters}
-                    />
-                )}
-
                 {error ? (
                     // Display error state
                     <View style={styles.errorContainer}>
@@ -184,9 +146,7 @@ const Souvenirs = () => {
                 ) : (
                     // Single FlashList for both loading and data states
                     <FlashList
-                        data={
-                            isLoading ? Array(6).fill(0) : sortedAndFilteredData
-                        }
+                        data={isLoading ? Array(6).fill(0) : souvenirData}
                         renderItem={({ item, index }) => {
                             if (isLoading) {
                                 return (
