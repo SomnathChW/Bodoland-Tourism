@@ -6,7 +6,7 @@ import LocationMapSection from "./LocationMapSection";
 import VirtualToursSection from "./VirtualToursSection";
 import EntryFeeSection from "./EntryFeeSection";
 import PackagesSection from "./PackagesSection";
-import CustomAlertDialog from "../../CustomAlertDialog";
+import AlertDialog from "@/components/UI/AlertDialog";
 import { Package } from "./PackagesSection"; // Import the Package type
 import { useAttractionDetails } from "@/hooks/useEntityDetails";
 import DetailsLoader from "@/components/UI/Details/Common/DetailsLoader";
@@ -134,8 +134,8 @@ const AttractionDetails = ({
                 onPackagePress={handlePackagePress}
             />
 
-            {/* Custom Alert Dialog */}
-            <CustomAlertDialog
+            {/* Alert Dialog */}
+            <AlertDialog
                 visible={dialogVisible}
                 title="Contact Options"
                 description={`How would you like to contact ${

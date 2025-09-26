@@ -1,25 +1,40 @@
 import React from "react";
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
+interface ButtonProps {
+    text: string;
+    onPress: () => void;
+    type?: "primary" | "secondary" | "cancel";
+    disabled?: boolean;
+}
+
 interface AlertDialogProps {
     visible: boolean;
     title: string;
     description: string;
-    cancelText?: string;
-    confirmText?: string;
-    onCancel: () => void;
-    onConfirm: () => void;
+    buttons: ButtonProps[];
+    onCancel?: () => void;
 }
 
 const AlertDialog = ({
     visible,
     title,
     description,
-    cancelText = "Cancel",
-    confirmText = "Continue",
+    buttons,
     onCancel,
-    onConfirm,
 }: AlertDialogProps) => {
+    // Validate button count (min 1, max 3)
+    const validButtons = buttons.slice(0, 3);
+
+    // Ensure we have at least one button
+    if (validButtons.length === 0) {
+        validButtons.push({
+            text: "OK",
+            onPress: onCancel || (() => {}),
+            type: "primary",
+        });
+    }
+
     return (
         <>
             {visible ? (
@@ -36,6 +51,7 @@ const AlertDialog = ({
                         visible={visible}
                         animationType="fade"
                         style={{ margin: 0 }}
+                        onRequestClose={onCancel}
                     >
                         <View style={styles.overlay}>
                             <View style={styles.modalContainer}>
@@ -44,38 +60,41 @@ const AlertDialog = ({
                                     {description}
                                 </Text>
                                 <View style={styles.buttonContainer}>
-                                    <TouchableOpacity
-                                        style={[
-                                            styles.button,
-                                            styles.cancelButton,
-                                        ]}
-                                        onPress={onCancel}
-                                    >
-                                        <Text
+                                    {validButtons.map((button, index) => (
+                                        <TouchableOpacity
+                                            key={index}
                                             style={[
-                                                styles.buttonText,
-                                                styles.cancelText,
+                                                styles.button,
+                                                button.type === "primary" &&
+                                                    styles.primaryButton,
+                                                button.type === "secondary" &&
+                                                    styles.primaryButton,
+                                                button.type === "cancel" &&
+                                                    styles.cancelButton,
+                                                button.disabled &&
+                                                    styles.disabledButton,
                                             ]}
+                                            onPress={button.onPress}
+                                            disabled={button.disabled}
                                         >
-                                            {cancelText}
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={[
-                                            styles.button,
-                                            styles.continueButton,
-                                        ]}
-                                        onPress={onConfirm}
-                                    >
-                                        <Text
-                                            style={[
-                                                styles.buttonText,
-                                                styles.continueText,
-                                            ]}
-                                        >
-                                            {confirmText}
-                                        </Text>
-                                    </TouchableOpacity>
+                                            <Text
+                                                style={[
+                                                    styles.buttonText,
+                                                    button.type === "primary" &&
+                                                        styles.primaryText,
+                                                    button.type ===
+                                                        "secondary" &&
+                                                        styles.primaryText,
+                                                    button.type === "cancel" &&
+                                                        styles.cancelText,
+                                                    button.disabled &&
+                                                        styles.disabledText,
+                                                ]}
+                                            >
+                                                {button.text}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ))}
                                 </View>
                             </View>
                         </View>
@@ -125,25 +144,31 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         borderWidth: 1,
     },
+    primaryButton: {
+        backgroundColor: "#fff",
+        borderColor: "#fff",
+    },
     cancelButton: {
         backgroundColor: "#181818",
         borderColor: "rgba(255, 255, 255, 0.19)",
     },
-    continueButton: {
-        backgroundColor: "#fff",
-        borderColor: "#fff",
+    disabledButton: {
+        opacity: 0.5,
     },
     buttonText: {
         fontSize: 14,
         fontWeight: "500",
         fontFamily: "SfProMedium",
     },
+    primaryText: {
+        color: "#000",
+    },
     cancelText: {
         color: "#fff",
         fontFamily: "SfProMedium",
     },
-    continueText: {
-        color: "#000",
+    disabledText: {
+        opacity: 0.7,
     },
 });
 

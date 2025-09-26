@@ -1,12 +1,5 @@
-import {
-    Text,
-    View,
-    StyleSheet,
-    StatusBar,
-    Platform,
-    FlatList,
-} from "react-native";
-import { useRouter, useFocusEffect } from "expo-router";
+import { Text, View, StyleSheet, FlatList } from "react-native";
+import { useRouter } from "expo-router";
 import React, { useCallback } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -22,7 +15,7 @@ import { categoryData } from "@/data/category_data";
 import { useDrawer } from "@/context/DrawerContext";
 import { useHomePageData } from "@/hooks/useHomePageData";
 
-type ListItem =
+type HomeItemTypes =
     | {
           type: "carousel";
           id: string;
@@ -53,12 +46,10 @@ const Home = () => {
     const router = useRouter();
     const insets = useSafeAreaInsets();
 
-    // Fetch all home page data from a single endpoint
     const {
         data: homePageResponse,
         isLoading: homePageLoading,
         error: homePageError,
-        refetch,
     } = useHomePageData({
         attractionsLimit: 5,
         souvenirsLimit: 5,
@@ -69,16 +60,6 @@ const Home = () => {
         districtsLimit: 5,
     });
 
-    // Refetch data when screen comes into focus
-    useFocusEffect(
-        useCallback(() => {
-            // Only refetch if data is stale or missing
-            if (!homePageResponse && !homePageLoading) {
-                refetch();
-            }
-        }, [homePageResponse, homePageLoading, refetch])
-    );
-
     // Extract data from the response
     const attractionsData = homePageResponse?.data?.attractions?.items || [];
     const souvenirsData = homePageResponse?.data?.souvenirs?.items || [];
@@ -88,7 +69,7 @@ const Home = () => {
     const cuisinesData = homePageResponse?.data?.cuisines?.items || [];
     const districtData = homePageResponse?.data?.districts?.items || [];
 
-    const listData: ListItem[] = [
+    const HomeItemsList: HomeItemTypes[] = [
         {
             type: "carousel",
             id: "carousel",
@@ -155,7 +136,7 @@ const Home = () => {
     ];
 
     const renderItem = useCallback(
-        ({ item }: { item: ListItem }) => {
+        ({ item }: { item: HomeItemTypes }) => {
             switch (item.type) {
                 case "carousel":
                     return (
@@ -175,7 +156,6 @@ const Home = () => {
                         />
                     );
                 case "section":
-                    // Handle all sections with consistent loading state
                     return (
                         <Section
                             subHeading={item.subHeading}
@@ -197,7 +177,6 @@ const Home = () => {
         },
         [homePageLoading]
     );
-    // --- End Render Item Function ---
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -224,7 +203,7 @@ const Home = () => {
                 {/* FlashList now includes the Carousel */}
                 <View style={{ flex: 1 }}>
                     <FlatList
-                        data={listData}
+                        data={HomeItemsList}
                         renderItem={renderItem}
                         keyExtractor={(item) => item.id}
                         showsVerticalScrollIndicator={false}

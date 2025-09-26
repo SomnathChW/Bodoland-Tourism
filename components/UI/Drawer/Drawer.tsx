@@ -234,7 +234,7 @@ function DrawerComponent(): JSX.Element {
                 style={[
                     styles.drawer,
                     drawerAnimatedStyle,
-                    {paddingBottom: insets.bottom}
+                    { paddingBottom: insets.bottom },
                 ]}
             >
                 <ProfileSection />
@@ -295,10 +295,21 @@ function DrawerComponent(): JSX.Element {
 
             <AlertDialog
                 visible={showLogoutDialog}
-                title="Sign Out"
-                description="Are you sure you want to sign out?"
+                title="Sign Out?"
+                description={"Are you sure you want to sign out?"}
+                buttons={[
+                    {
+                        text: "No, Cancel",
+                        onPress: handleLogoutDialog,
+                        type: "cancel",
+                    },
+                    {
+                        text: "Yes",
+                        onPress: handleSignOut,
+                        type: "secondary",
+                    },
+                ]}
                 onCancel={handleLogoutDialog}
-                onConfirm={handleSignOut}
             />
         </>
     );
