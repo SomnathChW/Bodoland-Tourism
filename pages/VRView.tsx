@@ -359,7 +359,6 @@ const VRViewFullScreen = () => {
                 style={styles.webView}
                 allowsFullscreenVideo={true}
                 javaScriptEnabled={true}
-                incognito={true}
                 onLoadEnd={() => {
                     setLoading(false);
                 }}
