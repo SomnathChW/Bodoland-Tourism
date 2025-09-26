@@ -2,17 +2,15 @@ import {
     Text,
     View,
     StyleSheet,
-    StatusBar,
     Dimensions,
     ActivityIndicator,
     TouchableOpacity,
 } from "react-native";
 import React, { useMemo } from "react";
 import { useDrawer } from "@/context/DrawerContext";
-import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import CuisineCard from "@/components/CuisineCard";
-import MenuButton from "@/components/UI/MenuButton";
+import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
 import CardLoader from "@/components/CardLoader";
 import { useSafeAreaInsets } from "react-native-safe-area-context";

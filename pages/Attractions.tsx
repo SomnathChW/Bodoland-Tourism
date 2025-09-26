@@ -2,7 +2,6 @@ import {
     Text,
     View,
     StyleSheet,
-    StatusBar,
     ActivityIndicator,
     TouchableOpacity,
     Dimensions,
@@ -12,7 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDrawer } from "@/context/DrawerContext";
 import { FlashList } from "@shopify/flash-list";
 import AttractionsCard from "@/components/AttractionsCard";
-import MenuButton from "@/components/UI/MenuButton";
+import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
 import CardLoader from "@/components/CardLoader";
 
@@ -102,9 +101,7 @@ const Attractions = () => {
                 ) : (
                     // Single FlashList for both loading and data states
                     <FlashList
-                        data={
-                            isLoading ? Array(6).fill(0) : attractionsData
-                        }
+                        data={isLoading ? Array(6).fill(0) : attractionsData}
                         renderItem={({ item, index }) => {
                             if (isLoading) {
                                 return (

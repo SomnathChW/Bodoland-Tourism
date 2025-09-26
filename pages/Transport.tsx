@@ -1,10 +1,9 @@
-import { Text, View, StyleSheet, StatusBar, Dimensions } from "react-native";
+import { Text, View, StyleSheet,Dimensions } from "react-native";
 import React from "react";
 import { useDrawer } from "@/context/DrawerContext";
-import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import CuisineCard from "@/components/CuisineCard";
-import MenuButton from "@/components/UI/MenuButton";
+import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { cuisineData } from "@/data/cuisine_data";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

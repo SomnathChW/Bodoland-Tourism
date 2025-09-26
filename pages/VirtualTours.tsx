@@ -1,6 +1,5 @@
 import {
     StyleSheet,
-    StatusBar,
     View,
     Text,
     Dimensions,
@@ -10,7 +9,7 @@ import {
 import React, { useMemo } from "react";
 
 import VrCard from "@/components/VrCard";
-import MenuButton from "@/components/UI/MenuButton";
+import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { FlashList } from "@shopify/flash-list";
 import { useDrawer } from "@/context/DrawerContext";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";

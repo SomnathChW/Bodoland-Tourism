@@ -1,8 +1,7 @@
-import { StyleSheet, Text, View, StatusBar } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { useDrawer } from "@/context/DrawerContext";
-import { Ionicons } from "@expo/vector-icons";
-import MenuButton from "@/components/UI/MenuButton";
+import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Help = () => {

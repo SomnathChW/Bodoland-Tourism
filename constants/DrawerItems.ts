@@ -4,7 +4,7 @@ type DrawerItemType = {
     icon: string;
 };
 
-export const drawerItems = [
+export const drawerItems: DrawerItemType[] = [
     {
         label: "Home",
         key: "home",

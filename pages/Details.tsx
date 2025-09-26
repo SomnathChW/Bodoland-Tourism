@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Dimensions } from "react-native";
+import { View, Dimensions } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import Animated, {
     useSharedValue,
@@ -21,7 +21,6 @@ import TransportDetails from "@/components/UI/Details/TransportDetails/Transport
 import DistrictDetails from "@/components/UI/Details/DistrictDetails/DistrictDetails";
 import StickyPurchaseButtons from "@/components/UI/Details/SouvenirDetails/StickyPurchaseButtons";
 import DetailsError from "@/components/UI/Details/Common/DetailsError";
-import { toast } from "sonner-native";
 
 const { height } = Dimensions.get("screen");
 const HEADER_MAX_HEIGHT = height * 0.45;

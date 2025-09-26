@@ -1,15 +1,10 @@
-import {
-    Text,
-    View,
-    StyleSheet,
-    Dimensions,
-} from "react-native";
+import { Text, View, StyleSheet, Dimensions } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useDrawer } from "@/context/DrawerContext";
 import { FlashList } from "@shopify/flash-list";
 import StaysCard from "@/components/StaysCard";
 import CardLoader from "@/components/CardLoader";
-import MenuButton from "@/components/UI/MenuButton";
+import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { staysData } from "@/data/stays_data";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

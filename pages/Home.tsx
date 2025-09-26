@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Section from "@/components/UI/Section/Section";
 import QuickLinks from "@/components/UI/QuickLinks/QuickLinksSection";
-import MenuButton from "@/components/UI/MenuButton";
+import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import CardVertical from "@/components/UI/Section/CardVertical";
 import CardHorizontal from "@/components/UI/Section/CardHorizontal";
 import Carousel from "@/components/UI/Carousel/Carousel";

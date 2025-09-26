@@ -2,7 +2,6 @@ import {
     StyleSheet,
     Text,
     View,
-    StatusBar,
     TouchableOpacity,
     FlatList,
     Dimensions,
@@ -15,8 +14,6 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { toast } from "sonner-native";
-
-const { width } = Dimensions.get("window");
 
 interface CheckoutProps {
     item_identifiers?: string[];

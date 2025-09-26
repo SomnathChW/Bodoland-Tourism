@@ -2,7 +2,6 @@ import {
     Text,
     View,
     StyleSheet,
-    StatusBar,
     ActivityIndicator,
     TouchableOpacity,
     Dimensions,
@@ -13,7 +12,7 @@ import { useRouter } from "expo-router";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import ProductCard from "@/components/ProductCard";
-import MenuButton from "@/components/UI/MenuButton";
+import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
 import CardLoader from "@/components/CardLoader";
 import { useSafeAreaInsets } from "react-native-safe-area-context";

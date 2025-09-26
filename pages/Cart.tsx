@@ -3,7 +3,6 @@ import {
     StyleSheet,
     Text,
     View,
-    StatusBar,
     FlatList,
     TouchableOpacity,
     Dimensions,
@@ -11,12 +10,10 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDrawer } from "@/context/DrawerContext";
 import { Ionicons } from "@expo/vector-icons";
-import MenuButton from "@/components/UI/MenuButton";
+import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { useDataStore } from "@/store/useDataStore";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
-
-const { width } = Dimensions.get("window");
 
 const Cart = () => {
     const { toggleDrawer } = useDrawer();
