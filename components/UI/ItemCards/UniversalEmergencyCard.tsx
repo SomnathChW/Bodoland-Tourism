@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { UniversalEmergencyService } from "@/data/emergency_data";
+import { UniversalEmergencyService } from "@/constants/emergencyNumbers";
 
 interface UniversalEmergencyCardProps {
     item: UniversalEmergencyService;

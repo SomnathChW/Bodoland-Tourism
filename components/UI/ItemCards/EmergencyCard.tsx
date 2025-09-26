@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import FastImageWLoader from "@/components/FastImageWLoader";
-import { EmergencyContact } from "@/data/emergency_data";
+import { EmergencyContact } from "@/constants/emergencyNumbers";
 import { LinearGradient } from "expo-linear-gradient";
 
 interface EmergencyCardProps {

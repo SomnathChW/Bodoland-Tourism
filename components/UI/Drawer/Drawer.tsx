@@ -34,7 +34,7 @@ import {
     DRAWER_ROUTES,
     getRouteByKey,
     getHelpRoutes,
-} from "@/constants/DrawerItems";
+} from "@/constants/drawerItems";
 import { useIconRenderer } from "./IconRenderer";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

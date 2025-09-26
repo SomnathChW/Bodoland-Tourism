@@ -1,4 +1,4 @@
-export const categoryData = [
+export const categoryItems = [
     {
         identifier: "category-souvenirs",
         title: "Souvenirs",

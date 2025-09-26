@@ -15,7 +15,7 @@ import {
     EmergencyContact,
     universalEmergencyNumbers,
     UniversalEmergencyService,
-} from "@/data/emergency_data";
+} from "@/constants/emergencyNumbers";
 import EmergencyCard from "@/components/UI/ItemCards/EmergencyCard";
 import UniversalEmergencyCard from "@/components/UI/ItemCards/UniversalEmergencyCard";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";

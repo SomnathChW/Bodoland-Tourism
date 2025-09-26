@@ -11,7 +11,7 @@ import CardHorizontal from "@/components/UI/Section/CardHorizontal";
 import Carousel from "@/components/UI/Carousel/Carousel";
 import CategoryCard from "@/components/UI/QuickLinks/CategoryCard";
 
-import { categoryData } from "@/data/category_data";
+import { categoryItems } from "@/constants/categoryItems";
 import { useDrawer } from "@/context/DrawerContext";
 import { useHomePageData } from "@/hooks/useHomePageData";
 
@@ -24,7 +24,7 @@ type HomeItemTypes =
     | {
           type: "quicklinks";
           id: string;
-          data: typeof categoryData;
+          data: typeof categoryItems;
           cardComponent: typeof CategoryCard;
           itemsPerRow: number;
       }
@@ -78,7 +78,7 @@ const Home = () => {
         {
             type: "quicklinks",
             id: "quicklinks",
-            data: categoryData,
+            data: categoryItems,
             cardComponent: CategoryCard,
             itemsPerRow: 5,
         },
