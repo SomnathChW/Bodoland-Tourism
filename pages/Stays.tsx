@@ -1,17 +1,15 @@
 import { Text, View, StyleSheet, Dimensions } from "react-native";
 import React, { useState, useEffect } from "react";
-import { useDrawer } from "@/context/DrawerContext";
 import { FlashList } from "@shopify/flash-list";
 import StaysCard from "@/components/UI/ItemCards/StaysCard";
 import CardLoader from "@/components/UI/ItemCards/CardLoader";
-import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { staysData } from "@/data/stays_data";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Header from "@/components/UI/PageHeader/Header";
 
 const { width, height } = Dimensions.get("screen");
 
 const Stays = React.memo(() => {
-    const { toggleDrawer } = useDrawer();
     const insets = useSafeAreaInsets();
     const [loading, setLoading] = useState(true);
 
@@ -26,58 +24,45 @@ const Stays = React.memo(() => {
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View>
-                            <Text style={styles.headingText}>Stays</Text>
-                            <Text style={styles.mainSubHeaddingText}>
-                                Find your perfect accommodation
-                            </Text>
-                        </View>
-                    </View>
-                </View>
+            <Header
+                headingText="Stays"
+                subHeadingText="Find your perfect accommodation"
+            />
 
-                {/* Single FlashList for both loading and data states */}
-                <FlashList
-                    data={loading ? Array(6).fill(0) : staysData}
-                    renderItem={({ item, index }) => {
-                        if (loading) {
-                            return (
-                                <CardLoader
-                                    index={index}
-                                    width={width}
-                                    height={height}
-                                />
-                            );
-                        }
+            {/* Single FlashList for both loading and data states */}
+            <FlashList
+                data={loading ? Array(6).fill(0) : staysData}
+                renderItem={({ item, index }) => {
+                    if (loading) {
                         return (
-                            <StaysCard
-                                item={item}
+                            <CardLoader
                                 index={index}
                                 width={width}
                                 height={height}
                             />
                         );
-                    }}
-                    getItemType={(item, index) => {
-                        return loading ? "loader" : "stay";
-                    }}
-                    horizontal={false}
-                    showsVerticalScrollIndicator={false}
-                    numColumns={2}
-                    keyExtractor={(item, index) =>
-                        loading ? `loader-${index}` : item.identifier
                     }
-                    contentContainerStyle={{}}
-                    removeClippedSubviews={true}
-                />
-            </View>
+                    return (
+                        <StaysCard
+                            item={item}
+                            index={index}
+                            width={width}
+                            height={height}
+                        />
+                    );
+                }}
+                getItemType={(item, index) => {
+                    return loading ? "loader" : "stay";
+                }}
+                horizontal={false}
+                showsVerticalScrollIndicator={false}
+                numColumns={2}
+                keyExtractor={(item, index) =>
+                    loading ? `loader-${index}` : item.identifier
+                }
+                contentContainerStyle={{}}
+                removeClippedSubviews={true}
+            />
         </View>
     );
 });

@@ -1,56 +1,38 @@
 import { Text, View, StyleSheet, Dimensions } from "react-native";
 import React from "react";
-import { useDrawer } from "@/context/DrawerContext";
 import { FlashList } from "@shopify/flash-list";
 import CuisineCard from "@/components/UI/ItemCards/CuisineCard";
-import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { cuisineData } from "@/data/cuisine_data";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Header from "@/components/UI/PageHeader/Header";
 
 const { width, height } = Dimensions.get("screen");
 
 const Transport = () => {
-    const { toggleDrawer } = useDrawer();
     const insets = useSafeAreaInsets();
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View>
-                            <Text style={styles.headingText}>Transport</Text>
-                            <Text
-                                style={styles.mainSubHeaddingText}
-                                numberOfLines={1}
-                            >
-                                Explore the rich culture of Bodoland
-                            </Text>
-                        </View>
-                    </View>
-                </View>
-                <FlashList
-                    data={cuisineData}
-                    renderItem={({ item, index }) => (
-                        <CuisineCard
-                            item={item}
-                            index={index}
-                            width={width}
-                            height={height}
-                        />
-                    )}
-                    horizontal={false}
-                    showsVerticalScrollIndicator={false}
-                    numColumns={2}
-                    keyExtractor={(item) => item.identifier}
-                    contentContainerStyle={{}}
-                />
-            </View>
+            <Header
+                headingText="Cuisines"
+                subHeadingText="Explore the rich culinary heritage"
+            />
+            <FlashList
+                data={cuisineData}
+                renderItem={({ item, index }) => (
+                    <CuisineCard
+                        item={item}
+                        index={index}
+                        width={width}
+                        height={height}
+                    />
+                )}
+                horizontal={false}
+                showsVerticalScrollIndicator={false}
+                numColumns={2}
+                keyExtractor={(item) => item.identifier}
+                contentContainerStyle={{}}
+            />
         </View>
     );
 };

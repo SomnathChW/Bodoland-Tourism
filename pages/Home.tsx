@@ -1,19 +1,18 @@
-import { Text, View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, FlatList } from "react-native";
 import { useRouter } from "expo-router";
 import React, { useCallback } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Section from "@/components/UI/Section/Section";
 import QuickLinks from "@/components/UI/QuickLinks/QuickLinksSection";
-import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import CardVertical from "@/components/UI/Section/CardVertical";
 import CardHorizontal from "@/components/UI/Section/CardHorizontal";
 import Carousel from "@/components/UI/Carousel/Carousel";
 import CategoryCard from "@/components/UI/QuickLinks/CategoryCard";
 
 import { categoryItems } from "@/constants/categoryItems";
-import { useDrawer } from "@/context/DrawerContext";
 import { useHomePageData } from "@/hooks/useHomePageData";
+import Header from "@/components/UI/PageHeader/Header";
 
 type HomeItemTypes =
     | {
@@ -42,7 +41,6 @@ type HomeItemTypes =
       };
 
 const Home = () => {
-    const { toggleDrawer } = useDrawer();
     const router = useRouter();
     const insets = useSafeAreaInsets();
 
@@ -180,25 +178,11 @@ const Home = () => {
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            <View style={styles.content}>
-                {/* Header remains the same */}
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View>
-                            <Text style={styles.headingText}>
-                                Bodoland Tourism
-                            </Text>
-                            <Text style={styles.mainSubHeaddingText}>
-                                Discover a land untouched
-                            </Text>
-                        </View>
-                    </View>
-                </View>
+                {/* Header */}
+                <Header
+                    headingText="Bodoland Tourism"
+                    subHeadingText="Discover a land untouched"
+                />
 
                 {/* FlashList now includes the Carousel */}
                 <View style={{ flex: 1 }}>
@@ -220,7 +204,6 @@ const Home = () => {
                         })}
                     />
                 </View>
-            </View>
         </View>
     );
 };

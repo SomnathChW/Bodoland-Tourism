@@ -24,8 +24,12 @@ const RootLayoutContent = React.memo(() => {
         SfProMedium: require("../assets/fonts/sf-pro-display-medium.otf"),
     });
 
-    const { loading, isAppCurrentVersion, isInternetConnected, isAppReady } =
-        useAuth();
+    const {
+        loading,
+        isAppVersionGreaterThanRequired,
+        isInternetConnected,
+        isAppReady,
+    } = useAuth();
 
     useEffect(() => {
         if (fontsLoaded && !loading && isAppReady) {
@@ -39,7 +43,7 @@ const RootLayoutContent = React.memo(() => {
         return <NoInternetScreen />;
     }
 
-    if (!isAppCurrentVersion) {
+    if (!isAppVersionGreaterThanRequired) {
         return <UpdateScreen />;
     }
 

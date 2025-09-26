@@ -8,17 +8,15 @@ import {
 } from "react-native";
 import React, { useMemo } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useDrawer } from "@/context/DrawerContext";
 import { FlashList } from "@shopify/flash-list";
 import AttractionsCard from "@/components/UI/ItemCards/AttractionsCard";
-import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
 import CardLoader from "@/components/UI/ItemCards/CardLoader";
+import Header from "@/components/UI/PageHeader/Header";
 
 const { width, height } = Dimensions.get("screen");
 
 const Attractions = () => {
-    const { toggleDrawer } = useDrawer();
     const insets = useSafeAreaInsets();
 
     const {
@@ -68,78 +66,64 @@ const Attractions = () => {
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View>
-                            <Text style={styles.headingText}>Attractions</Text>
-                            <Text style={styles.mainSubHeaddingText}>
-                                Discover exciting places to visit
-                            </Text>
-                        </View>
-                    </View>
-                </View>
+            <Header
+                headingText="Attractions"
+                subHeadingText="Discover exciting places to visit"
+            />
 
-                {error ? (
-                    // Display error state
-                    <View style={styles.errorContainer}>
-                        <Text style={styles.errorText}>
-                            Failed to load attractions
-                        </Text>
-                        <TouchableOpacity
-                            style={styles.retryButton}
-                            onPress={() => refetch()}
-                        >
-                            <Text style={styles.retryButtonText}>Retry</Text>
-                        </TouchableOpacity>
-                    </View>
-                ) : (
-                    // Single FlashList for both loading and data states
-                    <FlashList
-                        data={isLoading ? Array(6).fill(0) : attractionsData}
-                        renderItem={({ item, index }) => {
-                            if (isLoading) {
-                                return (
-                                    <CardLoader
-                                        index={index}
-                                        width={width}
-                                        height={height}
-                                    />
-                                );
-                            }
+            {error ? (
+                // Display error state
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>
+                        Failed to load attractions
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.retryButton}
+                        onPress={() => refetch()}
+                    >
+                        <Text style={styles.retryButtonText}>Retry</Text>
+                    </TouchableOpacity>
+                </View>
+            ) : (
+                // Single FlashList for both loading and data states
+                <FlashList
+                    data={isLoading ? Array(6).fill(0) : attractionsData}
+                    renderItem={({ item, index }) => {
+                        if (isLoading) {
                             return (
-                                <AttractionsCard
-                                    item={item}
+                                <CardLoader
                                     index={index}
                                     width={width}
                                     height={height}
                                 />
                             );
-                        }}
-                        getItemType={(item, index) => {
-                            return isLoading ? "loader" : "attraction";
-                        }}
-                        horizontal={false}
-                        showsVerticalScrollIndicator={false}
-                        numColumns={2}
-                        keyExtractor={(item, index) =>
-                            isLoading ? `loader-${index}` : item.identifier
                         }
-                        contentContainerStyle={{}}
-                        removeClippedSubviews={true}
-                        onEndReached={isLoading ? undefined : handleLoadMore}
-                        onEndReachedThreshold={0.7}
-                        ListFooterComponent={
-                            isLoading ? undefined : renderFooter
-                        }
-                    />
-                )}
-            </View>
+                        return (
+                            <AttractionsCard
+                                item={item}
+                                index={index}
+                                width={width}
+                                height={height}
+                            />
+                        );
+                    }}
+                    getItemType={(item, index) => {
+                        return isLoading ? "loader" : "attraction";
+                    }}
+                    horizontal={false}
+                    showsVerticalScrollIndicator={false}
+                    numColumns={2}
+                    keyExtractor={(item, index) =>
+                        isLoading ? `loader-${index}` : item.identifier
+                    }
+                    contentContainerStyle={{}}
+                    removeClippedSubviews={true}
+                    onEndReached={isLoading ? undefined : handleLoadMore}
+                    onEndReachedThreshold={0.7}
+                    ListFooterComponent={isLoading ? undefined : renderFooter}
+                    scrollEnabled={!isLoading}
+                />
+            )}
         </View>
     );
 };
@@ -150,37 +134,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-    },
-    content: {
-        flex: 1,
-        backgroundColor: "transparent",
-    },
-    header: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-    },
-    logo: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 20,
-    },
-    buttons: {
-        color: "#fff",
-    },
-    headingText: {
-        fontSize: 24,
-        fontWeight: "bold",
-        fontFamily: "SfProMedium",
-        color: "#fff",
-    },
-    mainSubHeaddingText: {
-        fontSize: 14,
-        fontWeight: "bold",
-        color: "#646f7e",
     },
     // New styles for Appwrite integration
     errorContainer: {

@@ -1,38 +1,23 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useDrawer } from "@/context/DrawerContext";
-import MenuButton from "@/components/UI/PageHeader/MenuButton";
+import Header from "@/components/UI/PageHeader/Header";
 
 const Settings = () => {
-    const { toggleDrawer } = useDrawer();
     const insets = useSafeAreaInsets();
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View>
-                            <Text style={styles.headingText}>Settings</Text>
-                            <Text style={styles.mainSubHeaddingText}>
-                                Manage your preferences
-                            </Text>
-                        </View>
-                    </View>
-                </View>
+            <Header
+                headingText="Settings"
+                subHeadingText="Manage your preferences"
+            />
 
-                <View style={styles.pageContent}>
-                    <Text style={styles.title}>Settings</Text>
-                    <Text style={styles.description}>
-                        This is the settings page of our application.
-                    </Text>
-                </View>
+            <View style={styles.pageContent}>
+                <Text style={styles.title}>Settings</Text>
+                <Text style={styles.description}>
+                    This is the settings page of our application.
+                </Text>
             </View>
         </View>
     );

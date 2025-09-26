@@ -7,18 +7,16 @@ import {
     TouchableOpacity,
 } from "react-native";
 import React, { useMemo } from "react";
-import { useDrawer } from "@/context/DrawerContext";
 import { FlashList } from "@shopify/flash-list";
 import FestivalsCard from "@/components/UI/ItemCards/FestivalsCard";
-import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
 import CardLoader from "@/components/UI/ItemCards/CardLoader";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Header from "@/components/UI/PageHeader/Header";
 
 const { width, height } = Dimensions.get("window");
 
 const Festivals = () => {
-    const { toggleDrawer } = useDrawer();
     const insets = useSafeAreaInsets();
 
     const {
@@ -67,77 +65,62 @@ const Festivals = () => {
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View>
-                            <Text style={styles.headingText}>Festivals</Text>
-                            <Text style={styles.mainSubHeaddingText}>
-                                Celebrate with the locals
-                            </Text>
-                        </View>
-                    </View>
+            <Header
+                headingText="Festivals"
+                subHeadingText="Celebrate with local traditions"
+            />
+            {error ? (
+                // Display error state
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>
+                        Failed to load festivals data
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.retryButton}
+                        onPress={() => refetch()}
+                    >
+                        <Text style={styles.retryButtonText}>Retry</Text>
+                    </TouchableOpacity>
                 </View>
-                {error ? (
-                    // Display error state
-                    <View style={styles.errorContainer}>
-                        <Text style={styles.errorText}>
-                            Failed to load festivals data
-                        </Text>
-                        <TouchableOpacity
-                            style={styles.retryButton}
-                            onPress={() => refetch()}
-                        >
-                            <Text style={styles.retryButtonText}>Retry</Text>
-                        </TouchableOpacity>
-                    </View>
-                ) : (
-                    // Single FlashList for both loading and data states
-                    <FlashList
-                        data={isLoading ? Array(10).fill(0) : festivalsData}
-                        renderItem={({ item, index }) => {
-                            if (isLoading) {
-                                return (
-                                    <CardLoader
-                                        index={index}
-                                        width={width}
-                                        height={height}
-                                    />
-                                );
-                            }
+            ) : (
+                // Single FlashList for both loading and data states
+                <FlashList
+                    data={isLoading ? Array(10).fill(0) : festivalsData}
+                    renderItem={({ item, index }) => {
+                        if (isLoading) {
                             return (
-                                <FestivalsCard
-                                    item={item as any}
+                                <CardLoader
                                     index={index}
                                     width={width}
                                     height={height}
                                 />
                             );
-                        }}
-                        getItemType={(item, index) => {
-                            return isLoading ? "loader" : "festival";
-                        }}
-                        horizontal={false}
-                        showsVerticalScrollIndicator={false}
-                        numColumns={2}
-                        keyExtractor={(item, index) =>
-                            isLoading ? `loader-${index}` : item.identifier
                         }
-                        contentContainerStyle={{}}
-                        removeClippedSubviews={true}
-                        onEndReached={isLoading ? undefined : handleLoadMore}
-                        onEndReachedThreshold={0.7}
-                        ListFooterComponent={
-                            isLoading ? undefined : renderFooter
-                        }
-                    />
-                )}
-            </View>
+                        return (
+                            <FestivalsCard
+                                item={item as any}
+                                index={index}
+                                width={width}
+                                height={height}
+                            />
+                        );
+                    }}
+                    getItemType={(item, index) => {
+                        return isLoading ? "loader" : "festival";
+                    }}
+                    horizontal={false}
+                    showsVerticalScrollIndicator={false}
+                    numColumns={2}
+                    keyExtractor={(item, index) =>
+                        isLoading ? `loader-${index}` : item.identifier
+                    }
+                    contentContainerStyle={{}}
+                    removeClippedSubviews={true}
+                    onEndReached={isLoading ? undefined : handleLoadMore}
+                    onEndReachedThreshold={0.7}
+                    ListFooterComponent={isLoading ? undefined : renderFooter}
+                />
+            )}
         </View>
     );
 };

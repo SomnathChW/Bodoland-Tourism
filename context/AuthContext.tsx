@@ -150,7 +150,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             const dbVer =
                 typeof appwriteVersion === "string" ? appwriteVersion : "0.0.0";
             const isAppVersionGreaterThanRequired =
-                compareSemver(appVer, dbVer) > 0;
+                compareSemver(appVer, dbVer) >= 0;
             const cacheData = {
                 timestamp: Date.now(),
                 serverVersion: appwriteVersion,

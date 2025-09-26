@@ -10,17 +10,17 @@ import {
     Image,
 } from "react-native";
 import React, { useState } from "react";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { toast } from "sonner-native";
+import Header from "@/components/UI/PageHeader/Header";
 
 interface CheckoutProps {
     item_identifiers?: string[];
 }
 
 const Checkout = ({ item_identifiers }: CheckoutProps) => {
-    const router = useRouter();
     const params = useLocalSearchParams();
     const insets = useSafeAreaInsets();
 
@@ -55,10 +55,6 @@ const Checkout = ({ item_identifiers }: CheckoutProps) => {
         pincode: "",
         state: "",
     });
-
-    const handleGoBack = () => {
-        router.back();
-    };
 
     const increaseQuantity = (item: string) => {
         const currentQuantity = itemQuantities[item] || 1;
@@ -243,258 +239,236 @@ const Checkout = ({ item_identifiers }: CheckoutProps) => {
     );
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <TouchableOpacity
-                            onPress={handleGoBack}
-                            style={styles.backButton}
-                        >
-                            <Ionicons
-                                name="arrow-back"
-                                size={30}
-                                color="white"
-                            />
-                        </TouchableOpacity>
-                        <View>
-                            <Text style={styles.headingText}>Checkout</Text>
-                            <Text style={styles.mainSubHeaddingText}>
-                                {itemsToCheckout.length}{" "}
-                                {itemsToCheckout.length === 1
-                                    ? "item"
-                                    : "items"}{" "}
-                                to purchase
-                            </Text>
-                        </View>
-                    </View>
-                </View>
+            <Header
+                buttonType="back"
+                headingText="Checkout"
+                subHeadingText={`${itemsToCheckout.length} ${
+                    itemsToCheckout.length === 1 ? "item" : "items"
+                } to purchase`}
+            />
 
-                <ScrollView
-                    contentContainerStyle={[
-                        { paddingBottom: itemsToCheckout.length > 0 ? 80 : 20 },
-                    ]}
-                    showsVerticalScrollIndicator={false}
-                    style={styles.pageContent}
-                >
-                    {itemsToCheckout.length === 0 ? (
-                        renderEmptyCheckout()
-                    ) : (
-                        <View style={styles.scrollViewContent}>
-                            {/* Section 1: Order Items */}
-                            <View style={styles.section}>
-                                <Text style={styles.sectionTitle}>
-                                    Order Summary
-                                </Text>
-                                <View style={styles.separator} />
-                                <View style={styles.sectionContent}>
-                                    <FlatList
-                                        data={itemsToCheckout}
-                                        keyExtractor={(item, index) =>
-                                            `${item}-${index}`
+            <ScrollView
+                contentContainerStyle={[
+                    { paddingBottom: itemsToCheckout.length > 0 ? 80 : 20 },
+                ]}
+                showsVerticalScrollIndicator={false}
+                style={styles.pageContent}
+            >
+                {itemsToCheckout.length === 0 ? (
+                    renderEmptyCheckout()
+                ) : (
+                    <View style={styles.scrollViewContent}>
+                        {/* Section 1: Order Items */}
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>
+                                Order Summary
+                            </Text>
+                            <View style={styles.separator} />
+                            <View style={styles.sectionContent}>
+                                <FlatList
+                                    data={itemsToCheckout}
+                                    keyExtractor={(item, index) =>
+                                        `${item}-${index}`
+                                    }
+                                    renderItem={renderCheckoutItem}
+                                    showsVerticalScrollIndicator={false}
+                                    scrollEnabled={false}
+                                />
+                            </View>
+                        </View>
+
+                        {/* Section 2: Shipping Details */}
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>
+                                Shipping Details
+                            </Text>
+                            <View style={styles.separator} />
+                            <View style={styles.sectionContent}>
+                                <View style={styles.inputContainer}>
+                                    <TextInput
+                                        style={styles.textInput}
+                                        placeholder="Full Name"
+                                        placeholderTextColor="#646f7e"
+                                        cursorColor="white"
+                                        value={shippingInfo.fullName}
+                                        onChangeText={(text) =>
+                                            setShippingInfo({
+                                                ...shippingInfo,
+                                                fullName: text,
+                                            })
                                         }
-                                        renderItem={renderCheckoutItem}
-                                        showsVerticalScrollIndicator={false}
-                                        scrollEnabled={false}
+                                    />
+                                </View>
+
+                                <View style={styles.inputContainer}>
+                                    <TextInput
+                                        style={styles.textInput}
+                                        placeholder="Phone Number"
+                                        placeholderTextColor="#646f7e"
+                                        cursorColor="white"
+                                        keyboardType="phone-pad"
+                                        value={shippingInfo.phone}
+                                        onChangeText={(text) =>
+                                            setShippingInfo({
+                                                ...shippingInfo,
+                                                phone: text,
+                                            })
+                                        }
+                                    />
+                                </View>
+
+                                <View style={styles.inputContainer}>
+                                    <TextInput
+                                        style={styles.textInput}
+                                        placeholder="Complete Address"
+                                        placeholderTextColor="#646f7e"
+                                        cursorColor="white"
+                                        multiline
+                                        numberOfLines={3}
+                                        value={shippingInfo.address}
+                                        onChangeText={(text) =>
+                                            setShippingInfo({
+                                                ...shippingInfo,
+                                                address: text,
+                                            })
+                                        }
+                                    />
+                                </View>
+
+                                <View style={styles.row}>
+                                    <View
+                                        style={[
+                                            styles.inputContainer,
+                                            styles.halfWidth,
+                                        ]}
+                                    >
+                                        <TextInput
+                                            style={styles.textInput}
+                                            placeholder="City"
+                                            placeholderTextColor="#646f7e"
+                                            cursorColor="white"
+                                            value={shippingInfo.city}
+                                            onChangeText={(text) =>
+                                                setShippingInfo({
+                                                    ...shippingInfo,
+                                                    city: text,
+                                                })
+                                            }
+                                        />
+                                    </View>
+
+                                    <View
+                                        style={[
+                                            styles.inputContainer,
+                                            styles.halfWidth,
+                                        ]}
+                                    >
+                                        <TextInput
+                                            style={styles.textInput}
+                                            placeholder="PIN Code"
+                                            placeholderTextColor="#646f7e"
+                                            cursorColor="white"
+                                            keyboardType="numeric"
+                                            value={shippingInfo.pincode}
+                                            onChangeText={(text) =>
+                                                setShippingInfo({
+                                                    ...shippingInfo,
+                                                    pincode: text,
+                                                })
+                                            }
+                                        />
+                                    </View>
+                                </View>
+
+                                <View style={styles.inputContainer}>
+                                    <TextInput
+                                        style={styles.textInput}
+                                        placeholder="State"
+                                        placeholderTextColor="#646f7e"
+                                        cursorColor="white"
+                                        value={shippingInfo.state}
+                                        onChangeText={(text) =>
+                                            setShippingInfo({
+                                                ...shippingInfo,
+                                                state: text,
+                                            })
+                                        }
                                     />
                                 </View>
                             </View>
-
-                            {/* Section 2: Shipping Details */}
-                            <View style={styles.section}>
-                                <Text style={styles.sectionTitle}>
-                                    Shipping Details
-                                </Text>
-                                <View style={styles.separator} />
-                                <View style={styles.sectionContent}>
-                                    <View style={styles.inputContainer}>
-                                        <TextInput
-                                            style={styles.textInput}
-                                            placeholder="Full Name"
-                                            placeholderTextColor="#646f7e"
-                                            cursorColor="white"
-                                            value={shippingInfo.fullName}
-                                            onChangeText={(text) =>
-                                                setShippingInfo({
-                                                    ...shippingInfo,
-                                                    fullName: text,
-                                                })
-                                            }
-                                        />
-                                    </View>
-
-                                    <View style={styles.inputContainer}>
-                                        <TextInput
-                                            style={styles.textInput}
-                                            placeholder="Phone Number"
-                                            placeholderTextColor="#646f7e"
-                                            cursorColor="white"
-                                            keyboardType="phone-pad"
-                                            value={shippingInfo.phone}
-                                            onChangeText={(text) =>
-                                                setShippingInfo({
-                                                    ...shippingInfo,
-                                                    phone: text,
-                                                })
-                                            }
-                                        />
-                                    </View>
-
-                                    <View style={styles.inputContainer}>
-                                        <TextInput
-                                            style={styles.textInput}
-                                            placeholder="Complete Address"
-                                            placeholderTextColor="#646f7e"
-                                            cursorColor="white"
-                                            multiline
-                                            numberOfLines={3}
-                                            value={shippingInfo.address}
-                                            onChangeText={(text) =>
-                                                setShippingInfo({
-                                                    ...shippingInfo,
-                                                    address: text,
-                                                })
-                                            }
-                                        />
-                                    </View>
-
-                                    <View style={styles.row}>
-                                        <View
-                                            style={[
-                                                styles.inputContainer,
-                                                styles.halfWidth,
-                                            ]}
-                                        >
-                                            <TextInput
-                                                style={styles.textInput}
-                                                placeholder="City"
-                                                placeholderTextColor="#646f7e"
-                                                cursorColor="white"
-                                                value={shippingInfo.city}
-                                                onChangeText={(text) =>
-                                                    setShippingInfo({
-                                                        ...shippingInfo,
-                                                        city: text,
-                                                    })
-                                                }
-                                            />
-                                        </View>
-
-                                        <View
-                                            style={[
-                                                styles.inputContainer,
-                                                styles.halfWidth,
-                                            ]}
-                                        >
-                                            <TextInput
-                                                style={styles.textInput}
-                                                placeholder="PIN Code"
-                                                placeholderTextColor="#646f7e"
-                                                cursorColor="white"
-                                                keyboardType="numeric"
-                                                value={shippingInfo.pincode}
-                                                onChangeText={(text) =>
-                                                    setShippingInfo({
-                                                        ...shippingInfo,
-                                                        pincode: text,
-                                                    })
-                                                }
-                                            />
-                                        </View>
-                                    </View>
-
-                                    <View style={styles.inputContainer}>
-                                        <TextInput
-                                            style={styles.textInput}
-                                            placeholder="State"
-                                            placeholderTextColor="#646f7e"
-                                            cursorColor="white"
-                                            value={shippingInfo.state}
-                                            onChangeText={(text) =>
-                                                setShippingInfo({
-                                                    ...shippingInfo,
-                                                    state: text,
-                                                })
-                                            }
-                                        />
-                                    </View>
-                                </View>
-                            </View>
-
-                            {/* Section 3: Payment Method */}
-                            <View style={styles.section}>
-                                <Text style={styles.sectionTitle}>
-                                    Payment Method
-                                </Text>
-                                <View style={styles.separator} />
-                                <View style={styles.sectionContent}>
-                                    <View style={styles.paymentMethod}>
-                                        <View style={styles.paymentMethodLeft}>
-                                            <Ionicons
-                                                name="cash-outline"
-                                                size={24}
-                                                color="#fff"
-                                            />
-                                            <View
-                                                style={styles.paymentMethodText}
-                                            >
-                                                <Text
-                                                    style={
-                                                        styles.paymentMethodTitle
-                                                    }
-                                                >
-                                                    Cash on Delivery
-                                                </Text>
-                                                <Text
-                                                    style={
-                                                        styles.paymentMethodSubtitle
-                                                    }
-                                                >
-                                                    Pay when you receive your
-                                                    order
-                                                </Text>
-                                            </View>
-                                        </View>
-                                        <View style={styles.paymentMethodRight}>
-                                            <Ionicons
-                                                name="checkmark-circle"
-                                                size={20}
-                                                color="#fff"
-                                            />
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
                         </View>
-                    )}
-                </ScrollView>
 
-                {/* Sticky Checkout Button - Only when items exist */}
-                {itemsToCheckout.length > 0 && (
-                    <View
-                        style={[
-                            styles.stickyContainer,
-                            { paddingBottom: Math.max(insets.bottom, 10) },
-                        ]}
-                    >
-                        <View style={styles.stickyButtonContainer}>
-                            <TouchableOpacity
-                                style={styles.proceedButton}
-                                onPress={handleCompleteOrder}
-                            >
-                                <Ionicons
-                                    name="bag-check-outline"
-                                    size={20}
-                                    color="#000"
-                                />
-                                <Text style={styles.proceedButtonText}>
-                                    Complete Order ({getSelectedItems().length}{" "}
-                                    items)
-                                </Text>
-                            </TouchableOpacity>
+                        {/* Section 3: Payment Method */}
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>
+                                Payment Method
+                            </Text>
+                            <View style={styles.separator} />
+                            <View style={styles.sectionContent}>
+                                <View style={styles.paymentMethod}>
+                                    <View style={styles.paymentMethodLeft}>
+                                        <Ionicons
+                                            name="cash-outline"
+                                            size={24}
+                                            color="#fff"
+                                        />
+                                        <View style={styles.paymentMethodText}>
+                                            <Text
+                                                style={
+                                                    styles.paymentMethodTitle
+                                                }
+                                            >
+                                                Cash on Delivery
+                                            </Text>
+                                            <Text
+                                                style={
+                                                    styles.paymentMethodSubtitle
+                                                }
+                                            >
+                                                Pay when you receive your order
+                                            </Text>
+                                        </View>
+                                    </View>
+                                    <View style={styles.paymentMethodRight}>
+                                        <Ionicons
+                                            name="checkmark-circle"
+                                            size={20}
+                                            color="#fff"
+                                        />
+                                    </View>
+                                </View>
+                            </View>
                         </View>
                     </View>
                 )}
-            </View>
+            </ScrollView>
+
+            {/* Sticky Checkout Button - Only when items exist */}
+            {itemsToCheckout.length > 0 && (
+                <View
+                    style={[
+                        styles.stickyContainer,
+                        { paddingBottom: Math.max(insets.bottom, 10) },
+                    ]}
+                >
+                    <View style={styles.stickyButtonContainer}>
+                        <TouchableOpacity
+                            style={styles.proceedButton}
+                            onPress={handleCompleteOrder}
+                        >
+                            <Ionicons
+                                name="bag-check-outline"
+                                size={20}
+                                color="#000"
+                            />
+                            <Text style={styles.proceedButtonText}>
+                                Complete Order ({getSelectedItems().length}{" "}
+                                items)
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )}
         </View>
     );
 };

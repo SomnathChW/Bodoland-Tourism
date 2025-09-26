@@ -5,7 +5,6 @@ import {
     View,
     FlatList,
     TouchableOpacity,
-    Dimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDrawer } from "@/context/DrawerContext";
@@ -14,6 +13,7 @@ import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { useDataStore } from "@/store/useDataStore";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
+import Header from "@/components/UI/PageHeader/Header";
 
 const Cart = () => {
     const { toggleDrawer } = useDrawer();
@@ -116,64 +116,40 @@ const Cart = () => {
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View>
-                            <Text style={styles.headingText}>Cart</Text>
-                            <Text style={styles.mainSubHeaddingText}>
-                                {allCartItems.length}{" "}
-                                {allCartItems.length === 1 ? "item" : "items"}{" "}
-                                in your cart
-                            </Text>
-                        </View>
-                    </View>
-                    {allCartItems.length > 0 && (
-                        <TouchableOpacity
-                            style={styles.clearButton}
-                            onPress={handleClearCart}
-                        >
-                            <Text style={styles.clearButtonText}>
-                                Clear All
-                            </Text>
-                        </TouchableOpacity>
-                    )}
-                </View>
+            <Header
+                headingText="Cart"
+                subHeadingText={`${allCartItems.length} ${allCartItems.length === 1 ? "item" : "items"} in your cart`}
+                clearCart={allCartItems.length > 0}
+                handleClearCart={handleClearCart}
+            />
 
-                <View style={styles.pageContent}>
-                    {allCartItems.length === 0 ? (
-                        renderEmptyCart()
-                    ) : (
-                        <FlatList
-                            data={allCartItems}
-                            keyExtractor={(item, index) => `${item}-${index}`}
-                            renderItem={renderCartItem}
-                            showsVerticalScrollIndicator={false}
-                            contentContainerStyle={styles.listContainer}
-                        />
-                    )}
-                </View>
-
-                {/* Sticky Checkout Button */}
-                {allCartItems.length > 0 && (
-                    <View style={styles.checkoutButtonContainer}>
-                        <TouchableOpacity
-                            style={styles.checkoutButton}
-                            onPress={handleCheckout}
-                        >
-                            <Text style={styles.checkoutButtonText}>
-                                Proceed to Checkout ({allCartItems.length}{" "}
-                                items)
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
+            <View style={styles.pageContent}>
+                {allCartItems.length === 0 ? (
+                    renderEmptyCart()
+                ) : (
+                    <FlatList
+                        data={allCartItems}
+                        keyExtractor={(item, index) => `${item}-${index}`}
+                        renderItem={renderCartItem}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={styles.listContainer}
+                    />
                 )}
             </View>
+
+            {/* Sticky Checkout Button */}
+            {allCartItems.length > 0 && (
+                <View style={styles.checkoutButtonContainer}>
+                    <TouchableOpacity
+                        style={styles.checkoutButton}
+                        onPress={handleCheckout}
+                    >
+                        <Text style={styles.checkoutButtonText}>
+                            Proceed to Checkout ({allCartItems.length} items)
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
     );
 };

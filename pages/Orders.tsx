@@ -1,38 +1,23 @@
 import { StyleSheet, Text, View, StatusBar } from "react-native";
 import React from "react";
-import { useDrawer } from "@/context/DrawerContext";
-import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Header from "@/components/UI/PageHeader/Header";
 
 const Orders = () => {
-    const { toggleDrawer } = useDrawer();
     const insets = useSafeAreaInsets();
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View>
-                            <Text style={styles.headingText}>Orders</Text>
-                            <Text style={styles.mainSubHeaddingText}>
-                                Your booking history
-                            </Text>
-                        </View>
-                    </View>
-                </View>
+            <Header
+                headingText="Your Orders"
+                subHeadingText="View and manage your bookings"
+            />
 
-                <View style={styles.pageContent}>
-                    <Text style={styles.title}>Your Orders</Text>
-                    <Text style={styles.description}>
-                        View and manage your bookings and reservations here.
-                    </Text>
-                </View>
+            <View style={styles.pageContent}>
+                <Text style={styles.title}>Your Orders</Text>
+                <Text style={styles.description}>
+                    View and manage your bookings and reservations here.
+                </Text>
             </View>
         </View>
     );
