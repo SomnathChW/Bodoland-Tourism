@@ -6,18 +6,15 @@ import {
     useEffect,
     useRef,
 } from "react";
-// import * as SystemUI from "expo-system-ui";
 import * as SecureStore from "expo-secure-store";
 import * as WebBrowser from "expo-web-browser";
 import { makeRedirectUri } from "expo-auth-session";
 import { Models } from "react-native-appwrite";
 import { toast } from "sonner-native";
 
-import { account, ID, database, OAuthProvider } from "@/lib/appwrite";
+import { account, ID, tablesdb, OAuthProvider } from "@/lib/appwrite";
 import { useDataStore } from "@/store/useDataStore";
 
-import { mockAccount } from "@/dev_helpers/mockAccount";
-// import { Platform } from "react-native";
 import * as Application from "expo-application";
 import * as Network from "expo-network";
 
@@ -116,12 +113,12 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             // Race between the database request and timeout
             const appwriteVersionDoc = await Promise.race([
-                database.getDocument({
+                tablesdb.getRow({
                     databaseId:
-                        process.env.EXPO_PUBLIC_DATABASE_APP_CHECK || "",
-                    collectionId: "version",
-                    documentId: "version_id",
-                    queries: [],
+                        (process.env
+                            .EXPO_PUBLIC_DATABASE_APP_CHECK as string) || "",
+                    tableId: "version",
+                    rowId: "version_id",
                 }),
                 timeoutPromise,
             ]);
@@ -221,7 +218,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
 
             const responseUser = await account.get();
-            // const responseUser = await mockAccount.get();
             setLoading(false);
             setSession(responseSession);
             setUser(responseUser);
@@ -254,10 +250,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        // if (Platform.OS === "android") {
-        //     SystemUI.setBackgroundColorAsync("#0d1116");
-        // }
-
         if (!hasInitialized.current) {
             init();
             hasInitialized.current = true;
@@ -322,12 +314,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 email: email,
                 password: password,
             });
-            // const responseSession =
-            //     await mockAccount.createEmailPasswordSession(email, password);
+
             const responseUser = await account.get();
-            // const responseUser = await mockAccount.get();
             setUser(responseUser);
-            setSession(responseSession); // setting session here so that the user is already stored
+            setSession(responseSession);
 
             if (!isSignup) {
                 toast.success(successMessage, { id: toast_id });
@@ -366,7 +356,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 password: password,
                 name: name,
             });
-            // await mockAccount.create(ID.unique(), email, password, name);
             toast.success("Signed up", { id: toast_id });
         } catch (error) {
             toast.error("Error signing up", { id: toast_id });
@@ -449,7 +438,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(true);
         try {
             await account.deleteSession({ sessionId: "current" });
-            // await mockAccount.deleteSession();
             await clearLocalData();
 
             toast.success("Signed out", { id: toast_id });
