@@ -9,10 +9,10 @@ import {
 import React, { useMemo } from "react";
 import { useDrawer } from "@/context/DrawerContext";
 import { FlashList } from "@shopify/flash-list";
-import FestivalsCard from "@/components/FestivalsCard";
+import FestivalsCard from "@/components/UI/ItemCards/FestivalsCard";
 import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
-import CardLoader from "@/components/CardLoader";
+import CardLoader from "@/components/UI/ItemCards/CardLoader";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");

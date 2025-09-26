@@ -16,10 +16,10 @@ import {
     universalEmergencyNumbers,
     UniversalEmergencyService,
 } from "@/data/emergency_data";
-import EmergencyCard from "@/components/EmergencyCard";
-import UniversalEmergencyCard from "@/components/UniversalEmergencyCard";
+import EmergencyCard from "@/components/UI/ItemCards/EmergencyCard";
+import UniversalEmergencyCard from "@/components/UI/ItemCards/UniversalEmergencyCard";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
-import CardLoader from "@/components/CardLoader";
+import CardLoader from "@/components/UI/ItemCards/CardLoader";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("screen");

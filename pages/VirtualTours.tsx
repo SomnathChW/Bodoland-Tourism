@@ -8,12 +8,12 @@ import {
 } from "react-native";
 import React, { useMemo } from "react";
 
-import VrCard from "@/components/VrCard";
+import VrCard from "@/components/UI/ItemCards/VrCard";
 import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { FlashList } from "@shopify/flash-list";
 import { useDrawer } from "@/context/DrawerContext";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
-import CardLoader from "@/components/CardLoader";
+import CardLoader from "@/components/UI/ItemCards/CardLoader";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("screen");
