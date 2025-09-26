@@ -33,11 +33,24 @@ const checkInternetConnection = async () => {
     }
 };
 
+// Compare two semantic version strings. Returns 1 if v1 > v2, -1 if v1 < v2, 0 if equal
+function compareSemver(v1: string, v2: string): number {
+    const a = v1.split(".").map(Number);
+    const b = v2.split(".").map(Number);
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+        const n1 = a[i] || 0;
+        const n2 = b[i] || 0;
+        if (n1 > n2) return 1;
+        if (n1 < n2) return -1;
+    }
+    return 0;
+}
+
 const AuthContext = createContext<{
     user: Models.User<{}> | null;
     session: Models.Session | null;
     loading: boolean;
-    isAppCurrentVersion: boolean;
+    isAppVersionGreaterThanRequired: boolean;
     isInternetConnected: boolean;
     isAppReady: boolean;
     signIn: ({
@@ -63,7 +76,7 @@ const AuthContext = createContext<{
     user: null,
     session: null,
     loading: true,
-    isAppCurrentVersion: true,
+    isAppVersionGreaterThanRequired: true,
     isInternetConnected: true,
     isAppReady: false,
     signIn: async () => {},
@@ -79,8 +92,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         null
     );
     const [session, setSession] = useState<Models.Session | null>(null);
-    const [isAppCurrentVersion, setIsAppCurrentVersion] =
-        useState<boolean>(true);
+    const [
+        isAppVersionGreaterThanRequired,
+        setIsAppVersionGreaterThanRequired,
+    ] = useState<boolean>(true);
     const [isInternetConnected, setIsInternetConnected] =
         useState<boolean>(true);
     const [isAppReady, setisAppReady] = useState<boolean>(false);
@@ -92,14 +107,16 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         clearCart();
         await SecureStore.deleteItemAsync("cart");
-        await SecureStore.deleteItemAsync("lastVersionCheck");
+        await SecureStore.deleteItemAsync(
+            "lastCheckIsAppVersionGreaterThanRequired"
+        );
     };
 
     const checkAppVersion = async (retryCount = 0) => {
         const maxRetries = 3;
         const retryDelay = 2000; // 2 seconds
         const requestTimeout = 10000; // 10 seconds timeout for each request
-        const cacheKey = "lastVersionCheck";
+        const cacheKey = "lastCheckIsAppVersionGreaterThanRequired";
         const cacheExpiryMs = 24 * 60 * 60 * 1000; // 24 hours
 
         try {
@@ -126,20 +143,28 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             const appwriteVersion = (appwriteVersionDoc as any).key;
 
             // Cache the successful version check
+            const appVer =
+                typeof nativeApplicationVersion === "string"
+                    ? nativeApplicationVersion
+                    : "0.0.0";
+            const dbVer =
+                typeof appwriteVersion === "string" ? appwriteVersion : "0.0.0";
+            const isAppVersionGreaterThanRequired =
+                compareSemver(appVer, dbVer) > 0;
             const cacheData = {
                 timestamp: Date.now(),
                 serverVersion: appwriteVersion,
                 appVersion: nativeApplicationVersion,
-                isCurrentVersion: appwriteVersion === nativeApplicationVersion,
+                isAppVersionGreaterThanRequired:
+                    isAppVersionGreaterThanRequired,
             };
             await SecureStore.setItemAsync(cacheKey, JSON.stringify(cacheData));
 
-            if (appwriteVersion === nativeApplicationVersion) {
-                setIsAppCurrentVersion(true);
+            if (isAppVersionGreaterThanRequired) {
+                setIsAppVersionGreaterThanRequired(true);
                 return true;
             }
-
-            setIsAppCurrentVersion(false);
+            setIsAppVersionGreaterThanRequired(false);
             return false;
         } catch (error) {
             console.error(
@@ -173,8 +198,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                         console.log(
                             "Using cached version check result due to network issues."
                         );
-                        setIsAppCurrentVersion(cachedData.isCurrentVersion);
-                        return cachedData.isCurrentVersion;
+                        setIsAppVersionGreaterThanRequired(
+                            cachedData.isAppVersionGreaterThanRequired
+                        );
+                        return cachedData.isAppVersionGreaterThanRequired;
                     }
                 }
             } catch (cacheError) {
@@ -186,7 +213,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             console.log(
                 "Version check failed after all retries and no valid cache. Assuming current version due to network issues."
             );
-            setIsAppCurrentVersion(true);
+            setIsAppVersionGreaterThanRequired(true);
             return true;
         }
     };
@@ -461,7 +488,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         session,
         loading,
-        isAppCurrentVersion,
+        isAppVersionGreaterThanRequired,
         isInternetConnected,
         isAppReady,
         signIn,
