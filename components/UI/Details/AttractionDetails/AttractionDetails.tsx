@@ -2,7 +2,7 @@ import { StyleSheet, View, Text, Linking } from "react-native";
 import React, { useState } from "react";
 import TitleSection from "../Common/TitleSection";
 import AboutSection from "../Common/AboutSection";
-import LocationMapSection from "./LocationMapSection";
+import LocationMapSection from "../Common/LocationMapSection";
 import VirtualToursSection from "./VirtualToursSection";
 import EntryFeeSection from "./EntryFeeSection";
 import PackagesSection from "./PackagesSection";
@@ -10,6 +10,7 @@ import AlertDialog from "@/components/UI/AlertDialog";
 import { Package } from "./PackagesSection"; // Import the Package type
 import { useAttractionDetails } from "@/hooks/useEntityDetails";
 import DetailsLoader from "@/components/UI/Details/Common/DetailsLoader";
+import { useRouter } from "expo-router";
 
 interface AttractionDetailsProps {
     identifier: string;
@@ -81,6 +82,21 @@ const AttractionDetails = ({
         }
     };
 
+    const router = useRouter();
+
+    const handleTourPress = (tour: any) => {
+        try {
+            if (tour?.tour_resource) {
+                router.navigate({
+                    pathname: "/vr_view",
+                    params: { tour_resource: tour.tour_resource },
+                });
+            }
+        } catch (error) {
+            console.log("Navigation error in VrCard:", error);
+        }
+    };
+
     // Use the attraction details hook to fetch attraction data
     const { attractionDetails, isLoading, error } = useAttractionDetails({
         identifier,
@@ -118,9 +134,7 @@ const AttractionDetails = ({
             />
             <VirtualToursSection
                 tours={attractionDetails.virtual_tours || []}
-                onTourPress={(tour) =>
-                    console.log("Virtual tour selected:", tour.tour_resource)
-                }
+                onTourPress={handleTourPress}
             />
             <EntryFeeSection
                 fees={attractionDetails.entry_pricing || []}
