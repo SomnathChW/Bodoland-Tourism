@@ -1,9 +1,16 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { View, StyleSheet, ViewStyle, DimensionValue } from "react-native";
 import FastImage from "@d11/react-native-fast-image";
 import { useRecyclingState } from "@shopify/flash-list";
 import LottieView from "lottie-react-native";
-
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    withTiming,
+    withDelay,
+    Easing,
+    runOnJS,
+} from "react-native-reanimated";
 interface FastImageWLoaderProps {
     source: {
         uri: string;
@@ -30,33 +37,62 @@ const FastImageWLoader: React.FC<FastImageWLoaderProps> = ({
     height = "100%",
     borderRadius = 0,
     indicatorSize = "small",
-    onLoad,
     onError,
     onLoadStart,
     onLoadEnd,
 }) => {
     // Use FlashList's useRecyclingState hook to handle state properly during recycling
-    const [isLoading, setIsLoading] = useRecyclingState(true, [source.uri]);
     const [hasError, setHasError] = useRecyclingState(false, [source.uri]);
+    const [showLoader, setShowLoader] = useRecyclingState(true, [source.uri]);
+
+    const imageOpacity = useSharedValue(0);
+    const loaderOpacity = useSharedValue(1);
+
+    useEffect(() => {
+        imageOpacity.value = 0;
+        loaderOpacity.value = 1;
+        setShowLoader(true);
+    }, [source.uri]);
+
+    const loaderAnimatedStyle = useAnimatedStyle(() => ({
+        opacity: loaderOpacity.value,
+    }));
+
+    const imageAnimatedStyle = useAnimatedStyle(() => ({
+        opacity: imageOpacity.value,
+    }));
 
     const handleLoadStart = useCallback(() => {
-        setIsLoading(true);
-        setHasError(false);
+        imageOpacity.value = 0;
+        loaderOpacity.value = 1;
+        setShowLoader(true);
         onLoadStart?.();
-    }, [onLoadStart]);
-
-    const handleLoad = useCallback(() => {
-        setIsLoading(false);
-        onLoad?.();
-    }, [onLoad]);
+        setHasError(false);
+    }, [onLoadStart, imageOpacity]);
 
     const handleLoadEnd = useCallback(() => {
-        setIsLoading(false);
+        imageOpacity.value = withTiming(1, {
+            duration: 250,
+            easing: Easing.inOut(Easing.ease),
+        });
+        loaderOpacity.value = withDelay(
+            100,
+            withTiming(
+                0,
+                {
+                    duration: 250,
+                },
+                (finished) => {
+                    if (finished) {
+                        runOnJS(setShowLoader)(false);
+                    }
+                }
+            )
+        );
         onLoadEnd?.();
-    }, [onLoadEnd]);
+    }, [onLoadEnd, imageOpacity]);
 
     const handleError = useCallback(() => {
-        setIsLoading(false);
         setHasError(true);
         onError?.();
     }, [onError]);
@@ -65,9 +101,12 @@ const FastImageWLoader: React.FC<FastImageWLoaderProps> = ({
         <View
             style={[styles.container, { width, height, borderRadius }, style]}
         >
-            {/* Show loading animation while image is loading */}
-            {isLoading && !hasError && (
-                <View style={styles.loaderContainer}>
+            {/* Render loading animation and unmount after fade completes */}
+            {showLoader && !hasError && (
+                <Animated.View
+                    style={[styles.loaderContainer, loaderAnimatedStyle]}
+                    pointerEvents="none"
+                >
                     <LottieView
                         source={require("../assets/lottie/loading-spinner.json")}
                         autoPlay
@@ -78,19 +117,20 @@ const FastImageWLoader: React.FC<FastImageWLoaderProps> = ({
                                 : styles.lottie
                         }
                     />
-                </View>
+                </Animated.View>
             )}
 
             {/* FastImage component */}
-            <FastImage
-                source={source}
-                style={[styles.image, { borderRadius }]}
-                resizeMode={resizeMode}
-                onLoadStart={handleLoadStart}
-                onLoad={handleLoad}
-                onLoadEnd={handleLoadEnd}
-                onError={handleError}
-            />
+            <Animated.View style={[styles.imageContainer, imageAnimatedStyle]}>
+                <FastImage
+                    source={source}
+                    style={[styles.image, { borderRadius }]}
+                    resizeMode={resizeMode}
+                    onLoadStart={handleLoadStart}
+                    onLoadEnd={handleLoadEnd}
+                    onError={handleError}
+                />
+            </Animated.View>
         </View>
     );
 };
@@ -106,16 +146,13 @@ const arePropsEqual = (
     if (prevProps.resizeMode !== nextProps.resizeMode) return false;
     if (prevProps.indicatorSize !== nextProps.indicatorSize) return false;
 
-    // Simple style comparison for common properties
     const prevStyle = prevProps.style || {};
     const nextStyle = nextProps.style || {};
     return prevStyle === nextStyle; // Reference equality check
 };
 
-// Apply the optimized memoization
 const MemoizedFastImageWLoader = React.memo(FastImageWLoader, arePropsEqual);
 
-// Set display name for better debugging
 MemoizedFastImageWLoader.displayName = "FastImageWLoader";
 
 const styles = StyleSheet.create({
@@ -133,6 +170,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         zIndex: 1,
+    },
+    imageContainer: {
+        width: "100%",
+        height: "100%",
     },
     lottie: {
         width: 120,

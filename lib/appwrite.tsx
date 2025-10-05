@@ -29,9 +29,9 @@ const client = new Client()
     .setEndpoint(appwrite_endpoint)
     .setProject(appwrite_project);
 
-if (process.env.EXPO_PUBLIC_DEV_KEY) {
-    client.setDevKey(process.env.EXPO_PUBLIC_DEV_KEY);
-}
+// if (process.env.EXPO_PUBLIC_DEV_KEY) {
+//     client.setDevKey(process.env.EXPO_PUBLIC_DEV_KEY);
+// }
 
 switch (Platform.OS) {
     case "ios":
