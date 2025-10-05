@@ -1,0 +1,110 @@
+diff --git a/dist/plugins/withViroAndroid.js b/dist/plugins/withViroAndroid.js
+index f2dbe29aff2cdc09b65e73a9072efbe0dd0336e9..6ee007fa8b920c8a3d5b0425b283892da71bcf52 100644
+--- a/dist/plugins/withViroAndroid.js
++++ b/dist/plugins/withViroAndroid.js
+@@ -31,12 +31,30 @@ const withBranchAndroid = (config) => {
+                 throw new Error("MainApplication.kt or MainApplication.java file not found.");
+             }
+             fs_1.default.readFile(mainApplicationPath, "utf-8", (err, data) => {
+-                if (isJava) {
+-                    data = (0, insertLinesHelper_1.insertLinesHelper)("import com.viromedia.bridge.ReactViroPackage;", `package ${config?.android?.package};`, data);
+-                }
+-                else {
+-                    data = (0, insertLinesHelper_1.insertLinesHelper)("import com.viromedia.bridge.ReactViroPackage", `package ${config?.android?.package}`, data);
+-                }
++                const packageName = config?.android?.package;
++    
++    if (isJava) {
++        data = (0, insertLinesHelper_1.insertLinesHelper)(
++            "import com.viromedia.bridge.ReactViroPackage;",
++            `package ${packageName};`,
++            data
++        );
++    } else {
++        // For Kotlin, we need to find the actual package declaration in the file
++        // which might have backticks around reserved keywords
++        const packageRegex = /package\s+[\w.`]+/;
++        const packageMatch = data.match(packageRegex);
++        
++        if (!packageMatch) {
++            throw new Error("Package declaration not found in MainApplication.kt");
++        }
++        
++        data = (0, insertLinesHelper_1.insertLinesHelper)(
++            "import com.viromedia.bridge.ReactViroPackage",
++            packageMatch[0], // Use the actual package line from the file
++            data
++        );
++    }
+                 const viroPlugin = config?.plugins?.find((plugin) => Array.isArray(plugin) && plugin[0] === "@reactvision/react-viro");
+                 if (Array.isArray(viroPlugin)) {
+                     if (Array.isArray(viroPlugin[1].android?.xRMode)) {
+@@ -46,38 +64,31 @@ const withBranchAndroid = (config) => {
+                         viroPluginConfig = [viroPlugin[1]?.android.xRMode];
+                     }
+                 }
+-                let target = "";
+-                for (const viroConfig of viroPluginConfig) {
+-                    if (isJava) {
+-                        target =
+-                            target +
+-                                `      packages.add(new ReactViroPackage(ReactViroPackage.ViroPlatform.${viroConfig}))\n`;
+-                    }
+-                    else {
+-                        // Use proper Kotlin syntax for newer formats
+-                        target =
+-                            target +
+-                                `            packages.add(ReactViroPackage(ReactViroPackage.ViroPlatform.${viroConfig}))\n`;
+-                    }
+-                }
++                // Determine the format and insertion point
++                let insertAfter = "";
++                let packageFormat = "";
++                
+                 if (isJava) {
+-                    data = (0, insertLinesHelper_1.insertLinesHelper)(target, "List<ReactPackage> packages = new PackageList(this).getPackages();", data);
++                    insertAfter = "List<ReactPackage> packages = new PackageList(this).getPackages();";
++                    packageFormat = "packages.add(new ReactViroPackage(ReactViroPackage.ViroPlatform.{config}))";
+                 }
+                 else {
+                     // Handle various MainApplication.kt formats
+                     if (data.includes("// packages.add(new MyReactNativePackage());")) {
+-                        data = (0, insertLinesHelper_1.insertLinesHelper)(target, "// packages.add(new MyReactNativePackage());", data);
++                        insertAfter = "// packages.add(new MyReactNativePackage());";
++                        packageFormat = "packages.add(new ReactViroPackage(ReactViroPackage.ViroPlatform.{config}))";
+                     }
+                     else if (data.includes("// add(MyReactNativePackage())")) {
+-                        data = (0, insertLinesHelper_1.insertLinesHelper)(target, "// add(MyReactNativePackage())", data);
++                        insertAfter = "// add(MyReactNativePackage())";
++                        packageFormat = "add(ReactViroPackage(ReactViroPackage.ViroPlatform.{config}))";
+                     }
+                     else if (data.includes("// packages.add(MyReactNativePackage())")) {
+-                        // Handle newer Expo format: // packages.add(MyReactNativePackage())
+-                        data = (0, insertLinesHelper_1.insertLinesHelper)(target, "// packages.add(MyReactNativePackage())", data);
++                        insertAfter = "// packages.add(MyReactNativePackage())";
++                        packageFormat = "packages.add(ReactViroPackage(ReactViroPackage.ViroPlatform.{config}))";
+                     }
+                     else if (data.includes("val packages = PackageList(this).packages")) {
+-                        // Handle newer format where packages is declared as val
+-                        data = (0, insertLinesHelper_1.insertLinesHelper)(target, "val packages = PackageList(this).packages", data);
++                        insertAfter = "val packages = PackageList(this).packages";
++                        packageFormat = "packages.add(ReactViroPackage(ReactViroPackage.ViroPlatform.{config}))";
+                     }
+                     else {
+                         throw new Error("Unable to insert Android packages into package list. Please create a new issue on GitHub and reference this message! " +
+@@ -85,6 +96,15 @@ const withBranchAndroid = (config) => {
+                             "'// packages.add(MyReactNativePackage())', or 'val packages = PackageList(this).packages'");
+                     }
+                 }
++                
++                // Build the target string with proper indentation
++                let target = "";
++                for (const viroConfig of viroPluginConfig) {
++                    const line = packageFormat.replace("{config}", viroConfig);
++                    target = target + `      ${line}\n`;
++                }
++                
++                data = (0, insertLinesHelper_1.insertLinesHelper)(target, insertAfter, data);
+                 fs_1.default.writeFile(mainApplicationPath, data, "utf-8", function (err) {
+                     if (err)
+                         console.log("Error writing MainApplication.java");
