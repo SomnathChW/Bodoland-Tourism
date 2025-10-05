@@ -26,29 +26,15 @@ const VRViewFullScreen = () => {
         );
     };
 
-    const [loading, setLoading] = React.useState(true);
-
     return (
         <>
             <WebView
-                source={
-                    loading
-                        ? {
-                              html: `<html><body style="background:black;display:flex;justify-content:center;align-items:center;height:100vh;"><h1 style="color:white;font-size:18px;">Loading VR Experience...</h1></body></html>`,
-                          }
-                        : {
-                              uri: `https://coolidance.appwrite.network/?img=${tour_resource}`,
-                          }
-                }
+                source={{
+                    uri: `https://coolidance.appwrite.network/?img=${tour_resource}`,
+                }}
                 style={styles.webView}
                 allowsFullscreenVideo={true}
                 javaScriptEnabled={true}
-                onLoadEnd={() => {
-                    setLoading(false);
-                }}
-                onError={() => {
-                    setLoading(false);
-                }}
             />
             <View
                 style={[
@@ -83,7 +69,7 @@ export default VRViewFullScreen;
 const styles = StyleSheet.create({
     webView: {
         flex: 1,
-        backgroundColor: "black",
+        backgroundColor: "#0d1116",
     },
     floatingButtonsContainer: {
         position: "absolute",
