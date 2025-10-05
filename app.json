@@ -73,6 +73,7 @@
                     }
                 }
             ],
+            "@reactvision/react-viro",
             "expo-font",
             "expo-web-browser"
         ],
