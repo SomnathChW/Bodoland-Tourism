@@ -1,27 +1,27 @@
 import React, { memo } from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
-interface MenuItemProps {
+interface DrawerItemProps {
     item: { key: string; label: string; icon: string };
     isActive: boolean;
     onPress: (key: string) => void;
     renderIcon: (iconName: string) => React.ReactNode;
 }
 
-const MenuItem = memo(
-    ({ item, isActive, onPress, renderIcon }: MenuItemProps) => {
+const DrawerItem = memo(
+    ({ item, isActive, onPress, renderIcon }: DrawerItemProps) => {
         return (
             <TouchableOpacity
                 key={item.key}
-                style={[styles.menuItem, isActive && styles.activeMenuItem]}
+                style={[styles.drawerItem, isActive && styles.activeDrawerItem]}
                 activeOpacity={0.8}
                 onPress={() => onPress(item.key)}
             >
                 {renderIcon(item.icon)}
                 <Text
                     style={[
-                        styles.menuItemText,
-                        isActive && styles.activeMenuItemText,
+                        styles.drawerItemText,
+                        isActive && styles.activeDrawerItemText,
                     ]}
                 >
                     {item.label}
@@ -32,29 +32,29 @@ const MenuItem = memo(
 );
 
 const styles = StyleSheet.create({
-    menuItem: {
+    drawerItem: {
         flexDirection: "row",
         alignItems: "center",
         paddingVertical: 12,
         backgroundColor: "transparent",
     },
-    activeMenuItem: {
+    activeDrawerItem: {
         backgroundColor: "#1e252e",
         borderRadius: 8,
         paddingHorizontal: 8,
     },
-    menuItemIcon: {
+    drawerItemIcon: {
         marginRight: 12,
     },
-    menuItemText: {
+    drawerItemText: {
         color: "#fff",
         fontSize: 14,
         fontFamily: "SfProMedium",
         fontWeight: "bold",
     },
-    activeMenuItemText: {
+    activeDrawerItemText: {
         color: "white",
     },
 });
 
-export default MenuItem;
+export default DrawerItem;

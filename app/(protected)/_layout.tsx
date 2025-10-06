@@ -28,6 +28,8 @@ const StackLayout = React.memo(() => {
         { name: "help", title: "Help" },
         { name: "orders", title: "Orders" },
         { name: "cart", title: "Cart" },
+        { name: "privacy", title: "Privacy Policy" },
+        { name: "feedback", title: "Feedback" },
     ];
 
     return (

@@ -4,11 +4,8 @@ import {
     StyleSheet,
     Dimensions,
     TouchableOpacity,
-    StatusBar,
     ScrollView,
-    Platform,
     Text,
-    Linking,
 } from "react-native";
 import { useDrawer } from "@/context/DrawerContext";
 import { useAuth } from "@/context/AuthContext";
@@ -23,8 +20,7 @@ import Animated, {
 import { useRouter } from "expo-router";
 
 // Import separated components
-import MenuItem from "@/components/UI/Drawer/MenuItem";
-import FooterItem from "@/components/UI/Drawer/FooterItem";
+import DrawerItem from "@/components/UI/Drawer/DrawerItem";
 import ProfileSection from "@/components/UI/Drawer/ProfileSection";
 import AlertDialog from "@/components/UI/AlertDialog";
 import {
@@ -33,7 +29,6 @@ import {
     helpItems,
     DRAWER_ROUTES,
     getRouteByKey,
-    getHelpRoutes,
 } from "@/constants/drawerItems";
 import { useIconRenderer } from "./IconRenderer";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -88,24 +83,20 @@ function DrawerComponent(): JSX.Element {
         };
     });
 
-    // Unified handler for both menu and help items
+    // Unified handler for menu, help, and footer items
     const handleNavigationItemPress = useCallback(
-        (key: string, itemType: "menu" | "help" = "menu") => {
+        (key: string, itemType: "menu" | "help" | "footer" = "menu") => {
             const now = Date.now();
             if (now - lastPress < 300) return; // debounce rapid taps
             setLastPress(now);
 
-            console.log("Selected item:", key);
-
-            if (itemType === "help" && key === "help") {
-                const helpCenterUrl = "https://example.com/help-center"; // Replace
-                Linking.openURL(helpCenterUrl).catch((err) =>
-                    console.error("Failed to open help center URL:", err)
-                );
-                toggleDrawer();
+            // Handle logout actions
+            if (itemType === "footer" && key === "logout") {
+                handleLogoutDialog();
                 return;
             }
 
+            // Handle navigation
             const targetRoute = getRouteByKey(key);
 
             if (!targetRoute) {
@@ -150,7 +141,14 @@ function DrawerComponent(): JSX.Element {
                 toggleDrawer();
             }, 50);
         },
-        [currentPath, toggleDrawer, router, drawerProgress, lastPress]
+        [
+            currentPath,
+            toggleDrawer,
+            router,
+            drawerProgress,
+            lastPress,
+            handleLogoutDialog,
+        ]
     );
 
     const handleMenuItemPress = useCallback(
@@ -164,34 +162,20 @@ function DrawerComponent(): JSX.Element {
     );
 
     const handleFooterItemPress = useCallback(
-        (key: string) => {
-            if (key === "logout") {
-                handleLogoutDialog();
-            } else if (key === "privacy") {
-                const privacyPolicyUrl = "https://example.com/privacy-policy"; // Replace
-                Linking.openURL(privacyPolicyUrl).catch((err) =>
-                    console.error("Failed to open privacy policy URL:", err)
-                );
-                toggleDrawer();
-            } else {
-                console.log(`Selected footer: ${key}`);
-                toggleDrawer();
-            }
-        },
-        [toggleDrawer, handleLogoutDialog]
+        (key: string) => handleNavigationItemPress(key, "footer"),
+        [handleNavigationItemPress]
     );
 
     const isMenuItemActive = useCallback(
         (itemKey: string) => {
             const targetRoute = getRouteByKey(itemKey);
-
             if (!targetRoute) return false;
-
             if (currentPath === targetRoute) return true;
 
             if (targetRoute === DRAWER_ROUTES.home) {
                 if (currentPath.startsWith("/(protected)/")) {
-                    const matchesOtherMenuItem = Object.values(
+                    // Check if current path matches any OTHER specific route
+                    const matchesAnyOtherRoute = Object.values(
                         DRAWER_ROUTES
                     ).some(
                         (route) =>
@@ -199,12 +183,7 @@ function DrawerComponent(): JSX.Element {
                             currentPath.startsWith(route)
                     );
 
-                    const helpRoutes = getHelpRoutes();
-                    const matchesHelpItem = helpRoutes.some(
-                        (route) => currentPath === route
-                    );
-
-                    return !matchesOtherMenuItem && !matchesHelpItem;
+                    return !matchesAnyOtherRoute;
                 }
             }
             return false;
@@ -212,7 +191,7 @@ function DrawerComponent(): JSX.Element {
         [currentPath]
     );
 
-    const isHelpItemActive = useCallback(
+    const isFooterOrMenuItemActive = useCallback(
         (itemKey: string) => {
             const route = getRouteByKey(itemKey);
             return route ? currentPath === route : false;
@@ -244,7 +223,7 @@ function DrawerComponent(): JSX.Element {
                     showsVerticalScrollIndicator={false}
                 >
                     {drawerItems.map((item) => (
-                        <MenuItem
+                        <DrawerItem
                             key={item.key}
                             item={item}
                             isActive={isMenuItemActive(item.key)}
@@ -269,10 +248,10 @@ function DrawerComponent(): JSX.Element {
                     </View>
 
                     {helpItems.map((item) => (
-                        <MenuItem
+                        <DrawerItem
                             key={item.key}
                             item={item}
-                            isActive={isHelpItemActive(item.key)}
+                            isActive={isFooterOrMenuItemActive(item.key)}
                             onPress={handleHelpItemPress}
                             renderIcon={renderIcon}
                         />
@@ -283,9 +262,10 @@ function DrawerComponent(): JSX.Element {
 
                 <View style={styles.drawerFooter}>
                     {drawerFooterItems.map((item) => (
-                        <FooterItem
+                        <DrawerItem
                             key={item.key}
                             item={item}
+                            isActive={isFooterOrMenuItemActive(item.key)}
                             renderIcon={renderIcon}
                             onPress={handleFooterItemPress}
                         />

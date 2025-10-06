@@ -91,25 +91,14 @@ export const DRAWER_ROUTES = {
     settings: "/(protected)/settings",
     cart: "/(protected)/cart",
     orders: "/(protected)/orders",
+    help: "/(protected)/help",
+
+    // Footer items
+    support: "/(protected)/feedback",
+    privacy: "/(protected)/privacy",
 } as const;
 
 // Helper function to get route by key
 export const getRouteByKey = (key: string): string | undefined => {
     return DRAWER_ROUTES[key as keyof typeof DRAWER_ROUTES];
-};
-
-// Helper function to get all menu routes
-export const getMenuRoutes = (): string[] => {
-    const menuKeys = ["home", "festivals", "cuisines", "transport"];
-    return menuKeys.map(
-        (key) => DRAWER_ROUTES[key as keyof typeof DRAWER_ROUTES]
-    );
-};
-
-// Helper function to get all help routes
-export const getHelpRoutes = (): string[] => {
-    const helpKeys = ["emergency", "about", "settings", "cart", "orders"];
-    return helpKeys.map(
-        (key) => DRAWER_ROUTES[key as keyof typeof DRAWER_ROUTES]
-    );
 };
