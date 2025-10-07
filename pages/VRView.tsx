@@ -22,7 +22,7 @@ const VRViewFullScreen = () => {
 
     const handleCardboardMode = () => {
         Linking.openURL(
-            `https://coolidance.appwrite.network/?img=${tour_resource}`
+            `https://virtualtours.appwrite.network/?img=${tour_resource}`
         );
     };
 
@@ -30,7 +30,7 @@ const VRViewFullScreen = () => {
         <>
             <WebView
                 source={{
-                    uri: `https://coolidance.appwrite.network/?img=${tour_resource}`,
+                    uri: `https://virtualtours.appwrite.network/?img=${tour_resource}`,
                 }}
                 style={styles.webView}
                 allowsFullscreenVideo={true}
