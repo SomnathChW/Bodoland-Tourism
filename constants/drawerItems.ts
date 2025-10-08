@@ -62,12 +62,12 @@ export const helpItems = [
 
 export const drawerFooterItems = [
     {
-        label: "Feedback & Support",
-        key: "support",
+        label: "Feedback",
+        key: "feedback",
         icon: "headset",
     },
     {
-        label: "Legal & Privacy Policy",
+        label: "Returns & Privacy Policy",
         key: "privacy",
         icon: "shield",
     },
@@ -94,7 +94,7 @@ export const DRAWER_ROUTES = {
     help: "/(protected)/help",
 
     // Footer items
-    support: "/(protected)/feedback",
+    feedback: "/(protected)/feedback",
     privacy: "/(protected)/privacy",
 } as const;
 
