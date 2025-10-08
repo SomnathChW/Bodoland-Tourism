@@ -10,6 +10,7 @@ type SectionProps = {
     style?: any;
     isLoading?: boolean;
     loadingCardCount?: number;
+    cardType?: "horizontal" | "vertical"; // Optional explicit card type
 };
 
 const Section = React.memo(
@@ -21,6 +22,7 @@ const Section = React.memo(
         style,
         isLoading = false,
         loadingCardCount = 3,
+        cardType,
     }: SectionProps) => {
         return (
             <View style={[{ marginBottom: 20 }, style]}>
@@ -43,6 +45,7 @@ const Section = React.memo(
                     CardComponent={cardComponent}
                     isLoading={isLoading}
                     loadingCardCount={loadingCardCount}
+                    cardType={cardType}
                 />
             </View>
         );

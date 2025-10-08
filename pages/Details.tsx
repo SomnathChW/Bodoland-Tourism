@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Dimensions } from "react-native";
+import { View, Dimensions } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import Animated, {
     useSharedValue,
@@ -18,6 +18,7 @@ import StayDetails from "@/components/UI/Details/StayDetails/StayDetails";
 import FestivalDetails from "@/components/UI/Details/FestivalDetails/FestivalDetails";
 import CuisineDetails from "@/components/UI/Details/CuisineDetails/CuisineDetails";
 import TransportDetails from "@/components/UI/Details/TransportDetails/TransportDetails";
+import DistrictDetails from "@/components/UI/Details/DistrictDetails/DistrictDetails";
 import StickyPurchaseButtons from "@/components/UI/Details/SouvenirDetails/StickyPurchaseButtons";
 import DetailsError from "@/components/UI/Details/Common/DetailsError";
 
@@ -137,6 +138,14 @@ const Details = () => {
                         onError={handleFetchError}
                     />
                 );
+            case "district":
+                return (
+                    <DistrictDetails
+                        identifier={identifier as string}
+                        onDataFetched={handleDataFetched}
+                        onError={handleFetchError}
+                    />
+                );
             default:
                 return (
                     <AttractionDetails
@@ -157,6 +166,16 @@ const Details = () => {
         return <DetailsError />;
     }
 
+    const handleGoBack = () => {
+        if (router.canGoBack()) {
+            router.back();
+        } else {
+            router.replace({
+                pathname: "/(protected)/(tabs)",
+            });
+        }
+    };
+
     return (
         <View style={staticStyles.container}>
             {/* Loading header */}
@@ -168,7 +187,7 @@ const Details = () => {
                     scrollY={scrollY}
                     minimizedHeaderHeight={minimizedHeaderHeight}
                     scrollDistance={scrollDistance}
-                    onBack={() => router.back()}
+                    onBack={handleGoBack}
                     insets={insets}
                     data={fetchedData}
                     isInsideScrollView={false}
@@ -191,7 +210,7 @@ const Details = () => {
                         scrollY={scrollY}
                         minimizedHeaderHeight={minimizedHeaderHeight}
                         scrollDistance={scrollDistance}
-                        onBack={() => router.back()}
+                        onBack={handleGoBack}
                         insets={insets}
                         data={fetchedData}
                         showOnlyMinimized={false}

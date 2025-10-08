@@ -18,6 +18,7 @@ const client = new QueryClient({
 const StackLayout = React.memo(() => {
     const screens = [
         { name: "details", title: "Details" },
+        { name: "checkout", title: "Checkout" },
         { name: "festivals", title: "Festivals" },
         { name: "cuisines", title: "Cuisine" },
         { name: "transport", title: "Transport" },
@@ -27,6 +28,8 @@ const StackLayout = React.memo(() => {
         { name: "help", title: "Help" },
         { name: "orders", title: "Orders" },
         { name: "cart", title: "Cart" },
+        { name: "privacy", title: "Privacy Policy" },
+        { name: "feedback", title: "Feedback" },
     ];
 
     return (
@@ -43,7 +46,6 @@ const StackLayout = React.memo(() => {
                     name="(tabs)"
                     options={{
                         headerShown: false,
-                        navigationBarColor: "#000000",
                     }}
                 />
                 {screens.map((items) => (
@@ -53,7 +55,6 @@ const StackLayout = React.memo(() => {
                         options={{
                             title: items.title,
                             headerShown: false,
-                            navigationBarColor: "#0d1116",
                         }}
                     />
                 ))}
@@ -74,15 +75,7 @@ const StackLayout = React.memo(() => {
                     }}
                 />
                 <Stack.Screen
-                    name="vr_view_fullscreen"
-                    options={{
-                        title: "VR View",
-                        headerShown: false,
-                        navigationBarHidden: true,
-                    }}
-                />
-                <Stack.Screen
-                    name="vr_view_cardboard"
+                    name="vr_view"
                     options={{
                         title: "VR View",
                         headerShown: false,

@@ -8,7 +8,7 @@ import {
     Functions,
     ID,
     OAuthProvider,
-    Databases,
+    TablesDB,
 } from "react-native-appwrite";
 
 if (
@@ -29,6 +29,10 @@ const client = new Client()
     .setEndpoint(appwrite_endpoint)
     .setProject(appwrite_project);
 
+// if (process.env.EXPO_PUBLIC_DEV_KEY) {
+//     client.setDevKey(process.env.EXPO_PUBLIC_DEV_KEY);
+// }
+
 switch (Platform.OS) {
     case "ios":
         client.setPlatform(appwrite_ios_platform);
@@ -40,6 +44,6 @@ switch (Platform.OS) {
 
 const account = new Account(client);
 const functions = new Functions(client);
-const database = new Databases(client);
+const tablesdb = new TablesDB(client);
 
-export { client, account, functions, ID, OAuthProvider, database };
+export { client, account, functions, ID, OAuthProvider, tablesdb };

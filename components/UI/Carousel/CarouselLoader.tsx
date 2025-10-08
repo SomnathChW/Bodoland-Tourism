@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 2,
     },
     activeDot: {
-        width: 20,
+        width: 60,
         height: 4,
         borderRadius: 2,
         backgroundColor: "rgba(255, 255, 255, 0.3)",

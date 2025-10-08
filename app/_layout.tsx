@@ -6,8 +6,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router/stack";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet } from "react-native";
+import { StyleSheet, StatusBar } from "react-native";
 
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { Toaster } from "sonner-native";
@@ -25,8 +24,12 @@ const RootLayoutContent = React.memo(() => {
         SfProMedium: require("../assets/fonts/sf-pro-display-medium.otf"),
     });
 
-    const { loading, isAppCurrentVersion, isInternetConnected, isAppReady } =
-        useAuth();
+    const {
+        loading,
+        isAppVersionGreaterThanRequired,
+        isInternetConnected,
+        isAppReady,
+    } = useAuth();
 
     useEffect(() => {
         if (fontsLoaded && !loading && isAppReady) {
@@ -40,18 +43,17 @@ const RootLayoutContent = React.memo(() => {
         return <NoInternetScreen />;
     }
 
-    if (!isAppCurrentVersion) {
+    if (!isAppVersionGreaterThanRequired) {
         return <UpdateScreen />;
     }
 
     return (
         <ThemeProvider value={DarkTheme}>
-            <StatusBar style="light" />
+            <StatusBar barStyle="light-content" />
             <Stack
                 initialRouteName="signin"
                 screenOptions={{
                     contentStyle: { backgroundColor: "#0d1116" },
-                    navigationBarColor: "#0d1116",
                     animation: "ios_from_right",
                     statusBarAnimation: "slide",
                 }}

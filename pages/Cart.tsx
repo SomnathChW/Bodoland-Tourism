@@ -3,21 +3,21 @@ import {
     StyleSheet,
     Text,
     View,
-    StatusBar,
     FlatList,
     TouchableOpacity,
-    Dimensions,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDrawer } from "@/context/DrawerContext";
 import { Ionicons } from "@expo/vector-icons";
-import MenuButton from "@/components/UI/MenuButton";
+import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { useDataStore } from "@/store/useDataStore";
 import * as SecureStore from "expo-secure-store";
-
-const { width } = Dimensions.get("window");
+import { router } from "expo-router";
+import Header from "@/components/UI/PageHeader/Header";
 
 const Cart = () => {
     const { toggleDrawer } = useDrawer();
+    const insets = useSafeAreaInsets();
     const { cart, removeFromCart, clearCart } = useDataStore();
     const [secureStoreCart, setSecureStoreCart] = useState<string[]>([]);
 
@@ -67,6 +67,14 @@ const Cart = () => {
         }
     };
 
+    const handleCheckout = () => {
+        if (allCartItems.length === 0) return;
+
+        // Create identifiers string from all cart items
+        const identifiers = allCartItems.join(",");
+        router.push(`/checkout?identifiers=${identifiers}`);
+    };
+
     const renderCartItem = ({
         item,
         index,
@@ -107,50 +115,41 @@ const Cart = () => {
     ];
 
     return (
-        <View style={styles.container}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View>
-                            <Text style={styles.headingText}>Cart</Text>
-                            <Text style={styles.mainSubHeaddingText}>
-                                {allCartItems.length}{" "}
-                                {allCartItems.length === 1 ? "item" : "items"}{" "}
-                                in your cart
-                            </Text>
-                        </View>
-                    </View>
-                    {allCartItems.length > 0 && (
-                        <TouchableOpacity
-                            style={styles.clearButton}
-                            onPress={handleClearCart}
-                        >
-                            <Text style={styles.clearButtonText}>
-                                Clear All
-                            </Text>
-                        </TouchableOpacity>
-                    )}
-                </View>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+            <Header
+                headingText="Cart"
+                subHeadingText={`${allCartItems.length} ${allCartItems.length === 1 ? "item" : "items"} in your cart`}
+                clearCart={allCartItems.length > 0}
+                handleClearCart={handleClearCart}
+            />
 
-                <View style={styles.pageContent}>
-                    {allCartItems.length === 0 ? (
-                        renderEmptyCart()
-                    ) : (
-                        <FlatList
-                            data={allCartItems}
-                            keyExtractor={(item, index) => `${item}-${index}`}
-                            renderItem={renderCartItem}
-                            showsVerticalScrollIndicator={false}
-                            contentContainerStyle={styles.listContainer}
-                        />
-                    )}
-                </View>
+            <View style={styles.pageContent}>
+                {allCartItems.length === 0 ? (
+                    renderEmptyCart()
+                ) : (
+                    <FlatList
+                        data={allCartItems}
+                        keyExtractor={(item, index) => `${item}-${index}`}
+                        renderItem={renderCartItem}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={styles.listContainer}
+                    />
+                )}
             </View>
+
+            {/* Sticky Checkout Button */}
+            {allCartItems.length > 0 && (
+                <View style={styles.checkoutButtonContainer}>
+                    <TouchableOpacity
+                        style={styles.checkoutButton}
+                        onPress={handleCheckout}
+                    >
+                        <Text style={styles.checkoutButtonText}>
+                            Proceed to Checkout ({allCartItems.length} items)
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
     );
 };
@@ -161,7 +160,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        paddingTop: StatusBar.currentHeight,
     },
     content: {
         flex: 1,
@@ -210,7 +208,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     listContainer: {
-        paddingBottom: 20,
+        paddingBottom: 100,
     },
     cartItem: {
         flexDirection: "row",
@@ -263,5 +261,29 @@ const styles = StyleSheet.create({
         color: "#8E8E93",
         textAlign: "center",
         lineHeight: 24,
+    },
+    checkoutButtonContainer: {
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: "#0d1116",
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        borderTopWidth: 1,
+        borderTopColor: "#333",
+    },
+    checkoutButton: {
+        backgroundColor: "#fff",
+        paddingVertical: 16,
+        borderRadius: 12,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    checkoutButtonText: {
+        color: "#000",
+        fontSize: 16,
+        fontWeight: "600",
+        fontFamily: "SF-Pro-Display-Medium",
     },
 });

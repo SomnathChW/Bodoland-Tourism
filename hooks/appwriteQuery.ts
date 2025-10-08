@@ -235,6 +235,7 @@ export const fetchHomePageData = async ({
     featuredLimit = 20,
     festivalsLimit = 5,
     cuisinesLimit = 5,
+    districtsLimit = 5,
     staleTime = 30 * 60 * 1000, // Not used here but kept because it's part of the params interface to reduce making another interface
 }: UseHomePageDataParams): Promise<HomePageApiResponse> => {
     try {
@@ -245,6 +246,7 @@ export const fetchHomePageData = async ({
             featured_limit: featuredLimit.toString(),
             festivals_limit: festivalsLimit.toString(),
             cuisines_limit: cuisinesLimit.toString(),
+            districts_limit: districtsLimit.toString(),
         });
 
         const response = await functions.createExecution(

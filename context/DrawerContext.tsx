@@ -6,9 +6,11 @@ import React, {
     useEffect,
     useMemo,
     useCallback,
+    JSX,
+    useRef,
 } from "react";
-import { usePathname } from "expo-router";
 import { BackHandler } from "react-native";
+import { usePathname } from "expo-router";
 
 interface DrawerContextType {
     isDrawerOpen: boolean;
@@ -27,51 +29,89 @@ export function _DrawerProvider({
     children,
 }: DrawerProviderProps): JSX.Element {
     const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-    const [currentPath, setCurrentPath] = useState<string>("/(protected)");
-
     const pathname = usePathname();
+    const [currentPath, setCurrentPath] = useState<string>(
+        "/(protected)" + pathname
+    );
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const lastPathRef = useRef<string>("/(protected)");
 
-    // Handle Android back button to close drawer
+    // Optimized pathname update using requestAnimationFrame for smooth navigation
+    useEffect(() => {
+        const formattedPath = "/(protected)" + pathname;
+
+        if (lastPathRef.current !== formattedPath) {
+            if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+            }
+
+            // Use requestAnimationFrame for smooth updates
+            debounceRef.current = setTimeout(() => {
+                requestAnimationFrame(() => {
+                    setCurrentPath(formattedPath);
+                    lastPathRef.current = formattedPath;
+                });
+            }, 50); // Reduced to 50ms for more responsive feel
+        }
+
+        return () => {
+            if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+            }
+        };
+    }, [pathname]);
+
     useEffect(() => {
         const backHandler = BackHandler.addEventListener(
             "hardwareBackPress",
             () => {
                 if (isDrawerOpen) {
                     setIsDrawerOpen(false);
-                    return true; // Prevent default back behavior
+                    return true;
                 }
-                return false; // Allow default back behavior
+                return false;
             }
         );
-
         return () => backHandler.remove();
     }, [isDrawerOpen]);
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setCurrentPath("/(protected)" + pathname);
-        }, 200); // delay just enough to avoid blocking tab switch
-
-        return () => clearTimeout(timeout);
-    }, [pathname]);
 
     const toggleDrawer = useCallback((): void => {
         setIsDrawerOpen((prev) => !prev);
     }, []);
 
     const setPath = useCallback((path: string): void => {
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+        }
         setCurrentPath(path);
+        lastPathRef.current = path;
     }, []);
 
-    // Memoize the context value to prevent unnecessary re-renders
-    const contextValue = useMemo(
+    // Memoize drawer-related values separately from path to reduce re-renders
+    const drawerValue = useMemo(
         () => ({
             isDrawerOpen,
             toggleDrawer,
-            setPath,
-            currentPath,
         }),
-        [isDrawerOpen, toggleDrawer, setPath, currentPath]
+        [isDrawerOpen, toggleDrawer]
+    );
+
+    // Memoize path-related values separately
+    const pathValue = useMemo(
+        () => ({
+            currentPath,
+            setPath,
+        }),
+        [currentPath, setPath]
+    );
+
+    // Combine values but avoid unnecessary re-renders by keeping them stable
+    const contextValue = useMemo(
+        () => ({
+            ...drawerValue,
+            ...pathValue,
+        }),
+        [drawerValue, pathValue]
     );
 
     return (
@@ -81,7 +121,6 @@ export function _DrawerProvider({
     );
 }
 
-// Memoized version of the DrawerProvider
 export const DrawerProvider = React.memo(_DrawerProvider);
 
 export const useDrawer = (): DrawerContextType => {

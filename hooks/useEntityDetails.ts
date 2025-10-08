@@ -183,3 +183,24 @@ export const useVirtualTourDetails = ({
         error: result.error,
     };
 };
+
+/**
+ * Custom hook to fetch district details from store or Appwrite
+ */
+export const useDistrictDetails = ({
+    identifier,
+    onDataFetched,
+    onError,
+}: Omit<UseEntityDetailsParams<"districts">, "entityType">) => {
+    const result = useEntityDetails({
+        identifier,
+        onDataFetched,
+        onError,
+    });
+
+    return {
+        districtDetails: result.entityDetails,
+        isLoading: result.isLoading,
+        error: result.error,
+    };
+};

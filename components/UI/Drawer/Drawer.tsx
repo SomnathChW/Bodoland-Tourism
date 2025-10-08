@@ -1,14 +1,11 @@
-import React, { useEffect, useCallback, memo, useState } from "react";
+import React, { useEffect, useCallback, memo, useState, JSX } from "react";
 import {
     View,
     StyleSheet,
     Dimensions,
     TouchableOpacity,
-    StatusBar,
     ScrollView,
-    Platform,
     Text,
-    Linking,
 } from "react-native";
 import { useDrawer } from "@/context/DrawerContext";
 import { useAuth } from "@/context/AuthContext";
@@ -23,21 +20,21 @@ import Animated, {
 import { useRouter } from "expo-router";
 
 // Import separated components
-import MenuItem from "@/components/UI/Drawer/MenuItem";
-import FooterItem from "@/components/UI/Drawer/FooterItem";
+import DrawerItem from "@/components/UI/Drawer/DrawerItem";
 import ProfileSection from "@/components/UI/Drawer/ProfileSection";
 import AlertDialog from "@/components/UI/AlertDialog";
 import {
     drawerItems,
     drawerFooterItems,
     helpItems,
-} from "@/constants/DrawerItems";
+    DRAWER_ROUTES,
+    getRouteByKey,
+} from "@/constants/drawerItems";
 import { useIconRenderer } from "./IconRenderer";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 const DRAWER_WIDTH: number = width * 0.65;
-const STATUS_BAR_HEIGHT =
-    Platform.OS === "ios" ? 44 : StatusBar.currentHeight || 24;
 
 function DrawerComponent(): JSX.Element {
     const { isDrawerOpen, toggleDrawer, currentPath } = useDrawer();
@@ -45,8 +42,10 @@ function DrawerComponent(): JSX.Element {
     const drawerProgress = useSharedValue(0);
     const router = useRouter();
     const renderIcon = useIconRenderer();
+    const insets = useSafeAreaInsets();
 
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+    const [lastPress, setLastPress] = useState(0);
 
     const handleLogoutDialog = () => {
         setShowLogoutDialog(!showLogoutDialog);
@@ -84,9 +83,26 @@ function DrawerComponent(): JSX.Element {
         };
     });
 
-    const handleMenuItemPress = useCallback(
-        (key: string) => {
-            if (!key.startsWith("/")) {
+    // Unified handler for menu, help, and footer items
+    const handleNavigationItemPress = useCallback(
+        (key: string, itemType: "menu" | "help" | "footer" = "menu") => {
+            const now = Date.now();
+            if (now - lastPress < 300) return; // debounce rapid taps
+            setLastPress(now);
+
+            // Handle logout actions
+            if (itemType === "footer" && key === "logout") {
+                handleLogoutDialog();
+                return;
+            }
+
+            // Handle navigation
+            const targetRoute = getRouteByKey(key);
+
+            if (!targetRoute) {
+                console.warn(
+                    `No valid route found for ${itemType} item: ${key}`
+                );
                 toggleDrawer();
                 return;
             }
@@ -98,137 +114,76 @@ function DrawerComponent(): JSX.Element {
                 "virtual_tours",
             ].some((path) => currentPath.includes(path));
 
-            if (key === currentPath) {
+            if (targetRoute === currentPath) {
                 toggleDrawer();
                 return;
             }
 
-            if (isInSomeOtherTab && key === "/(protected)/") {
+            if (isInSomeOtherTab && targetRoute === "/(protected)/") {
                 toggleDrawer();
                 return;
             }
 
+            // Navigate first
             if (router.canGoBack() && !isInSomeOtherTab) {
                 try {
-                    router.dismissTo(key as any);
+                    router.dismissTo(targetRoute as any);
                 } catch {
-                    router.push(key as any);
+                    router.push(targetRoute as any);
                 }
             } else {
-                router.push(key as any);
+                router.push(targetRoute as any);
             }
-            drawerProgress.value = 0;
-            toggleDrawer();
+
+            // Close drawer after navigation has settled
+            setTimeout(() => {
+                drawerProgress.value = 0;
+                toggleDrawer();
+            }, 50);
         },
-        [currentPath, toggleDrawer, router, drawerProgress]
+        [
+            currentPath,
+            toggleDrawer,
+            router,
+            drawerProgress,
+            lastPress,
+            handleLogoutDialog,
+        ]
     );
 
-    const handleFooterItemPress = useCallback(
-        (key: string) => {
-            if (key === "logout") {
-                handleLogoutDialog();
-            } else if (key === "privacy") {
-                // Open privacy policy link
-                const privacyPolicyUrl = "https://example.com/privacy-policy"; // Replace with actual URL
-                Linking.openURL(privacyPolicyUrl).catch((err) =>
-                    console.error("Failed to open privacy policy URL:", err)
-                );
-                toggleDrawer();
-            } else {
-                console.log(`Selected footer: ${key}`);
-                toggleDrawer();
-            }
-        },
-        [toggleDrawer, handleLogoutDialog]
+    const handleMenuItemPress = useCallback(
+        (key: string) => handleNavigationItemPress(key, "menu"),
+        [handleNavigationItemPress]
     );
 
     const handleHelpItemPress = useCallback(
-        (key: string) => {
-            // Handle Help Center as external link
-            if (key === "help") {
-                const helpCenterUrl = "https://example.com/help-center"; // Replace with actual URL
-                Linking.openURL(helpCenterUrl).catch((err) =>
-                    console.error("Failed to open help center URL:", err)
-                );
-                toggleDrawer();
-                return;
-            }
+        (key: string) => handleNavigationItemPress(key, "help"),
+        [handleNavigationItemPress]
+    );
 
-            // Map other help item keys to actual routes
-            const helpRouteMap: { [key: string]: string } = {
-                emergency: "/(protected)/emergency_contacts",
-                about: "/(protected)/about",
-                settings: "/(protected)/settings",
-                cart: "/(protected)/cart",
-                orders: "/(protected)/orders",
-            };
-
-            const route = helpRouteMap[key];
-            if (!route) {
-                toggleDrawer();
-                return;
-            }
-
-            const isInSomeOtherTab = [
-                "attractions",
-                "stays",
-                "souvenirs",
-                "virtual_tours",
-            ].some((path) => currentPath.includes(path));
-
-            if (route === currentPath) {
-                toggleDrawer();
-                return;
-            }
-
-            if (isInSomeOtherTab && route === "/(protected)/") {
-                toggleDrawer();
-                return;
-            }
-
-            if (router.canGoBack() && !isInSomeOtherTab) {
-                try {
-                    router.dismissTo(route as any);
-                } catch {
-                    router.push(route as any);
-                }
-            } else {
-                router.push(route as any);
-            }
-            drawerProgress.value = 0;
-            toggleDrawer();
-        },
-        [toggleDrawer, router, currentPath, drawerProgress]
+    const handleFooterItemPress = useCallback(
+        (key: string) => handleNavigationItemPress(key, "footer"),
+        [handleNavigationItemPress]
     );
 
     const isMenuItemActive = useCallback(
         (itemKey: string) => {
-            if (currentPath === itemKey) {
-                return true;
-            }
-            if (itemKey === "/(protected)/") {
+            const targetRoute = getRouteByKey(itemKey);
+            if (!targetRoute) return false;
+            if (currentPath === targetRoute) return true;
+
+            if (targetRoute === DRAWER_ROUTES.home) {
                 if (currentPath.startsWith("/(protected)/")) {
-                    // Check if current path matches any other main drawer item
-                    const matchesOtherMenuItem = drawerItems.some(
-                        (item) =>
-                            item.key !== "/(protected)/" &&
-                            currentPath.startsWith(item.key)
+                    // Check if current path matches any OTHER specific route
+                    const matchesAnyOtherRoute = Object.values(
+                        DRAWER_ROUTES
+                    ).some(
+                        (route) =>
+                            route !== DRAWER_ROUTES.home &&
+                            currentPath.startsWith(route)
                     );
 
-                    // Check if current path matches any help item route
-                    const helpRoutes = [
-                        "/(protected)/emergency_contacts",
-                        "/(protected)/about",
-                        "/(protected)/settings",
-                        "/(protected)/help",
-                        "/(protected)/cart",
-                        "/(protected)/orders",
-                    ];
-                    const matchesHelpItem = helpRoutes.some(
-                        (route) => currentPath === route
-                    );
-
-                    return !matchesOtherMenuItem && !matchesHelpItem;
+                    return !matchesAnyOtherRoute;
                 }
             }
             return false;
@@ -236,19 +191,9 @@ function DrawerComponent(): JSX.Element {
         [currentPath]
     );
 
-    const isHelpItemActive = useCallback(
+    const isFooterOrMenuItemActive = useCallback(
         (itemKey: string) => {
-            // Map help item keys to actual routes for active state checking
-            const helpRouteMap: { [key: string]: string } = {
-                emergency: "/(protected)/emergency_contacts",
-                about: "/(protected)/about",
-                settings: "/(protected)/settings",
-                help: "/(protected)/help",
-                cart: "/(protected)/cart",
-                orders: "/(protected)/orders",
-            };
-
-            const route = helpRouteMap[itemKey];
+            const route = getRouteByKey(itemKey);
             return route ? currentPath === route : false;
         },
         [currentPath]
@@ -256,8 +201,6 @@ function DrawerComponent(): JSX.Element {
 
     return (
         <>
-            <StatusBar translucent backgroundColor="transparent" />
-
             <Animated.View style={[styles.overlay, overlayAnimatedStyle]}>
                 <TouchableOpacity
                     style={styles.overlayTouch}
@@ -266,21 +209,21 @@ function DrawerComponent(): JSX.Element {
                 />
             </Animated.View>
 
-            <Animated.View style={[styles.drawer, drawerAnimatedStyle]}>
-                {/* Separate status bar space */}
-                <View style={styles.statusBarSpacer} />
-
-                {/* User Profile Section */}
+            <Animated.View
+                style={[
+                    styles.drawer,
+                    drawerAnimatedStyle,
+                    { paddingBottom: insets.bottom },
+                ]}
+            >
                 <ProfileSection />
 
-                {/* Scrollable Content */}
                 <ScrollView
                     style={styles.drawerContent}
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* Main Menu Items */}
                     {drawerItems.map((item) => (
-                        <MenuItem
+                        <DrawerItem
                             key={item.key}
                             item={item}
                             isActive={isMenuItemActive(item.key)}
@@ -289,7 +232,6 @@ function DrawerComponent(): JSX.Element {
                         />
                     ))}
 
-                    {/* Divider with horizontal padding */}
                     <View
                         style={{
                             paddingHorizontal: 20,
@@ -299,7 +241,6 @@ function DrawerComponent(): JSX.Element {
                         }}
                     />
 
-                    {/* Help Items Section with title */}
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionHeaderText}>
                             HELP & SUPPORT
@@ -307,25 +248,24 @@ function DrawerComponent(): JSX.Element {
                     </View>
 
                     {helpItems.map((item) => (
-                        <MenuItem
+                        <DrawerItem
                             key={item.key}
                             item={item}
-                            isActive={isHelpItemActive(item.key)}
+                            isActive={isFooterOrMenuItemActive(item.key)}
                             onPress={handleHelpItemPress}
                             renderIcon={renderIcon}
                         />
                     ))}
 
-                    {/* Add extra padding at the bottom to prevent cutoff */}
                     <View style={styles.scrollBottomPadding} />
                 </ScrollView>
 
-                {/* Sticky Footer */}
                 <View style={styles.drawerFooter}>
                     {drawerFooterItems.map((item) => (
-                        <FooterItem
+                        <DrawerItem
                             key={item.key}
                             item={item}
+                            isActive={isFooterOrMenuItemActive(item.key)}
                             renderIcon={renderIcon}
                             onPress={handleFooterItemPress}
                         />
@@ -333,20 +273,29 @@ function DrawerComponent(): JSX.Element {
                 </View>
             </Animated.View>
 
-            {/* Logout AlertDialog */}
             <AlertDialog
                 visible={showLogoutDialog}
-                title="Sign Out"
-                description="Are you sure you want to sign out?"
+                title="Sign Out?"
+                description={"Are you sure you want to sign out?"}
+                buttons={[
+                    {
+                        text: "No, Cancel",
+                        onPress: handleLogoutDialog,
+                        type: "cancel",
+                    },
+                    {
+                        text: "Yes",
+                        onPress: handleSignOut,
+                        type: "secondary",
+                    },
+                ]}
                 onCancel={handleLogoutDialog}
-                onConfirm={handleSignOut}
             />
         </>
     );
 }
 
 const Drawer = memo(DrawerComponent);
-
 export default Drawer;
 
 const styles = StyleSheet.create({
@@ -372,17 +321,10 @@ const styles = StyleSheet.create({
         backgroundColor: "#0d1116",
         zIndex: 2,
         shadowColor: "#000",
-        shadowOffset: {
-            width: 2,
-            height: 0,
-        },
+        shadowOffset: { width: 2, height: 0 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
-    },
-    statusBarSpacer: {
-        height: STATUS_BAR_HEIGHT,
-        backgroundColor: "#1c2026",
     },
     drawerContent: {
         flex: 1,

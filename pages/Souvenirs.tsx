@@ -2,30 +2,22 @@ import {
     Text,
     View,
     StyleSheet,
-    StatusBar,
     ActivityIndicator,
     TouchableOpacity,
     Dimensions,
 } from "react-native";
 import React, { useMemo } from "react";
-import { useDrawer } from "@/context/DrawerContext";
-import { useRouter } from "expo-router";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
-import ProductCard from "@/components/ProductCard";
-import DynamicSortFilterComponent from "@/components/UI/Header/DynamicSortFilterComponent";
-import MenuButton from "@/components/UI/MenuButton";
-import { useSortFilter } from "@/hooks/useSortFilter";
-import { souvenirsSortAndFilter } from "@/utils/sortFilterConfigs";
+import ProductCard from "@/components/UI/ItemCards/ProductCard";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
-import CardLoader from "@/components/CardLoader";
+import CardLoader from "@/components/UI/ItemCards/CardLoader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Header from "@/components/UI/PageHeader/Header";
 
 const { width, height } = Dimensions.get("window");
 
 const Souvenirs = () => {
-    const { toggleDrawer } = useDrawer();
-    const router = useRouter();
-    const showSortFilter = false; // Set to true if you want to show sort/filter options
+    const insets = useSafeAreaInsets();
 
     const {
         data,
@@ -60,23 +52,6 @@ const Souvenirs = () => {
         return data?.pages.flatMap((page) => page.data) || [];
     }, [data]);
 
-    const {
-        sortedAndFilteredData,
-        activeSortId,
-        setActiveSortId,
-        activeFilters,
-        setActiveFilters,
-        sortModalVisible,
-        setSortModalVisible,
-        filterModalVisible,
-        setFilterModalVisible,
-        resetFilters,
-    } = useSortFilter({
-        data: souvenirData,
-        sortOptions: souvenirsSortAndFilter.sortOptions,
-        filterOptions: souvenirsSortAndFilter.filterOptions,
-    });
-
     const renderFooter = () => {
         if (!isFetchingNextPage) return null;
         return (
@@ -92,127 +67,66 @@ const Souvenirs = () => {
         }
     };
 
-    const handleCartPress = () => {
-        router.navigate({
-            pathname: "/(protected)/cart",
-        });
-    };
-
-    const handleOrdersPress = () => {
-        router.navigate({
-            pathname: "/(protected)/orders",
-        });
-    };
-
     return (
-        <View style={styles.container}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View style={styles.textContainer}>
-                            <Text style={styles.headingText}>Souvenirs</Text>
-                            <Text
-                                style={styles.mainSubHeaddingText}
-                                numberOfLines={1}
-                                ellipsizeMode="tail"
-                            >
-                                Take a piece of Bodoland with you
-                            </Text>
-                        </View>
-                    </View>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+            <Header
+                headingText="Souvenirs"
+                subHeadingText="Take a piece of BTR home"
+                souvenir
+            />
 
-                    <View style={styles.headerButtons}>
-                        <TouchableOpacity
-                            style={styles.orderButton}
-                            onPress={handleOrdersPress}
-                            activeOpacity={0.7}
-                        >
-                            <MaterialIcons
-                                name="shopping-bag"
-                                size={24}
-                                color="#fff"
-                            />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.cartButton}
-                            onPress={handleCartPress}
-                            activeOpacity={0.7}
-                        >
-                            <Ionicons name="cart" size={24} color="#fff" />
-                        </TouchableOpacity>
-                    </View>
+            {error ? (
+                // Display error state
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>
+                        Failed to load souvenirs
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.retryButton}
+                        onPress={() => refetch()}
+                    >
+                        <Text style={styles.retryButtonText}>Retry</Text>
+                    </TouchableOpacity>
                 </View>
-
-                {/* Sorting and Filtering Component */}
-                {showSortFilter && (
-                    <DynamicSortFilterComponent
-                        sortOptions={souvenirsSortAndFilter.sortOptions}
-                        filterOptions={souvenirsSortAndFilter.filterOptions}
-                        activeSortId={activeSortId}
-                        setActiveSortId={setActiveSortId}
-                        activeFilters={activeFilters}
-                        setActiveFilters={setActiveFilters}
-                        sortModalVisible={sortModalVisible}
-                        setSortModalVisible={setSortModalVisible}
-                        filterModalVisible={filterModalVisible}
-                        setFilterModalVisible={setFilterModalVisible}
-                        resetFilters={resetFilters}
-                    />
-                )}
-
-                {error ? (
-                    // Display error state
-                    <View style={styles.errorContainer}>
-                        <Text style={styles.errorText}>
-                            Failed to load souvenirs
-                        </Text>
-                        <TouchableOpacity
-                            style={styles.retryButton}
-                            onPress={() => refetch()}
-                        >
-                            <Text style={styles.retryButtonText}>Retry</Text>
-                        </TouchableOpacity>
-                    </View>
-                ) : (
-                    // Single FlashList for both loading and data states
-                    <FlashList
-                        data={
-                            isLoading ? Array(6).fill(0) : sortedAndFilteredData
+            ) : (
+                // Single FlashList for both loading and data states
+                <FlashList
+                    data={isLoading ? Array(6).fill(0) : souvenirData}
+                    renderItem={({ item, index }) => {
+                        if (isLoading) {
+                            return (
+                                <CardLoader
+                                    index={index}
+                                    width={width}
+                                    height={height}
+                                />
+                            );
                         }
-                        renderItem={({ item, index }) => {
-                            if (isLoading) {
-                                return (
-                                    <CardLoader
-                                        index={index}
-                                        width={width}
-                                        height={height}
-                                    />
-                                );
-                            }
-                            return <ProductCard item={item} index={index} />;
-                        }}
-                        horizontal={false}
-                        showsVerticalScrollIndicator={false}
-                        numColumns={2}
-                        estimatedItemSize={300}
-                        keyExtractor={(item, index) =>
-                            isLoading ? `loader-${index}` : item.identifier
-                        }
-                        contentContainerStyle={{}}
-                        onEndReached={isLoading ? undefined : handleLoadMore}
-                        onEndReachedThreshold={0.7}
-                        ListFooterComponent={
-                            isLoading ? undefined : renderFooter
-                        }
-                    />
-                )}
-            </View>
+                        return (
+                            <ProductCard
+                                item={item}
+                                index={index}
+                                width={width}
+                                height={height}
+                            />
+                        );
+                    }}
+                    getItemType={(item, index) => {
+                        return isLoading ? "loader" : "product";
+                    }}
+                    horizontal={false}
+                    showsVerticalScrollIndicator={false}
+                    numColumns={2}
+                    keyExtractor={(item, index) =>
+                        isLoading ? `loader-${index}` : item.identifier
+                    }
+                    contentContainerStyle={{}}
+                    removeClippedSubviews={true}
+                    onEndReached={isLoading ? undefined : handleLoadMore}
+                    onEndReachedThreshold={0.7}
+                    ListFooterComponent={isLoading ? undefined : renderFooter}
+                />
+            )}
         </View>
     );
 };
@@ -223,43 +137,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        paddingTop: StatusBar.currentHeight,
-    },
-    content: {
-        flex: 1,
-        backgroundColor: "transparent",
-    },
-    header: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-    },
-    logo: {
-        flex: 1,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        gap: 20,
-    },
-    textContainer: {
-        flex: 1,
-        marginRight: 10,
-    },
-    buttons: {
-        color: "#fff",
-    },
-    headerButtons: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 10,
-    },
-    orderButton: {
-        padding: 8,
-    },
-    cartButton: {
-        padding: 8,
     },
     headingText: {
         fontSize: 24,

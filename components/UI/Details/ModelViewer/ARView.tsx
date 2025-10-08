@@ -113,8 +113,9 @@ function ARScene({
                         }
                     }}
                     onError={(event) => {
-                        const errorMsg = event.nativeEvent.error ? 
-                            String(event.nativeEvent.error) : "Unknown error";
+                        const errorMsg = event.nativeEvent.error
+                            ? String(event.nativeEvent.error)
+                            : "Unknown error";
                         setIsModelLoading(false);
                         setModelError(errorMsg);
                         if (onModelError) {

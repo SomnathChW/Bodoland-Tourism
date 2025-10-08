@@ -1,6 +1,5 @@
 import {
     StyleSheet,
-    StatusBar,
     View,
     Text,
     Dimensions,
@@ -9,17 +8,17 @@ import {
 } from "react-native";
 import React, { useMemo } from "react";
 
-import VrCard from "@/components/VrCard";
-import MenuButton from "@/components/UI/MenuButton";
+import VrCard from "@/components/UI/ItemCards/VrCard";
 import { FlashList } from "@shopify/flash-list";
-import { useDrawer } from "@/context/DrawerContext";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
-import CardLoader from "@/components/CardLoader";
+import CardLoader from "@/components/UI/ItemCards/CardLoader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Header from "@/components/UI/PageHeader/Header";
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("screen");
 
 const VrView = () => {
-    const { toggleDrawer } = useDrawer();
+    const insets = useSafeAreaInsets();
 
     const {
         data,
@@ -65,72 +64,65 @@ const VrView = () => {
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View>
-                            <Text style={styles.headingText}>
-                                Virtual Tours
-                            </Text>
-                            <Text style={styles.mainSubHeaddingText}>
-                                Explore the beauty of Bodoland
-                            </Text>
-                        </View>
-                    </View>
-                </View>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+            <Header
+                headingText="Virtual Tours"
+                subHeadingText="Explore the beauty of the region from home"
+            />
 
-                {error ? (
-                    <View style={styles.errorContainer}>
-                        <Text style={styles.errorText}>
-                            Failed to load virtual tours data
-                        </Text>
-                        <TouchableOpacity
-                            style={styles.retryButton}
-                            onPress={() => refetch()}
-                        >
-                            <Text style={styles.retryButtonText}>Retry</Text>
-                        </TouchableOpacity>
-                    </View>
-                ) : (
-                    // Single FlashList for both loading and data states
-                    <FlashList
-                        data={isLoading ? Array(10).fill(0) : virtualToursData}
-                        renderItem={({ item, index }) => {
-                            if (isLoading) {
-                                return (
-                                    <View collapsable={false}>
-                                        <CardLoader
-                                            index={index}
-                                            width={width}
-                                            height={height}
-                                        />
-                                    </View>
-                                );
-                            }
-                            return <VrCard item={item as any} index={index} />;
-                        }}
-                        horizontal={false}
-                        showsVerticalScrollIndicator={false}
-                        numColumns={2}
-                        estimatedItemSize={300}
-                        keyExtractor={(item, index) =>
-                            isLoading ? `loader-${index}` : item.identifier
+            {error ? (
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>
+                        Failed to load virtual tours data
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.retryButton}
+                        onPress={() => refetch()}
+                    >
+                        <Text style={styles.retryButtonText}>Retry</Text>
+                    </TouchableOpacity>
+                </View>
+            ) : (
+                // Single FlashList for both loading and data states
+                <FlashList
+                    data={isLoading ? Array(10).fill(0) : virtualToursData}
+                    renderItem={({ item, index }) => {
+                        if (isLoading) {
+                            return (
+                                <View collapsable={false}>
+                                    <CardLoader
+                                        index={index}
+                                        width={width}
+                                        height={height}
+                                    />
+                                </View>
+                            );
                         }
-                        contentContainerStyle={{}}
-                        onEndReached={isLoading ? undefined : handleLoadMore}
-                        onEndReachedThreshold={0.7}
-                        ListFooterComponent={
-                            isLoading ? undefined : renderFooter
-                        }
-                    />
-                )}
-            </View>
+                        return (
+                            <VrCard
+                                item={item as any}
+                                index={index}
+                                width={width}
+                                height={height}
+                            />
+                        );
+                    }}
+                    getItemType={(item, index) => {
+                        return isLoading ? "loader" : "virtual_tour";
+                    }}
+                    horizontal={false}
+                    showsVerticalScrollIndicator={false}
+                    numColumns={2}
+                    keyExtractor={(item, index) =>
+                        isLoading ? `loader-${index}` : item.identifier
+                    }
+                    contentContainerStyle={{}}
+                    removeClippedSubviews={true}
+                    onEndReached={isLoading ? undefined : handleLoadMore}
+                    onEndReachedThreshold={0.7}
+                    ListFooterComponent={isLoading ? undefined : renderFooter}
+                />
+            )}
         </View>
     );
 };
@@ -141,7 +133,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        paddingTop: StatusBar.currentHeight,
     },
     content: {
         flex: 1,

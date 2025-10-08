@@ -1,10 +1,12 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useAuth } from "@/context/AuthContext";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Not memoized ProfileSection component
 const ProfileSection = () => {
     const { user } = useAuth();
+    const insets = useSafeAreaInsets();
 
     const userData = {
         name: user?.name || "",
@@ -29,7 +31,7 @@ const ProfileSection = () => {
     };
 
     return (
-        <View style={styles.profileSection}>
+        <View style={[styles.profileSection, { paddingTop: insets.top + 10 }]}>
             <View style={styles.profileContent}>
                 <View style={[styles.initialsAvatar]}>
                     <Text style={styles.initialsText}>{getInitials()}</Text>
@@ -49,7 +51,7 @@ const styles = StyleSheet.create({
     },
     profileContent: {
         paddingHorizontal: 16,
-        paddingVertical: 20,
+        paddingBottom: 20,
         alignItems: "center",
     },
     profileInfo: {

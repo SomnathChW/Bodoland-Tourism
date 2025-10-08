@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Dimensions, Pressable } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
-import FastImage from "react-native-fast-image";
+import FastImage from "@d11/react-native-fast-image";
 
 type Props = {
     item: {
@@ -21,7 +21,7 @@ const CARD_WIDTH = Math.ceil(width * WIDTH_RATIO);
 const CARD_HEIGHT = Math.ceil(height * HEIGHT_RATIO);
 const TEXT_HEIGHT = Math.ceil(CARD_HEIGHT * 0.25); // Increased from 0.2 to 0.25
 
-const CardVertical = ({ item }: Props) => {
+const CardVertical = React.memo(({ item }: Props) => {
     const router = useRouter();
     return (
         <View style={styles.card}>
@@ -34,7 +34,7 @@ const CardVertical = ({ item }: Props) => {
                     ) {
                         if (item?.tour_resource) {
                             router.navigate({
-                                pathname: "/vr_view_fullscreen",
+                                pathname: "/vr_view",
                                 params: { tour_resource: item.tour_resource },
                             });
                         }
@@ -65,7 +65,7 @@ const CardVertical = ({ item }: Props) => {
             </Pressable>
         </View>
     );
-};
+});
 
 export default CardVertical;
 

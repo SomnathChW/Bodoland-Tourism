@@ -1,0 +1,83 @@
+import { StyleSheet, Text, View, StatusBar } from "react-native";
+import React from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Header from "@/components/UI/PageHeader/Header";
+
+const Feedback = () => {
+    const insets = useSafeAreaInsets();
+
+    return (
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+            <Header
+                headingText="Feedback"
+                subHeadingText="Share your thoughts and suggestions"
+            />
+
+            <View style={styles.pageContent}>
+                <Text style={styles.title}>Feedback</Text>
+                <Text style={styles.description}>
+                    Share your thoughts, suggestions, and experiences to help us
+                    improve.
+                </Text>
+            </View>
+        </View>
+    );
+};
+
+export default Feedback;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#0d1116",
+    },
+    content: {
+        flex: 1,
+        backgroundColor: "transparent",
+    },
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        backgroundColor: "transparent",
+    },
+    logo: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 15,
+    },
+    headingText: {
+        fontSize: 20,
+        fontWeight: "700",
+        color: "white",
+        fontFamily: "SF-Pro-Display-Medium",
+    },
+    mainSubHeaddingText: {
+        fontSize: 14,
+        color: "#8E8E93",
+        fontFamily: "SF-Pro-Display-Medium",
+    },
+    buttons: {
+        color: "white",
+    },
+    pageContent: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: 20,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "white",
+        marginBottom: 10,
+    },
+    description: {
+        fontSize: 16,
+        color: "#8E8E93",
+        textAlign: "center",
+        lineHeight: 24,
+    },
+});

@@ -18,6 +18,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useDataStore } from "@/store/useDataStore";
 import { toast } from "sonner-native";
@@ -34,6 +35,7 @@ const StickyPurchaseButtons: React.FC<StickyPurchaseButtonsProps> = ({
     souvenirIdentifier,
 }) => {
     const insets = useSafeAreaInsets();
+    const router = useRouter();
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const { addToCart } = useDataStore();
 
@@ -79,6 +81,19 @@ const StickyPurchaseButtons: React.FC<StickyPurchaseButtonsProps> = ({
         }
     };
 
+    const handleBuyNow = () => {
+        if (!souvenirIdentifier || !inStock) {
+            toast.error("Item is out of stock");
+            return;
+        }
+
+        // Navigate to checkout with the identifier
+        router.navigate({
+            pathname: "/(protected)/checkout",
+            params: { identifier: souvenirIdentifier },
+        });
+    };
+
     return (
         <View
             style={[
@@ -109,6 +124,7 @@ const StickyPurchaseButtons: React.FC<StickyPurchaseButtonsProps> = ({
                 <TouchableOpacity
                     style={[styles.button, styles.buyNowButton]}
                     disabled={!inStock}
+                    onPress={handleBuyNow}
                 >
                     <Ionicons name="flash-outline" size={20} color="#000" />
                     <Text style={[styles.buttonText, styles.buyNowText]}>

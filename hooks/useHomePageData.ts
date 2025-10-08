@@ -5,6 +5,8 @@ export interface HomePageItem {
     identifier: string;
     name: string;
     image: string;
+    long_description?: string;
+    short_description?: string;
     location?: string;
     tour_resource?: string;
     description?: string;
@@ -29,6 +31,7 @@ export interface HomePageApiResponse {
         featured: HomePageDataSection;
         festivals?: HomePageDataSection;
         cuisines?: HomePageDataSection;
+        districts?: HomePageDataSection;
     };
 }
 
@@ -39,6 +42,7 @@ export interface UseHomePageDataParams {
     featuredLimit?: number;
     festivalsLimit?: number;
     cuisinesLimit?: number;
+    districtsLimit?: number;
     staleTime?: number;
 }
 
@@ -49,6 +53,7 @@ export const useHomePageData = ({
     featuredLimit = 20,
     festivalsLimit = 5,
     cuisinesLimit = 5,
+    districtsLimit = 5,
     staleTime = 30 * 60 * 1000, // 30 minutes
 }: UseHomePageDataParams = {}) => {
     return useQuery<HomePageApiResponse>({
@@ -61,6 +66,7 @@ export const useHomePageData = ({
                 featuredLimit,
                 festivalsLimit,
                 cuisinesLimit,
+                districtsLimit,
             },
         ],
         queryFn: () =>
@@ -71,9 +77,13 @@ export const useHomePageData = ({
                 featuredLimit,
                 festivalsLimit,
                 cuisinesLimit,
+                districtsLimit,
             }),
         staleTime,
         retry: (failureCount) => failureCount < 2,
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+        refetchOnMount: false, // Don't refetch on mount if data is fresh
+        refetchOnWindowFocus: false, // Don't refetch on window focus
+        refetchOnReconnect: true, // Refetch on network reconnect
     });
 };

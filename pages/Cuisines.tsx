@@ -2,24 +2,22 @@ import {
     Text,
     View,
     StyleSheet,
-    StatusBar,
     Dimensions,
     ActivityIndicator,
     TouchableOpacity,
 } from "react-native";
 import React, { useMemo } from "react";
-import { useDrawer } from "@/context/DrawerContext";
-import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
-import CuisineCard from "@/components/CuisineCard";
-import MenuButton from "@/components/UI/MenuButton";
+import CuisineCard from "@/components/UI/ItemCards/CuisineCard";
 import { useAppwriteInfiniteQuery } from "@/hooks/useAppwriteInfiniteQuery";
-import CardLoader from "@/components/CardLoader";
+import CardLoader from "@/components/UI/ItemCards/CardLoader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Header from "@/components/UI/PageHeader/Header";
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("screen");
 
 const Cuisines = () => {
-    const { toggleDrawer } = useDrawer();
+    const insets = useSafeAreaInsets();
 
     const {
         data,
@@ -66,71 +64,64 @@ const Cuisines = () => {
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View>
-                            <Text style={styles.headingText}>Cuisine</Text>
-                            <Text style={styles.mainSubHeaddingText}>
-                                Savor the local flavors
-                            </Text>
-                        </View>
-                    </View>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+            <Header
+                headingText="Cuisines"
+                subHeadingText="Savor the local flavors"
+            />
+            {error ? (
+                // Display error state
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>
+                        Failed to load cuisine data
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.retryButton}
+                        onPress={() => refetch()}
+                    >
+                        <Text style={styles.retryButtonText}>Retry</Text>
+                    </TouchableOpacity>
                 </View>
-                {error ? (
-                    // Display error state
-                    <View style={styles.errorContainer}>
-                        <Text style={styles.errorText}>
-                            Failed to load cuisine data
-                        </Text>
-                        <TouchableOpacity
-                            style={styles.retryButton}
-                            onPress={() => refetch()}
-                        >
-                            <Text style={styles.retryButtonText}>Retry</Text>
-                        </TouchableOpacity>
-                    </View>
-                ) : (
-                    // Single FlashList for both loading and data states
-                    <FlashList
-                        data={isLoading ? Array(10).fill(0) : cuisineData}
-                        renderItem={({ item, index }) => {
-                            if (isLoading) {
-                                return (
-                                    <CardLoader
-                                        index={index}
-                                        width={width}
-                                        height={height}
-                                    />
-                                );
-                            }
-                            //We are sure it will have it everytime as we are ensuring the fields in the query itself thats why we have any
+            ) : (
+                // Single FlashList for both loading and data states
+                <FlashList
+                    data={isLoading ? Array(10).fill(0) : cuisineData}
+                    renderItem={({ item, index }) => {
+                        if (isLoading) {
                             return (
-                                <CuisineCard item={item as any} index={index} />
+                                <CardLoader
+                                    index={index}
+                                    width={width}
+                                    height={height}
+                                />
                             );
-                        }}
-                        horizontal={false}
-                        showsVerticalScrollIndicator={false}
-                        numColumns={2}
-                        estimatedItemSize={300}
-                        keyExtractor={(item, index) =>
-                            isLoading ? `loader-${index}` : item.identifier
                         }
-                        contentContainerStyle={{}}
-                        onEndReached={isLoading ? undefined : handleLoadMore}
-                        onEndReachedThreshold={0.7}
-                        ListFooterComponent={
-                            isLoading ? undefined : renderFooter
-                        }
-                    />
-                )}
-            </View>
+                        //We are sure it will have it everytime as we are ensuring the fields in the query itself thats why we have any
+                        return (
+                            <CuisineCard
+                                item={item as any}
+                                index={index}
+                                width={width}
+                                height={height}
+                            />
+                        );
+                    }}
+                    getItemType={(item, index) => {
+                        return isLoading ? "loader" : "cuisine";
+                    }}
+                    horizontal={false}
+                    showsVerticalScrollIndicator={false}
+                    numColumns={2}
+                    keyExtractor={(item, index) =>
+                        isLoading ? `loader-${index}` : item.identifier
+                    }
+                    contentContainerStyle={{}}
+                    removeClippedSubviews={true}
+                    onEndReached={isLoading ? undefined : handleLoadMore}
+                    onEndReachedThreshold={0.7}
+                    ListFooterComponent={isLoading ? undefined : renderFooter}
+                />
+            )}
         </View>
     );
 };
@@ -141,7 +132,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        paddingTop: StatusBar.currentHeight,
     },
     content: {
         flex: 1,

@@ -1,27 +1,20 @@
-import {
-    Text,
-    View,
-    StyleSheet,
-    StatusBar,
-    Platform,
-    FlatList,
-} from "react-native";
+import { View, StyleSheet, FlatList } from "react-native";
 import { useRouter } from "expo-router";
+import React, { useCallback } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Section from "@/components/UI/Section/Section";
 import QuickLinks from "@/components/UI/QuickLinks/QuickLinksSection";
-import MenuButton from "@/components/UI/MenuButton";
 import CardVertical from "@/components/UI/Section/CardVertical";
 import CardHorizontal from "@/components/UI/Section/CardHorizontal";
 import Carousel from "@/components/UI/Carousel/Carousel";
 import CategoryCard from "@/components/UI/QuickLinks/CategoryCard";
 
-import { districtData } from "@/data/district_data";
-import { categoryData } from "@/data/category_data";
-import { useDrawer } from "@/context/DrawerContext";
+import { categoryItems } from "@/constants/categoryItems";
 import { useHomePageData } from "@/hooks/useHomePageData";
+import Header from "@/components/UI/PageHeader/Header";
 
-type ListItem =
+type HomeItemTypes =
     | {
           type: "carousel";
           id: string;
@@ -30,7 +23,7 @@ type ListItem =
     | {
           type: "quicklinks";
           id: string;
-          data: typeof categoryData;
+          data: typeof categoryItems;
           cardComponent: typeof CategoryCard;
           itemsPerRow: number;
       }
@@ -49,9 +42,8 @@ type ListItem =
 
 const Home = () => {
     const router = useRouter();
-    const { toggleDrawer } = useDrawer();
+    const insets = useSafeAreaInsets();
 
-    // Fetch all home page data from a single endpoint
     const {
         data: homePageResponse,
         isLoading: homePageLoading,
@@ -63,6 +55,7 @@ const Home = () => {
         featuredLimit: 20,
         festivalsLimit: 5,
         cuisinesLimit: 5,
+        districtsLimit: 5,
     });
 
     // Extract data from the response
@@ -72,8 +65,9 @@ const Home = () => {
     const featuredData = homePageResponse?.data?.featured?.items || [];
     const festivalsData = homePageResponse?.data?.festivals?.items || [];
     const cuisinesData = homePageResponse?.data?.cuisines?.items || [];
+    const districtData = homePageResponse?.data?.districts?.items || [];
 
-    const listData: ListItem[] = [
+    const HomeItemsList: HomeItemTypes[] = [
         {
             type: "carousel",
             id: "carousel",
@@ -82,7 +76,7 @@ const Home = () => {
         {
             type: "quicklinks",
             id: "quicklinks",
-            data: categoryData,
+            data: categoryItems,
             cardComponent: CategoryCard,
             itemsPerRow: 5,
         },
@@ -139,78 +133,77 @@ const Home = () => {
         },
     ];
 
-    const renderItem = ({ item }: { item: ListItem }) => {
-        switch (item.type) {
-            case "carousel":
-                return (
-                    <View style={{ paddingBottom: 10 }}>
-                        <Carousel
-                            data={homePageLoading ? [] : item.data}
-                            isLoading={homePageLoading}
+    const renderItem = useCallback(
+        ({ item }: { item: HomeItemTypes }) => {
+            switch (item.type) {
+                case "carousel":
+                    return (
+                        <View style={{ paddingBottom: 10 }}>
+                            <Carousel
+                                data={homePageLoading ? [] : item.data}
+                                isLoading={homePageLoading}
+                            />
+                        </View>
+                    );
+                case "quicklinks":
+                    return (
+                        <QuickLinks
+                            data={item.data}
+                            cardComponent={item.cardComponent}
+                            itemsPerRow={item.itemsPerRow}
                         />
-                    </View>
-                );
-            case "quicklinks":
-                return (
-                    <QuickLinks
-                        data={item.data}
-                        cardComponent={item.cardComponent}
-                        itemsPerRow={item.itemsPerRow}
-                    />
-                );
-            case "section":
-                // Handle all sections with consistent loading state
-                return (
-                    <Section
-                        subHeading={item.subHeading}
-                        data={homePageLoading ? [] : item.data}
-                        cardComponent={item.cardComponent}
-                        viewAll={item.viewAll}
-                        isLoading={homePageLoading}
-                        loadingCardCount={3}
-                    />
-                );
-            default:
-                return null;
-        }
-    };
-    // --- End Render Item Function ---
+                    );
+                case "section":
+                    return (
+                        <Section
+                            subHeading={item.subHeading}
+                            data={homePageLoading ? [] : item.data}
+                            cardComponent={item.cardComponent}
+                            viewAll={item.viewAll}
+                            isLoading={homePageLoading}
+                            loadingCardCount={3}
+                            cardType={
+                                item.cardComponent === CardHorizontal
+                                    ? "horizontal"
+                                    : "vertical"
+                            }
+                        />
+                    );
+                default:
+                    return null;
+            }
+        },
+        [homePageLoading]
+    );
 
     return (
-        <View style={styles.container}>
-            <View style={styles.content}>
-                {/* Header remains the same */}
-                <View style={styles.header}>
-                    <View style={styles.logo}>
-                        <MenuButton
-                            onPress={toggleDrawer}
-                            size={30}
-                            color={styles.buttons.color}
-                        />
-                        <View>
-                            <Text style={styles.headingText}>
-                                Bodoland Tourism
-                            </Text>
-                            <Text style={styles.mainSubHeaddingText}>
-                                Discover a land untouched
-                            </Text>
-                        </View>
-                    </View>
-                </View>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+                {/* Header */}
+                <Header
+                    headingText="Bodoland Tourism"
+                    subHeadingText="Discover a land untouched"
+                />
 
                 {/* FlashList now includes the Carousel */}
                 <View style={{ flex: 1 }}>
                     <FlatList
-                        data={listData}
+                        data={HomeItemsList}
                         renderItem={renderItem}
                         keyExtractor={(item) => item.id}
-                        // estimatedItemSize={300}
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={styles.listContentContainer}
-                        removeClippedSubviews={false}
+                        removeClippedSubviews={true}
+                        windowSize={10}
+                        maxToRenderPerBatch={3}
+                        updateCellsBatchingPeriod={100}
+                        initialNumToRender={3}
+                        getItemLayout={(data, index) => ({
+                            length: 300, // Approximate item height
+                            offset: 300 * index,
+                            index,
+                        })}
                     />
                 </View>
-            </View>
         </View>
     );
 };
@@ -221,7 +214,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0d1116",
-        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     },
     content: {
         flex: 1,

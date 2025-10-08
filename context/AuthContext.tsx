@@ -6,18 +6,15 @@ import {
     useEffect,
     useRef,
 } from "react";
-import * as SystemUI from "expo-system-ui";
 import * as SecureStore from "expo-secure-store";
 import * as WebBrowser from "expo-web-browser";
 import { makeRedirectUri } from "expo-auth-session";
 import { Models } from "react-native-appwrite";
 import { toast } from "sonner-native";
 
-import { account, ID, database, OAuthProvider } from "@/lib/appwrite";
+import { account, ID, tablesdb, OAuthProvider } from "@/lib/appwrite";
 import { useDataStore } from "@/store/useDataStore";
 
-import { mockAccount } from "@/dev_helpers/mockAccount";
-import { Platform } from "react-native";
 import * as Application from "expo-application";
 import * as Network from "expo-network";
 
@@ -36,11 +33,24 @@ const checkInternetConnection = async () => {
     }
 };
 
+// Compare two semantic version strings. Returns 1 if v1 > v2, -1 if v1 < v2, 0 if equal
+function compareSemver(v1: string, v2: string): number {
+    const a = v1.split(".").map(Number);
+    const b = v2.split(".").map(Number);
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+        const n1 = a[i] || 0;
+        const n2 = b[i] || 0;
+        if (n1 > n2) return 1;
+        if (n1 < n2) return -1;
+    }
+    return 0;
+}
+
 const AuthContext = createContext<{
     user: Models.User<{}> | null;
     session: Models.Session | null;
     loading: boolean;
-    isAppCurrentVersion: boolean;
+    isAppVersionGreaterThanRequired: boolean;
     isInternetConnected: boolean;
     isAppReady: boolean;
     signIn: ({
@@ -66,7 +76,7 @@ const AuthContext = createContext<{
     user: null,
     session: null,
     loading: true,
-    isAppCurrentVersion: true,
+    isAppVersionGreaterThanRequired: true,
     isInternetConnected: true,
     isAppReady: false,
     signIn: async () => {},
@@ -82,8 +92,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         null
     );
     const [session, setSession] = useState<Models.Session | null>(null);
-    const [isAppCurrentVersion, setIsAppCurrentVersion] =
-        useState<boolean>(true);
+    const [
+        isAppVersionGreaterThanRequired,
+        setIsAppVersionGreaterThanRequired,
+    ] = useState<boolean>(true);
     const [isInternetConnected, setIsInternetConnected] =
         useState<boolean>(true);
     const [isAppReady, setisAppReady] = useState<boolean>(false);
@@ -95,35 +107,122 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         clearCart();
         await SecureStore.deleteItemAsync("cart");
+        await SecureStore.deleteItemAsync(
+            "lastCheckIsAppVersionGreaterThanRequired"
+        );
     };
 
-    const checkAppVersion = async () => {
-        try {
-            const appwriteVersionDoc = await database.getDocument(
-                process.env.EXPO_PUBLIC_DATABASE_APP_CHECK || "",
-                "version",
-                "version_id"
-            );
-            const appwriteVersion = appwriteVersionDoc.key;
+    const checkAppVersion = async (retryCount = 0) => {
+        const maxRetries = 3;
+        const retryDelay = 2000; // 2 seconds
+        const requestTimeout = 10000; // 10 seconds timeout for each request
+        const cacheKey = "lastCheckIsAppVersionGreaterThanRequired";
+        const cacheExpiryMs = 24 * 60 * 60 * 1000; // 24 hours
 
-            if (appwriteVersion === nativeApplicationVersion) {
-                setIsAppCurrentVersion(true);
+        try {
+            // Create a timeout promise
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(
+                    () => reject(new Error("Request timeout")),
+                    requestTimeout
+                )
+            );
+
+            // Race between the database request and timeout
+            const appwriteVersionDoc = await Promise.race([
+                tablesdb.getRow({
+                    databaseId:
+                        (process.env
+                            .EXPO_PUBLIC_DATABASE_APP_CHECK as string) || "",
+                    tableId: "version",
+                    rowId: "version_id",
+                }),
+                timeoutPromise,
+            ]);
+
+            const appwriteVersion = (appwriteVersionDoc as any).key;
+
+            // Cache the successful version check
+            const appVer =
+                typeof nativeApplicationVersion === "string"
+                    ? nativeApplicationVersion
+                    : "0.0.0";
+            const dbVer =
+                typeof appwriteVersion === "string" ? appwriteVersion : "0.0.0";
+            const isAppVersionGreaterThanRequired =
+                compareSemver(appVer, dbVer) >= 0;
+            const cacheData = {
+                timestamp: Date.now(),
+                serverVersion: appwriteVersion,
+                appVersion: nativeApplicationVersion,
+                isAppVersionGreaterThanRequired:
+                    isAppVersionGreaterThanRequired,
+            };
+            await SecureStore.setItemAsync(cacheKey, JSON.stringify(cacheData));
+
+            if (isAppVersionGreaterThanRequired) {
+                setIsAppVersionGreaterThanRequired(true);
                 return true;
             }
-
-            setIsAppCurrentVersion(false);
+            setIsAppVersionGreaterThanRequired(false);
             return false;
         } catch (error) {
-            // If we can’t reach backend, just return false
-            console.error("Error checking app version:", error);
-            setIsAppCurrentVersion(false);
-            return false;
+            console.error(
+                `Error checking app version (attempt ${retryCount + 1}):`,
+                error
+            );
+
+            // If network error and we haven't exceeded max retries, try again
+            if (retryCount < maxRetries) {
+                console.log(
+                    `Retrying version check in ${retryDelay}ms... (${
+                        retryCount + 1
+                    }/${maxRetries})`
+                );
+                await new Promise((resolve) => setTimeout(resolve, retryDelay));
+                return checkAppVersion(retryCount + 1);
+            }
+
+            // If all retries failed, check cache
+            try {
+                const cachedDataStr = await SecureStore.getItemAsync(cacheKey);
+                if (cachedDataStr) {
+                    const cachedData = JSON.parse(cachedDataStr);
+                    const isExpired =
+                        Date.now() - cachedData.timestamp > cacheExpiryMs;
+
+                    if (
+                        !isExpired &&
+                        cachedData.appVersion === nativeApplicationVersion
+                    ) {
+                        console.log(
+                            "Using cached version check result due to network issues."
+                        );
+                        setIsAppVersionGreaterThanRequired(
+                            cachedData.isAppVersionGreaterThanRequired
+                        );
+                        return cachedData.isAppVersionGreaterThanRequired;
+                    }
+                }
+            } catch (cacheError) {
+                console.error("Error reading version cache:", cacheError);
+            }
+
+            // If all retries failed and no valid cache, assume app is current version (network issue)
+            // This prevents showing update screen due to network problems
+            console.log(
+                "Version check failed after all retries and no valid cache. Assuming current version due to network issues."
+            );
+            setIsAppVersionGreaterThanRequired(true);
+            return true;
         }
     };
 
     const checkUserFromBackend = async () => {
         try {
-            let responseSession = await account.getSession("current");
+            let responseSession = await account.getSession({
+                sessionId: "current",
+            });
 
             // Refresh OAuth tokens on every visit to ensure fresh tokens
             if (
@@ -131,7 +230,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 responseSession.provider !== "email"
             ) {
                 try {
-                    responseSession = await account.updateSession("current");
+                    responseSession = await account.updateSession({
+                        sessionId: "current",
+                    });
                 } catch (refreshError) {
                     console.error(
                         "Failed to refresh OAuth token:",
@@ -144,7 +245,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
 
             const responseUser = await account.get();
-            // const responseUser = await mockAccount.get();
             setLoading(false);
             setSession(responseSession);
             setUser(responseUser);
@@ -158,7 +258,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             //     JSON.stringify(responseSession, null, 2)
             // );
         } catch (error) {
-            await clearLocalData();
             if (
                 error instanceof Error &&
                 "type" in error &&
@@ -166,6 +265,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             ) {
                 // TODO: Check if user was previously logged in and show message accordingly
                 // toast.info("Please SignIn to continue");
+                await clearLocalData();
             } else {
                 toast.error(
                     "Unable to verify session. Please try again later."
@@ -177,10 +277,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        if (Platform.OS === "android") {
-            SystemUI.setBackgroundColorAsync("#0d1116");
-        }
-
         if (!hasInitialized.current) {
             init();
             hasInitialized.current = true;
@@ -198,14 +294,24 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             setisAppReady(true);
             return;
         }
-        // Step 2: check app version
-        const currentVersion = await checkAppVersion();
-        if (!currentVersion) {
-            toast.error("Please update the app to the latest version");
-            setLoading(false);
-            setisAppReady(true);
-            return;
+
+        // Step 2: check app version (with improved error handling)
+        try {
+            const currentVersion = await checkAppVersion();
+            if (!currentVersion) {
+                toast.error("Please update the app to the latest version");
+                setLoading(false);
+                setisAppReady(true);
+                return;
+            }
+        } catch (error) {
+            console.error("Unexpected error during version check:", error);
+            // Don't block the app if version check fails unexpectedly
+            toast.warning(
+                "Unable to verify app version due to network issues. Continuing..."
+            );
         }
+
         // Step 3: if internet + version ok → verify user
         await checkUserFromBackend();
         setisAppReady(true);
@@ -231,16 +337,14 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(true);
 
         try {
-            const responseSession = await account.createEmailPasswordSession(
-                email,
-                password
-            );
-            // const responseSession =
-            //     await mockAccount.createEmailPasswordSession(email, password);
+            const responseSession = await account.createEmailPasswordSession({
+                email: email,
+                password: password,
+            });
+
             const responseUser = await account.get();
-            // const responseUser = await mockAccount.get();
             setUser(responseUser);
-            setSession(responseSession); // setting session here so that the user is already stored
+            setSession(responseSession);
 
             if (!isSignup) {
                 toast.success(successMessage, { id: toast_id });
@@ -273,8 +377,12 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         const toast_id = toast.loading("Signing up...");
         setLoading(true);
         try {
-            await account.create(ID.unique(), email, password, name);
-            // await mockAccount.create(ID.unique(), email, password, name);
+            await account.create({
+                userId: ID.unique(),
+                email: email,
+                password: password,
+                name: name,
+            });
             toast.success("Signed up", { id: toast_id });
         } catch (error) {
             toast.error("Error signing up", { id: toast_id });
@@ -300,11 +408,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             const scheme = `${deepLink.protocol}//`;
 
             // Start OAuth flow - get the login URL
-            const loginUrl = await account.createOAuth2Token(
-                OAuthProvider.Google,
-                `${deepLink}`,
-                `${deepLink}`
-            );
+            const loginUrl = await account.createOAuth2Token({
+                provider: OAuthProvider.Google,
+                success: `${deepLink}`,
+                failure: `${deepLink}`,
+            });
 
             // Open loginUrl and listen for the scheme redirect
             const result = await WebBrowser.openAuthSessionAsync(
@@ -320,10 +428,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
                 if (secret && userId) {
                     // Create session with OAuth credentials
-                    const responseSession = await account.createSession(
-                        userId,
-                        secret
-                    );
+                    const responseSession = await account.createSession({
+                        userId: userId,
+                        secret: secret,
+                    });
                     const responseUser = await account.get();
 
                     // Set user and session BEFORE setting loading to false
@@ -356,8 +464,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         const toast_id = toast.loading("Signing out...");
         setLoading(true);
         try {
-            await account.deleteSession("current");
-            // await mockAccount.deleteSession();
+            await account.deleteSession({ sessionId: "current" });
             await clearLocalData();
 
             toast.success("Signed out", { id: toast_id });
@@ -381,7 +488,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         session,
         loading,
-        isAppCurrentVersion,
+        isAppVersionGreaterThanRequired,
         isInternetConnected,
         isAppReady,
         signIn,

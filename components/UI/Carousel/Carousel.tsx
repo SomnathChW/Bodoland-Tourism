@@ -1,16 +1,19 @@
 import { StyleSheet, View, FlatList, Dimensions } from "react-native";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import CarouselCard from "./CarouselCard";
 import CarouselLoader from "./CarouselLoader";
+import { useFocusEffect } from "expo-router";
 import Animated, {
     useAnimatedScrollHandler,
     useSharedValue,
     useAnimatedStyle,
     withTiming,
-    runOnJS,
     useDerivedValue,
     SharedValue,
+    cancelAnimation,
 } from "react-native-reanimated";
+
+import { scheduleOnRN } from "react-native-worklets";
 
 const AUTO_SCROLL_INTERVAL = 5000; // 5 seconds
 
@@ -38,7 +41,8 @@ const Carousel = React.memo(
         const flatListRef = useRef<FlatList>(null);
         const scrollPosition = useSharedValue(0);
         const progressValue = useSharedValue(0);
-        const intervalRef = useRef<NodeJS.Timeout | null>(null);
+        const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+        const isComponentMounted = useRef(true);
 
         const itemList = data;
 
@@ -57,17 +61,28 @@ const Carousel = React.memo(
         }, [itemList]);
 
         const startProgressAnimation = React.useCallback(() => {
+            if (!isComponentMounted.current) return;
+            cancelAnimation(progressValue);
             progressValue.value = withTiming(1, {
                 duration: AUTO_SCROLL_INTERVAL,
             });
-        }, []);
+        }, [progressValue]);
 
         const resetProgress = React.useCallback(() => {
+            if (!isComponentMounted.current) return;
+            cancelAnimation(progressValue);
             progressValue.value = 0;
-        }, []);
+        }, [progressValue]);
 
         const autoScroll = React.useCallback(() => {
-            if (flatListRef.current && sortedItemList.length > 0) {
+            if (
+                !isComponentMounted.current ||
+                !flatListRef.current ||
+                sortedItemList.length === 0
+            )
+                return;
+
+            try {
                 const nextIndex =
                     (Math.floor(scrollPosition.value) + 1) %
                     sortedItemList.length;
@@ -76,17 +91,26 @@ const Carousel = React.memo(
                     animated: true,
                 });
                 scrollPosition.value = nextIndex;
-                runOnJS(resetProgress)();
-                runOnJS(startProgressAnimation)();
+                scheduleOnRN(resetProgress);
+                scheduleOnRN(startProgressAnimation);
+            } catch (error) {
+                // Handle scroll errors gracefully
+                console.log("Carousel scroll error:", error);
             }
         }, [sortedItemList.length, resetProgress, startProgressAnimation]);
 
         const resetAutoScrollInterval = React.useCallback(() => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
+                intervalRef.current = null;
             }
-            intervalRef.current = setInterval(autoScroll, AUTO_SCROLL_INTERVAL);
-        }, [autoScroll]);
+            if (isComponentMounted.current && sortedItemList.length > 0) {
+                intervalRef.current = setInterval(
+                    autoScroll,
+                    AUTO_SCROLL_INTERVAL
+                );
+            }
+        }, [autoScroll, sortedItemList.length]);
 
         const keyExtractor = React.useCallback(
             (item: CarouselTypes, index: number) => `${item.name}-${index}`,
@@ -104,6 +128,8 @@ const Carousel = React.memo(
 
         const onMomentumScrollEnd = React.useCallback(
             (event: any) => {
+                if (!isComponentMounted.current) return;
+
                 const contentOffsetX = event.nativeEvent.contentOffset.x;
                 const currentIndex = Math.round(contentOffsetX / width);
                 scrollPosition.value = currentIndex;
@@ -115,23 +141,42 @@ const Carousel = React.memo(
             [resetProgress, startProgressAnimation, resetAutoScrollInterval]
         );
 
+        // Handle component focus/blur for better performance
+        useFocusEffect(
+            useCallback(() => {
+                isComponentMounted.current = true;
+                if (sortedItemList.length > 0) {
+                    startProgressAnimation();
+                    resetAutoScrollInterval();
+                }
+
+                return () => {
+                    isComponentMounted.current = false;
+                    if (intervalRef.current) {
+                        clearInterval(intervalRef.current);
+                        intervalRef.current = null;
+                    }
+                    cancelAnimation(progressValue);
+                };
+            }, [
+                sortedItemList.length,
+                startProgressAnimation,
+                resetAutoScrollInterval,
+                progressValue,
+            ])
+        );
+
         useEffect(() => {
-            if (sortedItemList.length > 0) {
-                // Start initial progress animation
-                startProgressAnimation();
-                resetAutoScrollInterval();
-            }
             return () => {
+                // Cleanup on unmount
+                isComponentMounted.current = false;
                 if (intervalRef.current) {
                     clearInterval(intervalRef.current);
+                    intervalRef.current = null;
                 }
+                cancelAnimation(progressValue);
             };
-        }, [
-            sortedItemList,
-            autoScroll,
-            startProgressAnimation,
-            resetAutoScrollInterval,
-        ]);
+        }, [progressValue]);
 
         const renderItem = React.useCallback(
             ({ item, index }: { item: CarouselTypes; index: number }) => (
@@ -163,6 +208,10 @@ const Carousel = React.memo(
                     initialScrollIndex={0}
                     getItemLayout={getItemLayout}
                     onMomentumScrollEnd={onMomentumScrollEnd}
+                    windowSize={3}
+                    maxToRenderPerBatch={1}
+                    updateCellsBatchingPeriod={100}
+                    scrollEventThrottle={16}
                 />
 
                 {/* Dot Indicators */}
@@ -211,7 +260,7 @@ const DotIndicator = React.memo(
 
         const containerStyle = useAnimatedStyle(() => {
             return {
-                width: isCurrentActive.value ? 20 : 4,
+                width: isCurrentActive.value ? 60 : 4,
                 backgroundColor: isCurrentActive.value
                     ? "rgba(255, 255, 255, 0.3)"
                     : "rgba(255, 255, 255, 0.5)",
