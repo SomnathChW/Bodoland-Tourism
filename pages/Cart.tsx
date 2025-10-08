@@ -12,8 +12,9 @@ import { Ionicons } from "@expo/vector-icons";
 import MenuButton from "@/components/UI/PageHeader/MenuButton";
 import { useDataStore } from "@/store/useDataStore";
 import * as SecureStore from "expo-secure-store";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import Header from "@/components/UI/PageHeader/Header";
+import { useCallback } from "react";
 
 const Cart = () => {
     const { toggleDrawer } = useDrawer();
@@ -21,10 +22,12 @@ const Cart = () => {
     const { cart, removeFromCart, clearCart } = useDataStore();
     const [secureStoreCart, setSecureStoreCart] = useState<string[]>([]);
 
-    // Load cart from secure store on component mount
-    useEffect(() => {
-        loadCartFromSecureStore();
-    }, []);
+    // Load cart from secure store on component mount and when screen is focused
+    useFocusEffect(
+        useCallback(() => {
+            loadCartFromSecureStore();
+        }, [])
+    );
 
     const loadCartFromSecureStore = async () => {
         try {
@@ -118,7 +121,9 @@ const Cart = () => {
         <View style={[styles.container, { paddingTop: insets.top }]}>
             <Header
                 headingText="Cart"
-                subHeadingText={`${allCartItems.length} ${allCartItems.length === 1 ? "item" : "items"} in your cart`}
+                subHeadingText={`${allCartItems.length} ${
+                    allCartItems.length === 1 ? "item" : "items"
+                } in your cart`}
                 clearCart={allCartItems.length > 0}
                 handleClearCart={handleClearCart}
             />

@@ -73,6 +73,12 @@
                     }
                 }
             ],
+            [
+                "expo-image-picker",
+                {
+                    "photosPermission": "The app accesses your photos to let you share bugs with the Team, If you do not want to share photos, you can deny this permission without any issues with the app functionality."
+                }
+            ],
             "@reactvision/react-viro",
             "expo-font",
             "expo-web-browser"

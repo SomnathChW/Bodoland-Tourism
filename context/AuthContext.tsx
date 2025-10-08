@@ -50,6 +50,7 @@ const AuthContext = createContext<{
     user: Models.User<{}> | null;
     session: Models.Session | null;
     loading: boolean;
+    appVersion: string | null;
     isAppVersionGreaterThanRequired: boolean;
     isInternetConnected: boolean;
     isAppReady: boolean;
@@ -76,6 +77,7 @@ const AuthContext = createContext<{
     user: null,
     session: null,
     loading: true,
+    appVersion: nativeApplicationVersion || null,
     isAppVersionGreaterThanRequired: true,
     isInternetConnected: true,
     isAppReady: false,
@@ -100,13 +102,16 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         useState<boolean>(true);
     const [isAppReady, setisAppReady] = useState<boolean>(false);
     const hasInitialized = useRef(false);
-    const { clearCart } = useDataStore();
+    const { clearCart, clearOrders } = useDataStore();
+    const appVersion = nativeApplicationVersion || null;
 
     const clearLocalData = async () => {
         setSession(null);
         setUser(null);
         clearCart();
+        clearOrders();
         await SecureStore.deleteItemAsync("cart");
+        await SecureStore.deleteItemAsync("orders");
         await SecureStore.deleteItemAsync(
             "lastCheckIsAppVersionGreaterThanRequired"
         );
@@ -488,6 +493,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         session,
         loading,
+        appVersion,
         isAppVersionGreaterThanRequired,
         isInternetConnected,
         isAppReady,

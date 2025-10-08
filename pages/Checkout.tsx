@@ -9,12 +9,21 @@ import {
     ScrollView,
     Image,
 } from "react-native";
-import React, { useState } from "react";
-import { useLocalSearchParams } from "expo-router";
+import React, { useState, useEffect } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { toast } from "sonner-native";
 import Header from "@/components/UI/PageHeader/Header";
+import { useDataStore } from "@/store/useDataStore";
+import * as SecureStore from "expo-secure-store";
+
+interface CheckoutItem {
+    identifier: string;
+    name?: string;
+    price?: number;
+    image?: string;
+}
 
 interface CheckoutProps {
     item_identifiers?: string[];
@@ -23,28 +32,50 @@ interface CheckoutProps {
 const Checkout = ({ item_identifiers }: CheckoutProps) => {
     const params = useLocalSearchParams();
     const insets = useSafeAreaInsets();
+    const router = useRouter();
+    const { addOrder, removeFromCart, souvenirs } = useDataStore();
 
     // Get identifier from URL params or use prop
     const identifier = params?.identifier as string;
     const identifiers = params?.identifiers as string;
 
     // Parse identifiers and create checkout items with quantities
-    let itemsToCheckout: string[] = [];
+    let itemIdentifiers: string[] = [];
     if (identifiers) {
-        itemsToCheckout = identifiers.split(",");
+        itemIdentifiers = identifiers.split(",");
     } else if (identifier) {
-        itemsToCheckout = [identifier];
+        itemIdentifiers = [identifier];
     } else {
-        itemsToCheckout = item_identifiers || [];
+        itemIdentifiers = item_identifiers || [];
     }
+
+    // Map identifiers to full item data
+    const [itemsToCheckout, setItemsToCheckout] = useState<CheckoutItem[]>([]);
+
+    useEffect(() => {
+        const items = itemIdentifiers.map((id) => {
+            const souvenirData = souvenirs.find((s) => s.identifier === id);
+            return {
+                identifier: id,
+                name: souvenirData?.name || id,
+                price: souvenirData?.price
+                    ? parseFloat(souvenirData.price)
+                    : 299,
+                image:
+                    souvenirData?.image ||
+                    `https://picsum.photos/seed/${id}/60/60`,
+            };
+        });
+        setItemsToCheckout(items);
+    }, [itemIdentifiers.join(","), souvenirs]);
 
     // State for item quantities and selection
     const [itemQuantities, setItemQuantities] = useState<{
         [key: string]: number;
-    }>(itemsToCheckout.reduce((acc, item) => ({ ...acc, [item]: 1 }), {}));
+    }>(itemIdentifiers.reduce((acc, item) => ({ ...acc, [item]: 1 }), {}));
     const [selectedItems, setSelectedItems] = useState<{
         [key: string]: boolean;
-    }>(itemsToCheckout.reduce((acc, item) => ({ ...acc, [item]: true }), {}));
+    }>(itemIdentifiers.reduce((acc, item) => ({ ...acc, [item]: true }), {}));
 
     // Shipping form state
     const [shippingInfo, setShippingInfo] = useState({
@@ -92,10 +123,10 @@ const Checkout = ({ item_identifiers }: CheckoutProps) => {
     };
 
     const getSelectedItems = () => {
-        return itemsToCheckout.filter((item) => selectedItems[item]);
+        return itemsToCheckout.filter((item) => selectedItems[item.identifier]);
     };
 
-    const handleCompleteOrder = () => {
+    const handleCompleteOrder = async () => {
         const selectedItemsList = getSelectedItems();
 
         // Check if at least one item is selected
@@ -116,25 +147,95 @@ const Checkout = ({ item_identifiers }: CheckoutProps) => {
             return;
         }
 
-        // Process order logic here
-        console.log("Completing order for:", selectedItemsList);
-        console.log("Item quantities:", itemQuantities);
-        console.log("Shipping info:", shippingInfo);
-        toast.success("Order placed successfully!");
-        // Navigate to order confirmation or success page
+        // Create order object
+        const order = {
+            id: `ORDER-${Date.now()}`,
+            items: selectedItemsList.map((item) => ({
+                identifier: item.identifier,
+                name: item.name,
+                quantity: itemQuantities[item.identifier] || 1,
+                price: item.price || 299,
+                image: item.image,
+            })),
+            shippingInfo: {
+                ...shippingInfo,
+            },
+            paymentMethod: "Cash on Delivery",
+            status: "Pending",
+            createdAt: new Date().toISOString(),
+            totalAmount: selectedItemsList.reduce(
+                (total, item) =>
+                    total +
+                    (itemQuantities[item.identifier] || 1) *
+                        (item.price || 299),
+                0
+            ),
+        };
+
+        try {
+            // Save order to store
+            addOrder(order);
+
+            // Save to SecureStore
+            const existingOrdersString = await SecureStore.getItemAsync(
+                "orders"
+            );
+            const existingOrders = existingOrdersString
+                ? JSON.parse(existingOrdersString)
+                : [];
+            existingOrders.push(order);
+            await SecureStore.setItemAsync(
+                "orders",
+                JSON.stringify(existingOrders)
+            );
+
+            // Remove ordered items from cart
+            selectedItemsList.forEach((item) => {
+                removeFromCart(item.identifier);
+            });
+
+            // Update cart in SecureStore
+            const cartString = await SecureStore.getItemAsync("cart");
+            if (cartString) {
+                const cartArray = JSON.parse(cartString);
+                const updatedCart = cartArray.filter(
+                    (id: string) =>
+                        !selectedItemsList.some(
+                            (item) => item.identifier === id
+                        )
+                );
+                await SecureStore.setItemAsync(
+                    "cart",
+                    JSON.stringify(updatedCart)
+                );
+            }
+
+            console.log("Order created:", order);
+            toast.success("Order placed successfully!");
+
+            // Navigate back to cart or home
+            if (router.canGoBack()) {
+                router.back();
+            } else {
+                router.replace("/(protected)/(tabs)");
+            }
+        } catch (error) {
+            console.error("Error placing order:", error);
+            toast.error("Failed to place order. Please try again.");
+        }
     };
 
     const renderCheckoutItem = ({
         item,
         index,
     }: {
-        item: string;
+        item: CheckoutItem;
         index: number;
     }) => (
         <View
             style={[
                 styles.checkoutItem,
-                !selectedItems[item] && styles.checkoutItemDisabled,
+                !selectedItems[item.identifier] && styles.checkoutItemDisabled,
             ]}
         >
             <View style={styles.itemMainRow}>
@@ -142,22 +243,24 @@ const Checkout = ({ item_identifiers }: CheckoutProps) => {
                 <View style={styles.imageContainer}>
                     <Image
                         source={{
-                            uri: `https://picsum.photos/seed/${item}/60/60`,
+                            uri: item.image,
                         }}
                         style={styles.productImage}
                     />
                     <TouchableOpacity
                         style={styles.checkmarkOverlay}
-                        onPress={() => toggleItemSelection(item)}
+                        onPress={() => toggleItemSelection(item.identifier)}
                     >
                         <Ionicons
                             name={
-                                selectedItems[item]
+                                selectedItems[item.identifier]
                                     ? "checkmark-circle"
                                     : "ellipse-outline"
                             }
                             size={18}
-                            color={selectedItems[item] ? "#fff" : "#666"}
+                            color={
+                                selectedItems[item.identifier] ? "#fff" : "#666"
+                            }
                         />
                     </TouchableOpacity>
                 </View>
@@ -167,29 +270,31 @@ const Checkout = ({ item_identifiers }: CheckoutProps) => {
                     <Text
                         style={[
                             styles.productTitle,
-                            !selectedItems[item] && styles.productTitleDisabled,
+                            !selectedItems[item.identifier] &&
+                                styles.productTitleDisabled,
                         ]}
                     >
-                        {item}
+                        {item.name}
                     </Text>
-                    <Text style={styles.productPrice}>₹299</Text>
+                    <Text style={styles.productPrice}>₹{item.price}</Text>
                 </View>
 
                 {/* Quantity Controls */}
                 <View style={styles.quantityControls}>
                     <TouchableOpacity
                         style={styles.quantityButton}
-                        onPress={() => decreaseQuantity(item)}
+                        onPress={() => decreaseQuantity(item.identifier)}
                         disabled={
-                            !selectedItems[item] || itemQuantities[item] <= 1
+                            !selectedItems[item.identifier] ||
+                            itemQuantities[item.identifier] <= 1
                         }
                     >
                         <Ionicons
                             name="remove"
                             size={14}
                             color={
-                                !selectedItems[item] ||
-                                itemQuantities[item] <= 1
+                                !selectedItems[item.identifier] ||
+                                itemQuantities[item.identifier] <= 1
                                     ? "#666"
                                     : "#000"
                             }
@@ -199,25 +304,27 @@ const Checkout = ({ item_identifiers }: CheckoutProps) => {
                     <Text
                         style={[
                             styles.quantityText,
-                            !selectedItems[item] && styles.quantityTextDisabled,
+                            !selectedItems[item.identifier] &&
+                                styles.quantityTextDisabled,
                         ]}
                     >
-                        {itemQuantities[item] || 1}
+                        {itemQuantities[item.identifier] || 1}
                     </Text>
 
                     <TouchableOpacity
                         style={styles.quantityButton}
-                        onPress={() => increaseQuantity(item)}
+                        onPress={() => increaseQuantity(item.identifier)}
                         disabled={
-                            !selectedItems[item] || itemQuantities[item] >= 5
+                            !selectedItems[item.identifier] ||
+                            itemQuantities[item.identifier] >= 5
                         }
                     >
                         <Ionicons
                             name="add"
                             size={14}
                             color={
-                                !selectedItems[item] ||
-                                itemQuantities[item] >= 5
+                                !selectedItems[item.identifier] ||
+                                itemQuantities[item.identifier] >= 5
                                     ? "#666"
                                     : "#000"
                             }

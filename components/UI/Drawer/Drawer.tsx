@@ -38,7 +38,7 @@ const DRAWER_WIDTH: number = width * 0.65;
 
 function DrawerComponent(): JSX.Element {
     const { isDrawerOpen, toggleDrawer, currentPath } = useDrawer();
-    const { signOut } = useAuth();
+    const { signOut, appVersion } = useAuth();
     const drawerProgress = useSharedValue(0);
     const router = useRouter();
     const renderIcon = useIconRenderer();
@@ -270,6 +270,11 @@ function DrawerComponent(): JSX.Element {
                             onPress={handleFooterItemPress}
                         />
                     ))}
+                    <View style={styles.versionContainer}>
+                        <Text style={styles.versionText}>
+                            Version {appVersion || "Error!"}
+                        </Text>
+                    </View>
                 </View>
             </Animated.View>
 
@@ -337,6 +342,16 @@ const styles = StyleSheet.create({
         borderTopWidth: 2,
         borderTopColor: "#a0a0a0",
         padding: 12,
+    },
+    versionContainer: {
+        paddingTop: 4,
+        paddingHorizontal: 4,
+        alignItems: "center",
+    },
+    versionText: {
+        fontSize: 11,
+        color: "#646f7e",
+        fontFamily: "SfProMedium",
     },
     sectionHeader: {
         paddingVertical: 12,

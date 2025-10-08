@@ -11,6 +11,7 @@ export type State = {
     souvenirs: any[];
     extras: any[];
     cart: any[];
+    orders: any[];
 };
 
 export type Actions = {
@@ -20,6 +21,8 @@ export type Actions = {
     addToCart: (identifier: string) => void;
     removeFromCart: (identifier: string) => void;
     clearCart: () => void;
+    addOrder: (order: any) => void;
+    clearOrders: () => void;
 };
 
 export const useDataStore = create<State & Actions>((set) => ({
@@ -33,6 +36,7 @@ export const useDataStore = create<State & Actions>((set) => ({
     souvenirs: [],
     extras: [],
     cart: [],
+    orders: [],
 
     setData: (data) => set((state) => ({ ...state, ...data })),
 
@@ -125,5 +129,15 @@ export const useDataStore = create<State & Actions>((set) => ({
     clearCart: () =>
         set((state) => ({
             cart: [],
+        })),
+
+    addOrder: (order) =>
+        set((state) => ({
+            orders: [...state.orders, order],
+        })),
+
+    clearOrders: () =>
+        set((state) => ({
+            orders: [],
         })),
 }));
