@@ -229,23 +229,54 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 sessionId: "current",
             });
 
-            // Refresh OAuth tokens on every visit to ensure fresh tokens
+            // Refresh OAuth tokens only when the access token is expired or about to expire
             if (
                 responseSession.provider &&
                 responseSession.provider !== "email"
             ) {
-                try {
-                    responseSession = await account.updateSession({
-                        sessionId: "current",
-                    });
-                } catch (refreshError) {
-                    console.error(
-                        "Failed to refresh OAuth token:",
-                        refreshError
-                    );
-                    await signOut();
-                    toast.error("Session expired. Please sign in again.");
-                    return;
+                const expiryStr = responseSession.providerAccessTokenExpiry;
+                const isExpiredOrExpiringSoon =
+                    !expiryStr ||
+                    new Date(expiryStr).getTime() - Date.now() < 5 * 60 * 1000; // 5-min buffer
+
+                if (isExpiredOrExpiringSoon) {
+                    try {
+                        responseSession = await account.updateSession({
+                            sessionId: "current",
+                        });
+                    } catch (refreshError: any) {
+                        // If the provider didn't issue a refresh token (e.g. Google without
+                        // offline access), updateSession will fail with
+                        // "Missing required parameter: refresh_token".
+                        // In that case the existing Appwrite session is still valid — keep
+                        // the user signed in and continue.
+                        const isMissingRefreshToken =
+                            refreshError?.message
+                                ?.toLowerCase()
+                                .includes("refresh_token") ||
+                            refreshError?.type
+                                ?.toLowerCase()
+                                .includes("refresh_token");
+
+                        if (isMissingRefreshToken) {
+                            console.warn(
+                                "OAuth provider did not supply a refresh_token — " +
+                                    "continuing with existing Appwrite session.",
+                                refreshError
+                            );
+                            // Session is still valid; do not sign out the user.
+                        } else {
+                            // For any other refresh error (e.g. session truly revoked),
+                            // sign the user out so they can re-authenticate cleanly.
+                            console.error(
+                                "Failed to refresh OAuth token:",
+                                refreshError
+                            );
+                            await signOut();
+                            toast.error("Session expired. Please sign in again.");
+                            return;
+                        }
+                    }
                 }
             }
 
@@ -262,21 +293,30 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             //     "Session details:",
             //     JSON.stringify(responseSession, null, 2)
             // );
-        } catch (error) {
-            if (
-                error instanceof Error &&
-                "type" in error &&
-                (error as any).type.includes("general_unauthorized_scope")
+        } catch (error: any) {
+            const errorType: string = error?.type ?? "";
+            const errorCode: number = error?.code ?? 0;
+
+            if (errorType.includes("general_unauthorized_scope") || errorCode === 401) {
+                // No active session — user was never logged in or Appwrite session expired.
+                // Only show a toast if we had a session stored (i.e. user WAS logged in).
+                if (session) {
+                    await clearLocalData();
+                    toast.info("Your session has expired. Please sign in again.");
+                } else {
+                    // Cold start with no prior session — stay silent.
+                    await clearLocalData();
+                }
+            } else if (
+                errorType.includes("general_rate_limit_exceeded") ||
+                errorCode === 429
             ) {
-                // TODO: Check if user was previously logged in and show message accordingly
-                // toast.info("Please SignIn to continue");
-                await clearLocalData();
+                toast.error("Too many requests. Please wait a moment and try again.");
             } else {
-                toast.error(
-                    "Unable to verify session. Please try again later."
-                );
+                // Network error, server error, or unexpected exception.
+                // Don't sign the user out — they may just have a bad connection.
+                toast.error("Unable to verify session. Please check your connection.");
             }
-            // Only set loading to false if we haven't already done so in the try block
             setLoading(false);
         }
     };
